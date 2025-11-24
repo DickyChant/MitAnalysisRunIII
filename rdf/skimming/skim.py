@@ -126,6 +126,9 @@ if __name__ == "__main__":
     sampleToSkim = linesSamplesFile[whichSample].strip()
     print("Sample to skim: {0}".format(sampleToSkim))
 
+    with open("sample_name.txt", "w") as f:
+        f.write(sampleToSkim)
+
     year = -1
     isSkimData = -1
     if("Run2018" in sampleToSkim):

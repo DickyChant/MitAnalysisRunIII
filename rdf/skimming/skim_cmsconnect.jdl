@@ -1,0 +1,64 @@
+# Condor JDL file for CMS Connect skimming jobs
+# This JDL is tailored for CMS Connect infrastructure
+# Usage: condor_submit skim_cmsconnect.jdl
+
+# Basic job description
+Universe = vanilla
+Executable = skim_cmsconnect.sh
+
+# Job arguments - these will be set per job
+# Format: <whichSample> <whichJob> <group> <inputSamplesCfg> <inputFilesCfg> [outputDir]
+Arguments = $(whichSample) $(whichJob) $(group) $(inputSamplesCfg) $(inputFilesCfg) $(outputDir)
+
+# Resource requirements
+RequestMemory = 6000
+RequestCpus = 1
+RequestDisk = 2000000  # 2GB in KB
+
+# File transfer settings
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files = skim_cmsconnect.sh,skim.tgz
+transfer_output_files = ""
+
+# Logging
+Log = logs/skim_cmsconnect_$(whichSample)_$(whichJob).log
+Output = logs/skim_cmsconnect_$(whichSample)_$(whichJob).out
+Error = logs/skim_cmsconnect_$(whichSample)_$(whichJob).error
+
+# VOMS proxy for xrootd access
+use_x509userproxy = True
+x509userproxy = /tmp/x509up_u$(uid)
+
+# CMS Connect specific requirements
+# These can be adjusted based on CMS Connect's infrastructure
+Requirements = (OpSysAndVer =?= "CentOS7") || (OpSysAndVer =?= "AlmaLinux9") || (OpSysAndVer =?= "EL9")
+
+# Preferred sites for CMS Connect (adjust as needed)
++DESIRED_Sites = "T2_CH_CERN,T2_US_MIT,T2_US_Caltech,T2_US_Florida,T2_US_Nebraska,T2_US_Purdue,T2_US_UCSD,T2_US_Wisconsin"
+
+# Job environment
++WantIOProxy = true
++WNTag = "el9"
+
+# Job priority (adjust as needed)
+Priority = 10
+
+# Retry settings
+MaxRetries = 3
++RetryJob = true
+
+# Job accounting
++AccountingGroup = "analysis.$(user)"
++JobBatchName = "skim_cmsconnect"
+
+# Environment variables
+Environment = "SCRAM_ARCH=el9_amd64_gcc12"
+
+# Job description
++JobDescription = "CMS Connect skimming job for sample $(whichSample), job $(whichJob)"
+
+# Queue statement - this will be replaced by the submission script
+# For a single job, use: Queue
+# For multiple jobs, use: Queue whichSample whichJob group inputSamplesCfg inputFilesCfg outputDir from job_list.txt
+
