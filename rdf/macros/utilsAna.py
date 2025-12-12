@@ -177,9 +177,9 @@ def concatenate(result, tmp1):
     for f in tmp1:
         result.push_back(f)
 
-def getMClist(sampleNOW, skimType):
+def getMClist(sampleNOW, skimType, year=None):
 
-    files = findDIR("{}".format(SwitchSample(sampleNOW, skimType)[0]))
+    files = findDIR("{}".format(SwitchSample(sampleNOW, skimType, year)[0]))
     return files
 
 def getDATAlist(type, year, skimType):
@@ -189,6 +189,16 @@ def getDATAlist(type, year, skimType):
     #dirT2 = "/mnt/T2_US_MIT/hadoop/cms/store/user/paus/nanohr/D00/"
     #dirT2 = "/mnt/T3_US_MIT/hadoop/scratch/ceballos/nanoaod/skims_submit/" + skimType
     dirT2 = "/ceph/submit/data/group/cms/store/user/ceballos/nanoaod/skims_submit/" + skimType
+
+    if year == 2022:
+        dirT2 = "/home/scratch/stqian/wz_guillermo_2022a_2022b_2022d_2023a/skims_2022d/" + skimType
+    elif year == 2023:
+        dirT2 = "/home/scratch/stqian/wz_guillermo/skims_2023d/" + skimType
+    elif year == 2024:
+        dirT2 = "/home/scratch/stqian/wz_guillermo/skims_2024d/" + skimType
+    elif year == 2025:
+        dirT2 = "/home/scratch/stqian/wz_guillermo/skims_2025d/" + skimType
+
     dirTest = "/ceph/submit/data/group/cms/store/user/ceballos/test/test/"
 
     jsnName = ""
@@ -796,10 +806,50 @@ def getDATAlist(type, year, skimType):
 
     return files
 
-def SwitchSample(argument, skimType):
+def SwitchSample(argument, skimType, year=None):
 
-    #dirT2 = "/scratch/submit/cms/ceballos/nanoaod/skims_submit/" + skimType
-    dirT2 = "/ceph/submit/data/group/cms/store/user/ceballos/nanoaod/skims_submit/" + skimType
+    # Normalize year format (handle era format like 20220, 20221, etc.)
+
+    
+    # Year-dependent base directory
+    # You can customize this based on year (aligned with getDATAlist)
+    if year is not None:
+        # # Example: year-specific paths
+        # # Uncomment and modify these to use year-dependent paths:
+        # # if year == 2022:
+        # #     dirT2 = "/path/to/2022/skims/" + skimType
+        # # elif year == 2023:
+        # #     dirT2 = "/path/to/2023/skims/" + skimType
+        # # elif year == 2024:
+        # #     dirT2 = "/path/to/2024/skims/" + skimType
+        # # else:
+        # #     dirT2 = "/ceph/submit/data/group/cms/store/user/ceballos/nanoaod/skims_submit/" + skimType
+        
+        # # Default: use same path structure as getDATAlist for consistency
+        # # This ensures MC and data samples use the same base directory structure
+        # dirT2 = "/ceph/submit/data/group/cms/store/user/ceballos/nanoaod/skims_submit/" + skimType
+        if year == 20220:
+            dirT2 = "/home/scratch/stqian/wz_guillermo_2022a_2022b_2022d_2023a/skims_2022a/" + skimType
+        elif year == 20221:
+            dirT2 = "/home/scratch/stqian/wz_guillermo_2022a_2022b_2022d_2023a/skims_2022b/" + skimType
+        elif year == 20230:
+            dirT2 = "/home/scratch/stqian/wz_guillermo_2022a_2022b_2022d_2023a/skims_2023a/" + skimType
+        elif year == 20231:
+            dirT2 = "/home/scratch/stqian/wz_guillermo/skims_2023b/" + skimType
+        elif year == 20240:
+            dirT2 = "/home/scratch/stqian/wz_guillermo/skims_2024a/" + skimType
+        elif year == 20241:
+            dirT2 = "/home/scratch/stqian/wz_guillermo/skims_2024b/" + skimType
+    else:
+        # Default path when year not specified (backward compatibility)
+        #dirT2 = "/scratch/submit/cms/ceballos/nanoaod/skims_submit/" + skimType
+        dirT2 = "/ceph/submit/data/group/cms/store/user/ceballos/nanoaod/skims_submit/" + skimType
+
+    if year is not None and year > 10000:
+        year = year // 10
+    print("year: ", year)
+    print("dirT2: ", dirT2)
+    
     dirLocal = "/work/submit/mariadlf/Hrare/D01"
 
     ggWWXS_LO_MCFM = 0.0496265/(0.1086*0.1086)

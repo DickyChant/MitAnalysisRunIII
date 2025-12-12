@@ -114,6 +114,8 @@ echo ""
 # Create logs directory
 mkdir -p logs
 
+mkdir ${YEAR}
+
 # Create output directories structure
 echo "Creating output directory structure..."
 mkdir -p "${OUTPUT_BASE_DIR}"
@@ -155,7 +157,8 @@ RequestDisk = DiskUsage
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 # transfer_output_files = 1l/${sampleName}/output_1l_${whichSample}_${whichJob}.root, 2l/${sampleName}/output_2l_${whichSample}_${whichJob}.root, 3l/${sampleName}/output_3l_${whichSample}_${whichJob}.root, met/${sampleName}/output_met_${whichSample}_${whichJob}.root
-transfer_output_files = 1l, 2l, 3l, met, pho
+transfer_output_files = 1l, 2l, /3l, met, pho
+transfer_output_remaps = 1l=${YEAR}/1l; 2l=${YEAR}/2l; 3l=${YEAR}/3l; met=${YEAR}/met; pho=${YEAR}/pho
 Log    = logs/simple_skim_${whichSample}_${whichJob}.log
 Output = logs/simple_skim_${whichSample}_${whichJob}.out
 Error  = logs/simple_skim_${whichSample}_${whichJob}.error
