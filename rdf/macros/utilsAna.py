@@ -1,5 +1,5 @@
 import ROOT
-import os, json, sys
+import os, json, sys, fnmatch
 from utilsCategory import plotCategory
 from subprocess import call,check_output
 #from correctionlib import _core
@@ -9,6 +9,106 @@ correctionlib.register_pyroot_binding()
 #ROOT.gInterpreter.Load("mysf.so")
 
 useXROOTD = False
+
+# CMS Connect mode: resolve local paths to accessible paths for remote Condor jobs
+# Set via environment variable CMS_CONNECT_MODE=1 or in code
+CMS_CONNECT_MODE = os.environ.get('CMS_CONNECT_MODE', '0') == '1'
+CMS_CONNECT_FILES_TRANSFERRED = os.environ.get('CMS_CONNECT_FILES_TRANSFERRED', '0') == '1'
+
+# File path mapping for transferred files (loaded on demand)
+_file_path_mapping = None
+
+def loadFileMapping():
+    """Load file path mapping for transferred files."""
+    global _file_path_mapping
+    if _file_path_mapping is not None:
+        return _file_path_mapping
+    
+    _file_path_mapping = {}
+    mappingFile = os.environ.get('CMS_CONNECT_FILE_MAPPING', 'file_path_mapping.txt')
+    
+    if os.path.exists(mappingFile):
+        try:
+            with open(mappingFile, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and '\t' in line:
+                        orig, trans = line.split('\t', 1)
+                        _file_path_mapping[orig] = trans
+            print(f"Loaded {len(_file_path_mapping)} file path mappings from {mappingFile}")
+        except Exception as e:
+            print(f"Error loading file mapping: {e}")
+    
+    return _file_path_mapping
+
+def resolvePathForRemote(localPath):
+    """
+    Resolve local file paths to accessible paths for remote Condor jobs on CMS Connect.
+    
+    This function converts local paths (like /home/scratch/...) to paths accessible
+    from remote worker nodes. Options include:
+    1. xrootd URLs (if files are accessible via xrootd)
+    2. Network paths (if accessible via shared filesystem)
+    3. Keep original path if already accessible
+    
+    Args:
+        localPath: Local file or directory path
+        
+    Returns:
+        Resolved path accessible from remote nodes
+    """
+    # First check if files were transferred and use mapping
+    if CMS_CONNECT_FILES_TRANSFERRED:
+        mapping = loadFileMapping()
+        if localPath in mapping:
+            mappedPath = mapping[localPath]
+            if os.path.exists(mappedPath):
+                return mappedPath
+            # Try to find file by basename in transferred_data
+            filename = os.path.basename(localPath)
+            transferredDir = os.environ.get('CMS_CONNECT_DATA_DIR', 'transferred_data')
+            candidatePath = os.path.join(transferredDir, filename)
+            if os.path.exists(candidatePath):
+                return candidatePath
+    
+    if not CMS_CONNECT_MODE:
+        return localPath
+    
+    # If path is already an xrootd URL, return as-is
+    if localPath.startswith('root://'):
+        return localPath
+    
+    # Map local paths to accessible paths
+    # Common patterns for CMS Connect:
+    
+    # MIT T2/T3 paths - convert to xrootd if available
+    if '/mnt/T2_US_MIT/' in localPath or '/mnt/T3_US_MIT/' in localPath:
+        # Convert to xrootd URL
+        if '/mnt/T2_US_MIT/' in localPath:
+            xrdPath = localPath.replace('/mnt/T2_US_MIT/', '')
+            return f'root://t2serv007.mit.edu/{xrdPath}'
+        elif '/mnt/T3_US_MIT/' in localPath:
+            xrdPath = localPath.replace('/mnt/T3_US_MIT/', '')
+            return f'root://t3serv017.mit.edu/{xrdPath}'
+    
+    # Ceph submit paths - may be accessible via xrootd
+    if '/ceph/submit/data/group/cms' in localPath:
+        xrdPath = localPath.replace('/ceph/submit/data/group/cms', '')
+        return f'root://submit50.mit.edu{xrdPath}'
+    
+    # Home/scratch paths - these typically need special handling
+    # For CMS Connect, these may need to be:
+    # 1. Converted to xrootd if available
+    # 2. Or kept as-is if accessible via network mount
+    # 3. Or files need to be transferred (handled separately)
+    if '/home/scratch/' in localPath:
+        # Try to find if there's an xrootd equivalent
+        # For now, return as-is and let findDIR handle it
+        # In practice, you may need to configure this based on your setup
+        return localPath
+    
+    # Default: return as-is (may work if accessible via network mount)
+    return localPath
 
 def getLumi(year):
     lumi = [36.1, 41.5, 60.0, 8.1, 26.7, 18.1, 9.7, 108.5, 81.5]
@@ -96,7 +196,13 @@ def findDataset(name):
 
 def findDIR(directory):
 
-    print(directory)
+    # Print to stderr to avoid contaminating file lists when called from collect_files_for_job.py
+    print(directory, file=sys.stderr)
+
+    # Resolve path for remote access if in CMS Connect mode
+    resolvedDir = resolvePathForRemote(directory)
+    if resolvedDir != directory:
+        print(f"Resolved path for remote access: {resolvedDir}")
 
     maxFiles = 1000000000
     if("/1l/" in directory and "NANOAODSIM" in directory and
@@ -111,6 +217,70 @@ def findDIR(directory):
     counter = 0
     rootFiles = ROOT.vector('string')()
 
+    # Check if this is an xrootd URL
+    if resolvedDir.startswith('root://'):
+        # Use xrdfs to list files recursively
+        try:
+            # Extract server and path from xrootd URL
+            # Format: root://server/path
+            parts = resolvedDir.replace('root://', '').split('/', 1)
+            if len(parts) == 2:
+                server = parts[0]
+                xrdpath = '/' + parts[1]
+            else:
+                server = parts[0]
+                xrdpath = '/'
+            
+            print(f"Listing xrootd files from root://{server}{xrdpath}")
+            
+            # Recursively list files using xrdfs
+            def list_xrootd_recursive(server, path):
+                """Recursively list files in xrootd directory"""
+                files = []
+                try:
+                    # List directory contents
+                    output = check_output(['xrdfs', f'root://{server}', 'ls', path], 
+                                        stderr=sys.stderr).decode(sys.stdout.encoding)
+                    entries = [line.strip() for line in output.split('\n') if line.strip()]
+                    
+                    for entry in entries:
+                        # Check if it's a directory (xrdfs ls shows directories with trailing /)
+                        if entry.endswith('/'):
+                            # Recursively list subdirectory
+                            subdir = entry.rstrip('/')
+                            files.extend(list_xrootd_recursive(server, subdir))
+                        else:
+                            # It's a file
+                            if entry.endswith('.root'):
+                                files.append(entry)
+                except Exception as e:
+                    print(f"Error listing {path}: {e}")
+                return files
+            
+            stringFiles = list_xrootd_recursive(server, xrdpath)
+            
+            for filePath in stringFiles:
+                # Construct full xrootd URL
+                fullPath = f'root://{server}{filePath}'
+                if "failed/" in fullPath: continue
+                if "log/" in fullPath: continue
+                if ".txt" in fullPath: continue
+                if(("XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" in fullPath) or
+                   ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" in fullPath)):
+                    print("Bad file: {0}".format(fullPath))
+                    continue
+                counter+=1
+                if(counter > maxFiles): break
+                rootFiles.push_back(fullPath)
+            
+            print(f"Found {len(rootFiles)} files via xrootd")
+            return rootFiles
+        except Exception as e:
+            print(f"Error listing xrootd files: {e}")
+            print(f"Falling back to local path access")
+            # Fall through to local file access
+    
+    # Handle local xrootd access (original code)
     if(useXROOTD == True and "/ceph/submit/data/group/cms" in directory):
         xrd = "root://submit50.mit.edu/"
         xrdpath = directory.replace("/ceph/submit/data/group/cms","")
@@ -125,8 +295,78 @@ def findDIR(directory):
             if(counter > maxFiles): break
             rootFiles.push_back(filePath)
 
+    # Local file system access
     else:
-        for root, directories, filenames in os.walk(directory):
+        # Use resolved directory for file access
+        accessDir = resolvedDir if not resolvedDir.startswith('root://') else directory
+        
+        # If files were transferred, use file mapping to find them
+        if CMS_CONNECT_FILES_TRANSFERRED and not os.path.exists(accessDir):
+            mapping = loadFileMapping()
+            if mapping:
+                # Use mapping to find transferred files
+                print(f"Using file mapping to find transferred files ({len(mapping)} entries)")
+                print(f"Looking for files matching directory: {directory}")
+                
+                # Normalize directory path for matching (remove trailing slash)
+                normDir = directory.rstrip('/')
+                
+                # For directory-based access, we need to find files that match the directory
+                # Match files whose original path starts with the directory path
+                matchedCount = 0
+                for origPath, transPath in mapping.items():
+                    # Check if this file belongs to the requested directory
+                    # Normalize original path for comparison
+                    normOrigPath = origPath.rstrip('/')
+                    
+                    # Match if original path starts with directory, or directory is in the path
+                    if normOrigPath.startswith(normDir) or normDir in normOrigPath:
+                        # Verify the transferred file exists
+                        if os.path.exists(transPath) and transPath.endswith('.root'):
+                            if "failed/" in transPath: continue
+                            if "log/" in transPath: continue
+                            if ".txt" in transPath: continue
+                            if(("XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" in transPath) or
+                               ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" in transPath)):
+                                continue
+                            rootFiles.push_back(transPath)
+                            matchedCount += 1
+                            counter += 1
+                            if(counter > maxFiles): break
+                
+                if len(rootFiles) > 0:
+                    print(f"Found {len(rootFiles)} files via file mapping (matched {matchedCount} files)")
+                    return rootFiles
+                else:
+                    print(f"Warning: No files matched directory {directory} in mapping")
+                
+                # Fallback: search current directory for ROOT files
+                print("Searching current directory for transferred ROOT files...")
+                for root, directories, filenames in os.walk('.'):
+                    for f in filenames:
+                        if f.endswith('.root'):
+                            filePath = os.path.join(os.path.abspath(root), f)
+                            if "failed/" in filePath: continue
+                            if "log/" in filePath: continue
+                            if ".txt" in filePath: continue
+                            if(("XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" in filePath) or
+                               ("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" in filePath)):
+                                continue
+                            counter+=1
+                            if(counter > maxFiles): break
+                            rootFiles.push_back(filePath)
+                if len(rootFiles) > 0:
+                    print(f"Found {len(rootFiles)} files in current directory")
+                    return rootFiles
+        
+        if not os.path.exists(accessDir):
+            print(f"Warning: Directory does not exist: {accessDir}")
+            print(f"Original directory: {directory}")
+            print(f"Resolved directory: {resolvedDir}")
+            # Return empty list if directory doesn't exist
+            return rootFiles
+        
+        for root, directories, filenames in os.walk(accessDir):
             for f in filenames:
 
                 isBadFile = False
@@ -178,7 +418,8 @@ def concatenate(result, tmp1):
         result.push_back(f)
 
 def getMClist(sampleNOW, skimType, year=None):
-
+    # If files were transferred, findDIR will use the file mapping automatically
+    # So we can just call findDIR normally - it will handle the mapping
     files = findDIR("{}".format(SwitchSample(sampleNOW, skimType, year)[0]))
     return files
 
@@ -840,6 +1081,8 @@ def SwitchSample(argument, skimType, year=None):
             dirT2 = "/home/scratch/stqian/wz_guillermo/skims_2024a/" + skimType
         elif year == 20241:
             dirT2 = "/home/scratch/stqian/wz_guillermo/skims_2024b/" + skimType
+        else:
+            dirT2 = "/ceph/submit/data/group/cms/store/user/ceballos/nanoaod/skims_submit/" + skimType
     else:
         # Default path when year not specified (backward compatibility)
         #dirT2 = "/scratch/submit/cms/ceballos/nanoaod/skims_submit/" + skimType
@@ -847,8 +1090,9 @@ def SwitchSample(argument, skimType, year=None):
 
     if year is not None and year > 10000:
         year = year // 10
-    print("year: ", year)
-    print("dirT2: ", dirT2)
+    # Print to stderr to avoid contaminating file lists when called from collect_files_for_job.py
+    print("year: ", year, file=sys.stderr)
+    print("dirT2: ", dirT2, file=sys.stderr)
     
     dirLocal = "/work/submit/mariadlf/Hrare/D01"
 
@@ -1336,3 +1580,14 @@ def SwitchSample(argument, skimType, year=None):
        982:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/WZJJto3LNu-QCD_TuneCP5_13p6TeV_madgraph-pythia8",0.4958618*1000*0.60,plotCategory("kPlotWZ")),
     }
     return switch.get(argument, "BKGdefault, xsecDefault, category")
+
+
+if __name__ == "__main__":
+    print("Testing SwitchSample function...")
+    print(SwitchSample(100, "2l", 20220))
+    print(SwitchSample(100, "2l", 20221))
+    print(SwitchSample(100, "2l", 20230))
+    print(SwitchSample(100, "2l", 20231))
+    print(SwitchSample(100, "2l", 20240))
+    print(SwitchSample(100, "2l", 20241))
+    print(SwitchSample(100, "2l", 2025))

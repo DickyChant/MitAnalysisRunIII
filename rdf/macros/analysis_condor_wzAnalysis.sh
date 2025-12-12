@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This script runs on the Condor worker node
+# This script runs on the Condor worker node for wzAnalysis
 # It sets up the environment, extracts the tarball, and runs the analysis
 
 source /cvmfs/cms.cern.ch/cmsset_default.sh
@@ -103,18 +103,19 @@ echo "Looking for transferred ROOT files..."
 find . -name "*.root" -type f | head -10
 
 # Run the analysis script
-# $1 = switchSample
+# $1 = switchSample (process for wzAnalysis)
 # $2 = year
 # $3 = whichJob
 # $4 = condorJob
-# $5 = analysisName (e.g., "analysis_with_switchSample")
-./analysis_slurm_with_switchSample.sh $1 $2 $3 $4 $5
+# $5 = analysisName (should be "wzAnalysis")
+./analysis_slurm_wzAnalysis.sh $1 $2 $3 $4 $5
 
 # Clean up
 rm -rf functions* *.pyc $5.tgz \
-*Analysis.py analysis_slurm_with_switchSample.sh functions.h utils*.py \
+*Analysis.py analysis_slurm*.sh functions.h utils*.py \
 data weights_mva tmva_helper_xml.* \
 mysf.* \
 jsns config jsonpog-integration 
 
 ls -l
+
