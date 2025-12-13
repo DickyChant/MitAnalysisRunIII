@@ -3,7 +3,7 @@
 # Script to create a new skimming folder for wz_guillermo analysis
 # Based on make_newskimfolder.sh
 
-TARGET_DIR="/home/scratch/stqian/wz_guillermo"
+TARGET_DIR="/home/scratch/stqian/wz_guillermo_new_working_dir"
 SOURCE_DIR="/home/stqian/MitAnalysisRunIII/rdf/skimming"
 MACROS_DIR="/home/stqian/MitAnalysisRunIII/rdf/macros"
 

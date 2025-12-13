@@ -28,12 +28,17 @@ if __name__ == "__main__":
     outputCfg = "skim_input_files_fromDAS.cfg"
     outputForCondorCfg = "skim_input_condor_jobs_fromDAS.cfg"
     group = 5
+    suffix = ""
 
-    valid = ["inputCfg=", "outputCfg=", "outputForCondorCfg=", "group=", 'help']
+    valid = ["inputCfg=", "outputCfg=", "outputForCondorCfg=", "group=", "suffix=", 'help']
     usage  =  "Usage: ana.py --inputCfg=<{0}>\n".format(inputCfg)
     usage +=  "              --outputCfg=<{0}>\n".format(outputCfg)
     usage +=  "              --outputForCondorCfg=<{0}>\n".format(outputForCondorCfg)
-    usage +=  "              --group=<{0}>".format(group)
+    usage +=  "              --group=<{0}>\n".format(group)
+    usage +=  "              --suffix=<SUFFIX>  (optional) Suffix to append to output filenames before .cfg\n"
+    usage +=  "                                   e.g., --suffix=2025d creates:\n"
+    usage +=  "                                   skim_input_files_fromDAS_2025d.cfg\n"
+    usage +=  "                                   skim_input_condor_jobs_fromDAS_2025d.cfg"
     try:
         opts, args = getopt.getopt(sys.argv[1:], "", valid)
     except getopt.GetoptError as ex:
@@ -53,6 +58,28 @@ if __name__ == "__main__":
             outputForCondorCfg = str(arg)
         if opt == "--group":
             group = int(arg)
+        if opt == "--suffix":
+            suffix = str(arg)
+
+    # Apply suffix to output filenames if provided
+    if suffix:
+        # Insert suffix before .cfg extension
+        if outputCfg.endswith('.cfg'):
+            outputCfg = outputCfg[:-4] + '_' + suffix + '.cfg'
+        else:
+            outputCfg = outputCfg + '_' + suffix
+        
+        if outputForCondorCfg.endswith('.cfg'):
+            outputForCondorCfg = outputForCondorCfg[:-4] + '_' + suffix + '.cfg'
+        else:
+            outputForCondorCfg = outputForCondorCfg + '_' + suffix
+
+    print("Output files will be:")
+    print("  - {0}".format(outputCfg))
+    print("  - {0}".format(outputForCondorCfg))
+    if suffix:
+        print("  (using suffix: {0})".format(suffix))
+    print("")
 
     outputFile = open(outputCfg, 'w')
     outputForCondorFile = open(outputForCondorCfg, 'w')
