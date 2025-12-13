@@ -1,24 +1,99 @@
 #!/bin/sh
 
 # Condor submission script for wz_guillermo skimming
-# Usage: ./skim_condor_wz_guillermo.sh <year> [outputBaseDir]
+# Usage: ./skim_condor_wz_guillermo.sh <year> [outputBaseDir] [--input-samples-cfg <file>] [--input-files-cfg <file>] [--condor-jobs-cfg <file>]
 
-if [ $# -lt 1 ]; then
-    echo "TOO FEW PARAMETERS"
-    echo "Usage: $0 <year> [outputBaseDir]"
-    echo "  year: Data year (e.g., 2022a, 2023b, etc.)"
-    echo "  outputBaseDir: (optional) Base directory for output (default: /home/scratch/stqian/wz_guillermo/skims)"
+YEAR=""
+OUTPUT_BASE_DIR=""
+INPUTSAMPLESCFG=""
+INPUTFILESCFG=""
+CONDORJOBS=""
+WORK_DIR="/home/scratch/stqian/wz_guillermo"
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --input-samples-cfg|-s)
+            INPUTSAMPLESCFG="$2"
+            shift 2
+            ;;
+        --input-files-cfg|-f)
+            INPUTFILESCFG="$2"
+            shift 2
+            ;;
+        --condor-jobs-cfg|-c)
+            CONDORJOBS="$2"
+            shift 2
+            ;;
+        --work-dir|-w)
+            WORK_DIR="$2"
+            shift 2
+            ;;
+        --help|-h)
+            echo "Usage: $0 <year> [OPTIONS]"
+            echo ""
+            echo "Required:"
+            echo "  year                  Data year (e.g., 2022a, 2023b, etc.)"
+            echo ""
+            echo "Options:"
+            echo "  outputBaseDir         (positional, optional) Base directory for output"
+            echo "                        (default: /home/scratch/stqian/wz_guillermo/skims)"
+            echo "  --input-samples-cfg, -s FILE   Input samples config file"
+            echo "                        (default: skim_input_samples_<YEAR>_fromDAS.cfg)"
+            echo "  --input-files-cfg, -f FILE     Input files config file"
+            echo "                        (default: skim_input_files_fromDAS.cfg)"
+            echo "  --condor-jobs-cfg, -c FILE     Condor jobs config file"
+            echo "                        (default: skim_input_condor_jobs_fromDAS.cfg)"
+            echo "  --work-dir, -w PATH   Work directory (default: /home/scratch/stqian/wz_guillermo)"
+            echo "  --help, -h            Show this help message"
+            echo ""
+            echo "Examples:"
+            echo "  $0 2022a"
+            echo "  $0 2022a /path/to/output"
+            echo "  $0 2022a --input-samples-cfg custom_samples.cfg --condor-jobs-cfg custom_jobs.cfg"
+            exit 0
+            ;;
+        -*)
+            echo "Unknown option: $1"
+            echo "Use --help for usage information"
+            exit 1
+            ;;
+        *)
+            if [ -z "$YEAR" ]; then
+                YEAR="$1"
+            elif [ -z "$OUTPUT_BASE_DIR" ]; then
+                OUTPUT_BASE_DIR="$1"
+            else
+                echo "Error: Too many positional arguments"
+                echo "Use --help for usage information"
+                exit 1
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Check if year is provided
+if [ -z "$YEAR" ]; then
+    echo "Error: Year is required"
+    echo "Usage: $0 <year> [outputBaseDir] [OPTIONS]"
+    echo "Use --help for more information"
     exit 1
 fi
 
-YEAR=$1
-OUTPUT_BASE_DIR=${2:-"/home/scratch/stqian/wz_guillermo/skims"}
-WORK_DIR="/home/scratch/stqian/wz_guillermo"
+# Set defaults for output base dir and config files
+OUTPUT_BASE_DIR=${OUTPUT_BASE_DIR:-"/home/scratch/stqian/wz_guillermo/skims"}
+INPUTSAMPLESCFG=${INPUTSAMPLESCFG:-"skim_input_samples_${YEAR}_fromDAS.cfg"}
+INPUTFILESCFG=${INPUTFILESCFG:-"skim_input_files_fromDAS.cfg"}
+CONDORJOBS=${CONDORJOBS:-"skim_input_condor_jobs_fromDAS.cfg"}
 
 echo "=== Condor Submission for wz_guillermo Skimming ==="
 echo "Year: $YEAR"
 echo "Work directory: $WORK_DIR"
 echo "Output base directory: $OUTPUT_BASE_DIR"
+echo "Input samples config: $INPUTSAMPLESCFG"
+echo "Input files config: $INPUTFILESCFG"
+echo "Condor jobs config: $CONDORJOBS"
 echo ""
 
 # Check if work directory exists
@@ -34,26 +109,22 @@ cd "$WORK_DIR" || {
     exit 1
 }
 
-# Check for required files
-INPUTSAMPLESCFG="skim_input_samples_${YEAR}_fromDAS.cfg"
-INPUTFILESCFG="skim_input_files_fromDAS.cfg"
-CONDORJOBS="skim_input_condor_jobs_fromDAS.cfg"
-
+# Check for required files (config files should be in work directory)
 if [ ! -f "$INPUTSAMPLESCFG" ]; then
     echo "Error: Input samples config not found: $INPUTSAMPLESCFG"
-    echo "Please run make_skim_input_files_fromDAS.py first"
+    echo "Please run make_skim_input_files_fromDAS.py first, or specify with --input-samples-cfg"
     exit 1
 fi
 
 if [ ! -f "$INPUTFILESCFG" ]; then
     echo "Error: Input files config not found: $INPUTFILESCFG"
-    echo "Please run make_skim_input_files_fromDAS.cfg first"
+    echo "Please run make_skim_input_files_fromDAS.py first, or specify with --input-files-cfg"
     exit 1
 fi
 
 if [ ! -f "$CONDORJOBS" ]; then
     echo "Error: Condor jobs config not found: $CONDORJOBS"
-    echo "Please run make_skim_input_files_fromDAS.py first"
+    echo "Please run make_skim_input_files_fromDAS.py first, or specify with --condor-jobs-cfg"
     exit 1
 fi
 

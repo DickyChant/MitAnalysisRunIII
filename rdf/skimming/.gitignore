@@ -1,3 +1,4 @@
 skim_input_files_*.cfg
 skim_input_condor_*.cfg
 skim_input_samples_2022_fromDAS.cfg
+skim_completeness_report_*.md

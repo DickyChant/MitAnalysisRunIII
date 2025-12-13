@@ -7,6 +7,8 @@ YEAR=""
 MISSING_JOBS_FILE=""
 OUTPUT_BASE_DIR=""
 WORK_DIR="/home/scratch/stqian/wz_guillermo"
+INPUTSAMPLESCFG=""
+INPUTFILESCFG=""
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -23,6 +25,14 @@ while [[ $# -gt 0 ]]; do
             WORK_DIR="$2"
             shift 2
             ;;
+        --input-samples-cfg|-s)
+            INPUTSAMPLESCFG="$2"
+            shift 2
+            ;;
+        --input-files-cfg|-f)
+            INPUTFILESCFG="$2"
+            shift 2
+            ;;
         --help|-h)
             echo "Usage: $0 <year> [OPTIONS]"
             echo ""
@@ -34,12 +44,17 @@ while [[ $# -gt 0 ]]; do
             echo "                                 (default: WORK_DIR/skim_input_condor_missing_jobs_<year>.cfg)"
             echo "  --output-base-dir, -o PATH    Base directory for output (default: /home/scratch/stqian/wz_guillermo/skims)"
             echo "  --work-dir, -w PATH           Work directory (default: /home/scratch/stqian/wz_guillermo)"
+            echo "  --input-samples-cfg, -s FILE  Input samples config file"
+            echo "                                 (default: skim_input_samples_<YEAR>_fromDAS.cfg)"
+            echo "  --input-files-cfg, -f FILE    Input files config file"
+            echo "                                 (default: skim_input_files_fromDAS.cfg)"
             echo "  --help, -h                    Show this help message"
             echo ""
             echo "Examples:"
             echo "  $0 2022a"
             echo "  $0 2022a --missing-jobs-file /path/to/missing_jobs.cfg"
             echo "  $0 2022a --output-base-dir /path/to/skims"
+            echo "  $0 2022a --input-samples-cfg custom_samples.cfg --input-files-cfg custom_files.cfg"
             exit 0
             ;;
         -*)
@@ -68,21 +83,23 @@ if [ -z "$YEAR" ]; then
     exit 1
 fi
 
-# Set default missing jobs file if not provided
+# Set defaults
 if [ -z "$MISSING_JOBS_FILE" ]; then
     MISSING_JOBS_FILE="${WORK_DIR}/skim_input_condor_missing_jobs_${YEAR}.cfg"
 fi
-
-# Set default output base directory
 if [ -z "$OUTPUT_BASE_DIR" ]; then
     OUTPUT_BASE_DIR="/home/scratch/stqian/wz_guillermo/skims"
 fi
+INPUTSAMPLESCFG=${INPUTSAMPLESCFG:-"skim_input_samples_${YEAR}_fromDAS.cfg"}
+INPUTFILESCFG=${INPUTFILESCFG:-"skim_input_files_fromDAS.cfg"}
 
 echo "=== Resubmitting Missing Skim Jobs ==="
 echo "Year: $YEAR"
 echo "Work directory: $WORK_DIR"
 echo "Output base directory: $OUTPUT_BASE_DIR"
 echo "Missing jobs file: $MISSING_JOBS_FILE"
+echo "Input samples config: $INPUTSAMPLESCFG"
+echo "Input files config: $INPUTFILESCFG"
 echo ""
 
 # Check if work directory exists
@@ -112,16 +129,15 @@ if [ ! -s "$MISSING_JOBS_FILE" ]; then
 fi
 
 # Check for required files
-INPUTSAMPLESCFG="skim_input_samples_${YEAR}_fromDAS.cfg"
-INPUTFILESCFG="skim_input_files_fromDAS.cfg"
-
 if [ ! -f "$INPUTSAMPLESCFG" ]; then
     echo "Error: Input samples config not found: $INPUTSAMPLESCFG"
+    echo "Please specify with --input-samples-cfg if using a custom file"
     exit 1
 fi
 
 if [ ! -f "$INPUTFILESCFG" ]; then
     echo "Error: Input files config not found: $INPUTFILESCFG"
+    echo "Please specify with --input-files-cfg if using a custom file"
     exit 1
 fi
 
