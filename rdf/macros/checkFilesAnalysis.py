@@ -17,7 +17,7 @@ def readMCSample(sampleNOW, year, PDType, skimType):
             nevents = df.Count().GetValue()
             del df
         except Exception as e:
-            print("{0} {1}".format(files[f].replace("root://t3serv017.mit.edu/","/mnt/T3_US_MIT/hadoop"),e))
+            print("{0} {1}".format(files[f],e))
 
 def readDASample(sampleNOW, year, PDType, skimType):
 
@@ -30,7 +30,7 @@ def readDASample(sampleNOW, year, PDType, skimType):
             nevents = df.Count().GetValue()
             del df
         except Exception as e:
-            print("{0} {1}".format(files[f].replace("root://t3serv017.mit.edu/","/mnt/T3_US_MIT/hadoop"),e))
+            print("{0} {1}".format(files[f],e))
 
 if __name__ == "__main__":
 

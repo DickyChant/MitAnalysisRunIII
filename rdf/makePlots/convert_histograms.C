@@ -5,7 +5,7 @@
 #include <map>
 #include "common.h"
 
-void convert_histograms(bool isModify = false, TString inputSampleName = "/home/submit/ceballos/cards/combine_plots/mytest.root", 
+void convert_histograms(bool isModify = false, TString inputSampleName = "input.root",
   TString subFoldersName = "combinedMy/mll", TString outputSampleName = "output.root"){
 
   TFile *fileInput = new TFile(inputSampleName.Data(), "read");

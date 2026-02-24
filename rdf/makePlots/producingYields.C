@@ -16,7 +16,7 @@
 
 // shapeName = shapes_fit_s / shapes_fit_b / shapes_prefit
 
-void producingYields(int jetBin = -1, TString mlfitResult = "/home/submit/ceballos/cards/ww_smp24001/logs_ana1009/fitDiagnosticsww_fid_normalized1_obs.root", TString shapeName = "shapes_fit_s") {
+void producingYields(int jetBin = -1, TString mlfitResult = "fitDiagnostics.root", TString shapeName = "shapes_fit_s") {
 
   TFile *mlfit = TFile::Open(mlfitResult); assert(mlfit);
   TH1F* _histoWrite[nPlotCategories];

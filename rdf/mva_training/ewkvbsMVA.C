@@ -21,7 +21,7 @@ void ewkvbsMVA(
   TString testTreeEventSplitStr="(eventNum % 10)>=5";
 
   // EW WZ vs. QCD WZ (nsel = 0 / 3)
-  TString inputFileName = "/work/submit/ceballos/mva_samples/ntupleWZAna_year2027.root";
+  TString inputFileName = "ntupleWZAna_year2027.root";
   TCut cutTrainSignal = Form("%s && vbs_ptj1 > 50 && vbs_ptj2 > 50 && (theCat==%d)",trainTreeEventSplitStr.Data(),8);
   TCut cutTrainBkg    = Form("%s && vbs_ptj1 > 50 && vbs_ptj2 > 50 && (theCat==%d)",trainTreeEventSplitStr.Data(),9);
   TCut cutTestSignal  = Form("%s && vbs_ptj1 > 50 && vbs_ptj2 > 50 && (theCat==%d)",testTreeEventSplitStr.Data(), 8);
@@ -29,14 +29,14 @@ void ewkvbsMVA(
   if     (nsel == 0){ // 15 var / WZ
   }
   else if(nsel == 1){ // 15 var / WZ
-    inputFileName = "/work/submit/ceballos/mva_samples/ntupleWZAna_year2027.root";
+    inputFileName = "ntupleWZAna_year2027.root";
     cutTrainSignal = Form("%s && vbs_ptj1 > 50 && vbs_ptj2 > 50 && (theCat==%d)"            ,trainTreeEventSplitStr.Data(),8);
     cutTrainBkg    = Form("%s && vbs_ptj1 > 50 && vbs_ptj2 > 50 && (theCat==%d||theCat==%d)",trainTreeEventSplitStr.Data(),9,13);
     cutTestSignal  = Form("%s && vbs_ptj1 > 50 && vbs_ptj2 > 50 && (theCat==%d)"            ,testTreeEventSplitStr.Data(), 8);
     cutTestBkg     = Form("%s && vbs_ptj1 > 50 && vbs_ptj2 > 50 && (theCat==%d||theCat==%d)",testTreeEventSplitStr.Data(), 9,13);
   }
   else if(nsel == 2){ // 15 var / WW + WZ
-    inputFileName = "/work/submit/ceballos/mva_samples/ntupleWWAna_year2027.root";
+    inputFileName = "ntupleWWAna_year2027.root";
     cutTrainSignal = Form("%s && vbs_ptj1 > 50 && vbs_ptj2 > 50 && (theCat==%d||theCat==%d)",trainTreeEventSplitStr.Data(),6,8);
     cutTrainBkg    = Form("%s && vbs_ptj1 > 50 && vbs_ptj2 > 50 && (theCat==%d||theCat==%d)",trainTreeEventSplitStr.Data(),7,9);
     cutTestSignal  = Form("%s && vbs_ptj1 > 50 && vbs_ptj2 > 50 && (theCat==%d||theCat==%d)",testTreeEventSplitStr.Data(), 6,8);
@@ -47,7 +47,7 @@ void ewkvbsMVA(
   else if(nsel == 4){ // 14 var (no zepmax) / WZ
   }
   else if(nsel == 5){ // 15 var / WW
-    inputFileName = "/work/submit/ceballos/mva_samples/ntupleWWAna_year2027.root";
+    inputFileName = "ntupleWWAna_year2027.root";
     cutTrainSignal = Form("%s && vbs_ptj1 > 50 && vbs_ptj2 > 50 && (theCat==%d)",trainTreeEventSplitStr.Data(),6);
     cutTrainBkg    = Form("%s && vbs_ptj1 > 50 && vbs_ptj2 > 50 && (theCat==%d)",trainTreeEventSplitStr.Data(),7);
     cutTestSignal  = Form("%s && vbs_ptj1 > 50 && vbs_ptj2 > 50 && (theCat==%d)",testTreeEventSplitStr.Data(), 6);

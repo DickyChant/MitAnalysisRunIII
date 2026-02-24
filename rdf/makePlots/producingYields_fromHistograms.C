@@ -14,7 +14,7 @@
 #include "TRandom.h"
 #include "common.h"
 
-void producingYields_fromHistograms(TString plotName = "/home/submit/ceballos/cards/combine_plots_madgraph_smp24001/ww_output_bin-2.root", int chan = 0, int printOverall = 1) {
+void producingYields_fromHistograms(TString plotName = "output.root", int chan = 0, int printOverall = 1) {
 
   double yields[nPlotCategories], yieldsE[nPlotCategories];
   bool nonZeroYields[nPlotCategories];

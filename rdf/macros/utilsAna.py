@@ -10,6 +10,11 @@ correctionlib.register_pyroot_binding()
 
 useXROOTD = False
 
+# Configurable base paths — override via environment variables
+SKIM_BASE_DIR = os.environ.get("SKIM_BASE_DIR", "/home/scratch/stqian/wz_guillermo/skims_submit")
+SCRATCH_SAMPLE_DIR = os.environ.get("SCRATCH_SAMPLE_DIR", "/home/scratch/stqian/samples")
+XRD_SERVER = os.environ.get("XRD_SERVER", "")
+
 def getLumi(year):
     lumi = [36.1, 41.5, 60.0, 8.1, 26.7, 18.1, 9.7, 109.6, 105.0]
 
@@ -111,9 +116,9 @@ def findDIR(directory):
     counter = 0
     rootFiles = ROOT.vector('string')()
 
-    if(useXROOTD == True and "/ceph/submit/data/group/cms" in directory):
-        xrd = "root://submit50.mit.edu/"
-        xrdpath = directory.replace("/ceph/submit/data/group/cms","")
+    if(useXROOTD == True and XRD_SERVER and XRD_SERVER in directory):
+        xrd = XRD_SERVER
+        xrdpath = directory.replace(XRD_SERVER,"")
         f = check_output(['xrdfs', f'{xrd}', 'ls', xrdpath]).decode(sys.stdout.encoding)
         stringFiles = f.split()
         for e in range(len(stringFiles)):
@@ -186,10 +191,8 @@ def getDATAlist(type, year, skimType):
 
     if(year > 10000): year = year // 10
 
-    #dirT2 = "/mnt/T2_US_MIT/hadoop/cms/store/user/paus/nanohr/D00/"
-    #dirT2 = "/mnt/T3_US_MIT/hadoop/scratch/ceballos/nanoaod/skims_submit/" + skimType
-    dirT2 = "/ceph/submit/data/group/cms/store/user/ceballos/nanoaod/skims_submit/" + skimType
-    dirTest = "/ceph/submit/data/group/cms/store/user/ceballos/test/test/"
+    dirT2 = SKIM_BASE_DIR + "/" + skimType
+    dirTest = SKIM_BASE_DIR + "/test/"
 
     jsnName = ""
     if(year == 2016):
@@ -798,10 +801,9 @@ def getDATAlist(type, year, skimType):
 
 def SwitchSample(argument, skimType):
 
-    #dirT2 = "/scratch/submit/cms/ceballos/nanoaod/skims_submit/" + skimType
-    dirT2 = "/ceph/submit/data/group/cms/store/user/ceballos/nanoaod/skims_submit/" + skimType
-    dirScratch = "/scratch/submit/cms/ceballos/nanoaod/samples"
-    dirLocal = "/work/submit/mariadlf/Hrare/D01"
+    dirT2 = SKIM_BASE_DIR + "/" + skimType
+    dirScratch = SCRATCH_SAMPLE_DIR
+    dirLocal = SCRATCH_SAMPLE_DIR
 
     ggWWXS_LO_MCFM = 0.0496265/(0.1086*0.1086)
     ggWWXS_LO_MADGRAPH = 3.51313
@@ -1268,46 +1270,46 @@ def SwitchSample(argument, skimType):
 
        900:(dirLocal+"/2018/vbf-hrhogamma-powheg+NANOAOD_01",1.0*1000,plotCategory("kPlotBSM")),
 
-       901:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/DY_MLM_2022_preEE",6345.99*1000,plotCategory("kPlotDY")),
-       902:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/DY_2022_preEE",6345.99*1000,plotCategory("kPlotDY")),
-       903:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/DY_2022_postEE",6345.99*1000,plotCategory("kPlotDY")),
-       904:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/DY_2023_partA",6345.99*1000,plotCategory("kPlotDY")),
-       905:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/DY_2023_partB",6345.99*1000,plotCategory("kPlotDY")),
+       901:(dirScratch+"/test_samples/DY_MLM_2022_preEE",6345.99*1000,plotCategory("kPlotDY")),
+       902:(dirScratch+"/test_samples/DY_2022_preEE",6345.99*1000,plotCategory("kPlotDY")),
+       903:(dirScratch+"/test_samples/DY_2022_postEE",6345.99*1000,plotCategory("kPlotDY")),
+       904:(dirScratch+"/test_samples/DY_2023_partA",6345.99*1000,plotCategory("kPlotDY")),
+       905:(dirScratch+"/test_samples/DY_2023_partB",6345.99*1000,plotCategory("kPlotDY")),
 
-       906:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/TTto2L2Nu_2022_postEE",0.950*923.6*0.1086*0.1086*9*1000,plotCategory("kPlotTT")),
-       907:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/TWminusto2L2Nu_2022_postEE",23.97*1000*2.0,plotCategory("kPlotTW")),
+       906:(dirScratch+"/test_samples/TTto2L2Nu_2022_postEE",0.950*923.6*0.1086*0.1086*9*1000,plotCategory("kPlotTT")),
+       907:(dirScratch+"/test_samples/TWminusto2L2Nu_2022_postEE",23.97*1000*2.0,plotCategory("kPlotTW")),
 
-       960:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/qqWW_2018",(118.7-3.974)*0.1086*0.1086*9*1000,plotCategory("kPlotqqWW")),
+       960:(dirScratch+"/test_samples/qqWW_2018",(118.7-3.974)*0.1086*0.1086*9*1000,plotCategory("kPlotqqWW")),
 
-       961:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/qqWW_2022_postEE",(118.7*1.06-ggWWXS_LO_MCFM)*0.1086*0.1086*9*1000,plotCategory("kPlotqqWW")),
+       961:(dirScratch+"/test_samples/qqWW_2022_postEE",(118.7*1.06-ggWWXS_LO_MCFM)*0.1086*0.1086*9*1000,plotCategory("kPlotqqWW")),
 
-       962:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/GluGlutoContintoWWtoENuENu_postEE"    ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
-       963:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/GluGlutoContintoWWtoENuMuNu_postEE"   ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
-       964:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/GluGlutoContintoWWtoENuTauNu_postEE"  ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
-       965:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/GluGlutoContintoWWtoMuNuENu_postEE"   ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
-       966:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/GluGlutoContintoWWtoMuNuMuNu_postEE"  ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
-       967:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/GluGlutoContintoWWtoMuNuTauNu_postEE" ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
-       968:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/GluGlutoContintoWWtoTauNuENu_postEE"  ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
-       969:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/GluGlutoContintoWWtoTauNuMuNu_postEE" ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
-       970:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/GluGlutoContintoWWtoTauNuTauNu_postEE",(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
+       962:(dirScratch+"/test_samples/GluGlutoContintoWWtoENuENu_postEE"    ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
+       963:(dirScratch+"/test_samples/GluGlutoContintoWWtoENuMuNu_postEE"   ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
+       964:(dirScratch+"/test_samples/GluGlutoContintoWWtoENuTauNu_postEE"  ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
+       965:(dirScratch+"/test_samples/GluGlutoContintoWWtoMuNuENu_postEE"   ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
+       966:(dirScratch+"/test_samples/GluGlutoContintoWWtoMuNuMuNu_postEE"  ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
+       967:(dirScratch+"/test_samples/GluGlutoContintoWWtoMuNuTauNu_postEE" ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
+       968:(dirScratch+"/test_samples/GluGlutoContintoWWtoTauNuENu_postEE"  ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
+       969:(dirScratch+"/test_samples/GluGlutoContintoWWtoTauNuMuNu_postEE" ,(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
+       970:(dirScratch+"/test_samples/GluGlutoContintoWWtoTauNuTauNu_postEE",(0.1086*0.1086)*ggWWXS_LO_MCFM*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
 
-       971:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/ggWWto2L2Nu_OS_PolarizationLL_postEE",0.24053*(ggWWXS_LO_MCFM/ggWWXS_LO_MADGRAPH)*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
-       972:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/ggWWto2L2Nu_OS_PolarizationLT_postEE",0.08268*(ggWWXS_LO_MCFM/ggWWXS_LO_MADGRAPH)*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
-       973:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/ggWWto2L2Nu_OS_PolarizationTL_postEE",0.08268*(ggWWXS_LO_MCFM/ggWWXS_LO_MADGRAPH)*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
-       974:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/ggWWto2L2Nu_OS_PolarizationTT_postEE",3.10724*(ggWWXS_LO_MCFM/ggWWXS_LO_MADGRAPH)*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
+       971:(dirScratch+"/test_samples/ggWWto2L2Nu_OS_PolarizationLL_postEE",0.24053*(ggWWXS_LO_MCFM/ggWWXS_LO_MADGRAPH)*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
+       972:(dirScratch+"/test_samples/ggWWto2L2Nu_OS_PolarizationLT_postEE",0.08268*(ggWWXS_LO_MCFM/ggWWXS_LO_MADGRAPH)*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
+       973:(dirScratch+"/test_samples/ggWWto2L2Nu_OS_PolarizationTL_postEE",0.08268*(ggWWXS_LO_MCFM/ggWWXS_LO_MADGRAPH)*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
+       974:(dirScratch+"/test_samples/ggWWto2L2Nu_OS_PolarizationTT_postEE",3.10724*(ggWWXS_LO_MCFM/ggWWXS_LO_MADGRAPH)*ggWWXS_kFactor*1000,plotCategory("kPlotggWW")),
 
-       975:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/WW_MINNLO_13p0TeV",(118.7-3.974)*0.1086*0.1086*9*1000,plotCategory("kPlotqqWW")),
+       975:(dirScratch+"/test_samples/WW_MINNLO_13p0TeV",(118.7-3.974)*0.1086*0.1086*9*1000,plotCategory("kPlotqqWW")),
 
-       976:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/WW_MINNLO_13p6TeV",12.80173*1000,plotCategory("kPlotqqWW")),
+       976:(dirScratch+"/test_samples/WW_MINNLO_13p6TeV",12.80173*1000,plotCategory("kPlotqqWW")),
 
-       977:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/WZ3l_2022_postEE",4.924*1.08*1000,plotCategory("kPlotWZ")),
+       977:(dirScratch+"/test_samples/WZ3l_2022_postEE",4.924*1.08*1000,plotCategory("kPlotWZ")),
 
-       978:("/ceph/submit/data/user/c/ceballos/test_samples/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8",0.5*0.0295576*1000,plotCategory("kPlotEWKSSWW")),
-       979:("/ceph/submit/data/user/c/ceballos/test_samples/WmWmJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8",0.5*0.0295576*1000,plotCategory("kPlotEWKSSWW")),
+       978:(dirScratch+"/test_samples/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8",0.5*0.0295576*1000,plotCategory("kPlotEWKSSWW")),
+       979:(dirScratch+"/test_samples/WmWmJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8",0.5*0.0295576*1000,plotCategory("kPlotEWKSSWW")),
 
-       980:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/WWJJto2L2Nu-SS-noTop-EWK_TuneCP5_13p6TeV_madgraph-pythia8",0.0295576*1000,plotCategory("kPlotEWKSSWW")),
-       981:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/WZJJto3LNu-EWK_TuneCP5_13p6TeV_madgraph-pythia8",0.0429366*1000,plotCategory("kPlotEWKWZ")),
-       982:("/ceph/submit/data/group/cms/store/user/ceballos/test_samples/WZJJto3LNu-QCD_TuneCP5_13p6TeV_madgraph-pythia8",0.4958618*1000*0.60,plotCategory("kPlotWZ")),
+       980:(dirScratch+"/test_samples/WWJJto2L2Nu-SS-noTop-EWK_TuneCP5_13p6TeV_madgraph-pythia8",0.0295576*1000,plotCategory("kPlotEWKSSWW")),
+       981:(dirScratch+"/test_samples/WZJJto3LNu-EWK_TuneCP5_13p6TeV_madgraph-pythia8",0.0429366*1000,plotCategory("kPlotEWKWZ")),
+       982:(dirScratch+"/test_samples/WZJJto3LNu-QCD_TuneCP5_13p6TeV_madgraph-pythia8",0.4958618*1000*0.60,plotCategory("kPlotWZ")),
 
        983: (dirScratch+"/WWJJto2L2Nu-SS-noTop-EWK_TuneCP5_13p6TeV_sherpa+Run3+NANOAODSIM",0.0398961*1000,plotCategory("kPlotEWKSSWW")),
     }

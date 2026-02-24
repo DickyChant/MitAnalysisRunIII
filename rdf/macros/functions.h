@@ -1707,6 +1707,8 @@ float compute_jet_var(Vec_f pt, Vec_f eta, Vec_f phi, Vec_f mass, unsigned int v
   else if(var == 7) theVar = abs(p2.Eta());
   else if(var == 8) theVar = p1.Phi();
   else if(var == 9) theVar = p2.Phi();
+  else if(var == 10) theVar = mass[0];
+  else if(var == 11) theVar = (pt.size() > 1) ? mass[1] : -1;
   return theVar;
 }
 
@@ -1887,6 +1889,17 @@ float compute_3l_var(const Vec_f& mu_pt, const Vec_f& mu_eta, const Vec_f& mu_ph
      else if(var == 14) theVar = p4mom[tagW].Pt();
      else if(var == 15) theVar = p4mom[tagW].Eta();
      else if(var == 16) theVar = std::sqrt(2*p4mom[tagW].Pt()*met_pt*(1-std::cos(deltaPhi(p4mom[tagW].Phi(),met_phi))));
+     else if(var == 17) theVar = p4mom[tagZ[0]].Eta();
+     else if(var == 18) theVar = p4mom[tagZ[1]].Eta();
+     else if(var == 19) theVar = p4mom[tagZ[0]].Phi();
+     else if(var == 20) theVar = p4mom[tagZ[1]].Phi();
+     else if(var == 21) theVar = p4mom[tagZ[0]].M();
+     else if(var == 22) theVar = p4mom[tagZ[1]].M();
+     else if(var == 23) theVar = p4mom[tagW].Phi();
+     else if(var == 24) theVar = p4mom[tagW].M();
+     else if(var == 25) theVar = ltype[tagZ[0]];
+     else if(var == 26) theVar = ltype[tagZ[1]];
+     else if(var == 27) theVar = ltype[tagW];
    }
    return theVar;
 }

@@ -179,6 +179,7 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
             "weight",
             "theCat",
             "ngood_jets",
+            # VBS kinematic variables
             "vbs_mjj",
             "vbs_ptjj",
             "vbs_detajj",
@@ -187,6 +188,12 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
             "vbs_ptj2",
             "vbs_etaj1",
             "vbs_etaj2",
+            "vbs_phij1",
+            "vbs_phij2",
+            "vbs_massj1",
+            "vbs_massj2",
+            "vbs_btagj1",
+            "vbs_btagj2",
             "vbs_zepvv",
             "vbs_zepmax",
             "vbs_sumHT",
@@ -194,20 +201,42 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
             "vbs_pttot",
             "vbs_detavvj1",
             "vbs_detavvj2",
-            "vbs_ptbalance"
+            "vbs_ptbalance",
+            # Z lepton p4 and flavor (0=mu, 1=el)
+            "ptl1Z",
+            "etal1Z",
+            "phil1Z",
+            "massl1Z",
+            "flavorl1Z",
+            "ptl2Z",
+            "etal2Z",
+            "phil2Z",
+            "massl2Z",
+            "flavorl2Z",
+            # W lepton p4 and flavor
+            "ptlW",
+            "etalW_signed",
+            "philW",
+            "masslW",
+            "flavorlW",
+            # MET
+            "PuppiMET_ptDef",
+            "PuppiMET_phiDef",
+            # Additional lepton/mass variables
+            "mll",
+            "m3l",
+            "mtW",
+            "TriLepton_flavor",
     ]:
         branchList.push_back(branchName)
 
-    #ROOT.gInterpreter.ProcessLine('''
-    #TMVA::Experimental::RReader model("weights_mva/bdt_BDTG_vbfinc_v0.weights.xml");
-    #computeModel = TMVA::Experimental::Compute<15, float>(model);
-    #''')
-    #variables = ROOT.model.GetVariableNames()
-    #print(variables)
-
     MVAweights = "weights_mva/bdt_BDTG_vbfinc_v{0}.weights.xml".format(versionMVA)
-    tmva_helper = tmva_helper_xml.TMVAHelperXML(MVAweights)
-    print(tmva_helper.variables)
+    tmva_helper = None
+    if(os.path.exists(MVAweights) and doNtuples == False):
+        tmva_helper = tmva_helper_xml.TMVAHelperXML(MVAweights)
+        print(tmva_helper.variables)
+    else:
+        print("MVA weights not found or doNtuples mode — skipping BDT inference")
 
     dftag = selectionLL(df,year,PDType,isData,count)
 
@@ -228,7 +257,10 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
                     .Define("theCat","compute_category({0},kPlotNonPrompt,kPlotWS,nFake,nTight,0)".format(theCat))
                     )
 
-    dfbase = tmva_helper.run_inference(dfbase,"bdt_vbfinc",0)
+    if(tmva_helper is not None):
+        dfbase = tmva_helper.run_inference(dfbase,"bdt_vbfinc",0)
+    else:
+        dfbase = dfbase.Define("bdt_vbfinc", "0.0f")
 
     dfwzcatMuonMomUp        = []
     dfwzcatElectronMomUp    = []
@@ -476,65 +508,66 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
         dfwzbvbscatJESUp        [x] = dfwzbvbscatJESUp        [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptDef	> {1}".format(altMass,metCut))
         dfwzbvbscatUnclusteredUp[x] = dfwzbvbscatUnclusteredUp[x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptUnclUp	> {1}".format(altMass,metCut))
 
-        dfwzvbscatJes00Up[x] = redefineMVAVariables(dfwzvbscatJes00Up[x],tmva_helper,"Jes00Up",versionMVA)
-        dfwzvbscatJes01Up[x] = redefineMVAVariables(dfwzvbscatJes01Up[x],tmva_helper,"Jes01Up",versionMVA)
-        dfwzvbscatJes02Up[x] = redefineMVAVariables(dfwzvbscatJes02Up[x],tmva_helper,"Jes02Up",versionMVA)
-        dfwzvbscatJes03Up[x] = redefineMVAVariables(dfwzvbscatJes03Up[x],tmva_helper,"Jes03Up",versionMVA)
-        dfwzvbscatJes04Up[x] = redefineMVAVariables(dfwzvbscatJes04Up[x],tmva_helper,"Jes04Up",versionMVA)
-        dfwzvbscatJes05Up[x] = redefineMVAVariables(dfwzvbscatJes05Up[x],tmva_helper,"Jes05Up",versionMVA)
-        dfwzvbscatJes06Up[x] = redefineMVAVariables(dfwzvbscatJes06Up[x],tmva_helper,"Jes06Up",versionMVA)
-        dfwzvbscatJes07Up[x] = redefineMVAVariables(dfwzvbscatJes07Up[x],tmva_helper,"Jes07Up",versionMVA)
-        dfwzvbscatJes08Up[x] = redefineMVAVariables(dfwzvbscatJes08Up[x],tmva_helper,"Jes08Up",versionMVA)
-        dfwzvbscatJes09Up[x] = redefineMVAVariables(dfwzvbscatJes09Up[x],tmva_helper,"Jes09Up",versionMVA)
-        dfwzvbscatJes10Up[x] = redefineMVAVariables(dfwzvbscatJes10Up[x],tmva_helper,"Jes10Up",versionMVA)
-        dfwzvbscatJes11Up[x] = redefineMVAVariables(dfwzvbscatJes11Up[x],tmva_helper,"Jes11Up",versionMVA)
-        dfwzvbscatJes12Up[x] = redefineMVAVariables(dfwzvbscatJes12Up[x],tmva_helper,"Jes12Up",versionMVA)
-        dfwzvbscatJes13Up[x] = redefineMVAVariables(dfwzvbscatJes13Up[x],tmva_helper,"Jes13Up",versionMVA)
-        dfwzvbscatJes14Up[x] = redefineMVAVariables(dfwzvbscatJes14Up[x],tmva_helper,"Jes14Up",versionMVA)
-        dfwzvbscatJes15Up[x] = redefineMVAVariables(dfwzvbscatJes15Up[x],tmva_helper,"Jes15Up",versionMVA)
-        dfwzvbscatJes16Up[x] = redefineMVAVariables(dfwzvbscatJes16Up[x],tmva_helper,"Jes16Up",versionMVA)
-        dfwzvbscatJes17Up[x] = redefineMVAVariables(dfwzvbscatJes17Up[x],tmva_helper,"Jes17Up",versionMVA)
-        dfwzvbscatJes18Up[x] = redefineMVAVariables(dfwzvbscatJes18Up[x],tmva_helper,"Jes18Up",versionMVA)
-        dfwzvbscatJes19Up[x] = redefineMVAVariables(dfwzvbscatJes19Up[x],tmva_helper,"Jes19Up",versionMVA)
-        dfwzvbscatJes20Up[x] = redefineMVAVariables(dfwzvbscatJes20Up[x],tmva_helper,"Jes20Up",versionMVA)
-        dfwzvbscatJes21Up[x] = redefineMVAVariables(dfwzvbscatJes21Up[x],tmva_helper,"Jes21Up",versionMVA)
-        dfwzvbscatJes22Up[x] = redefineMVAVariables(dfwzvbscatJes22Up[x],tmva_helper,"Jes22Up",versionMVA)
-        dfwzvbscatJes23Up[x] = redefineMVAVariables(dfwzvbscatJes23Up[x],tmva_helper,"Jes23Up",versionMVA)
-        dfwzvbscatJes24Up[x] = redefineMVAVariables(dfwzvbscatJes24Up[x],tmva_helper,"Jes24Up",versionMVA)
-        dfwzvbscatJes25Up[x] = redefineMVAVariables(dfwzvbscatJes25Up[x],tmva_helper,"Jes25Up",versionMVA)
-        dfwzvbscatJes26Up[x] = redefineMVAVariables(dfwzvbscatJes26Up[x],tmva_helper,"Jes26Up",versionMVA)
-        dfwzvbscatJes27Up[x] = redefineMVAVariables(dfwzvbscatJes27Up[x],tmva_helper,"Jes27Up",versionMVA)
-        dfwzvbscatJerUp  [x] = redefineMVAVariables(dfwzvbscatJerUp  [x],tmva_helper,"JerUp"  ,versionMVA)
+        if(tmva_helper is not None):
+            dfwzvbscatJes00Up[x] = redefineMVAVariables(dfwzvbscatJes00Up[x],tmva_helper,"Jes00Up",versionMVA)
+            dfwzvbscatJes01Up[x] = redefineMVAVariables(dfwzvbscatJes01Up[x],tmva_helper,"Jes01Up",versionMVA)
+            dfwzvbscatJes02Up[x] = redefineMVAVariables(dfwzvbscatJes02Up[x],tmva_helper,"Jes02Up",versionMVA)
+            dfwzvbscatJes03Up[x] = redefineMVAVariables(dfwzvbscatJes03Up[x],tmva_helper,"Jes03Up",versionMVA)
+            dfwzvbscatJes04Up[x] = redefineMVAVariables(dfwzvbscatJes04Up[x],tmva_helper,"Jes04Up",versionMVA)
+            dfwzvbscatJes05Up[x] = redefineMVAVariables(dfwzvbscatJes05Up[x],tmva_helper,"Jes05Up",versionMVA)
+            dfwzvbscatJes06Up[x] = redefineMVAVariables(dfwzvbscatJes06Up[x],tmva_helper,"Jes06Up",versionMVA)
+            dfwzvbscatJes07Up[x] = redefineMVAVariables(dfwzvbscatJes07Up[x],tmva_helper,"Jes07Up",versionMVA)
+            dfwzvbscatJes08Up[x] = redefineMVAVariables(dfwzvbscatJes08Up[x],tmva_helper,"Jes08Up",versionMVA)
+            dfwzvbscatJes09Up[x] = redefineMVAVariables(dfwzvbscatJes09Up[x],tmva_helper,"Jes09Up",versionMVA)
+            dfwzvbscatJes10Up[x] = redefineMVAVariables(dfwzvbscatJes10Up[x],tmva_helper,"Jes10Up",versionMVA)
+            dfwzvbscatJes11Up[x] = redefineMVAVariables(dfwzvbscatJes11Up[x],tmva_helper,"Jes11Up",versionMVA)
+            dfwzvbscatJes12Up[x] = redefineMVAVariables(dfwzvbscatJes12Up[x],tmva_helper,"Jes12Up",versionMVA)
+            dfwzvbscatJes13Up[x] = redefineMVAVariables(dfwzvbscatJes13Up[x],tmva_helper,"Jes13Up",versionMVA)
+            dfwzvbscatJes14Up[x] = redefineMVAVariables(dfwzvbscatJes14Up[x],tmva_helper,"Jes14Up",versionMVA)
+            dfwzvbscatJes15Up[x] = redefineMVAVariables(dfwzvbscatJes15Up[x],tmva_helper,"Jes15Up",versionMVA)
+            dfwzvbscatJes16Up[x] = redefineMVAVariables(dfwzvbscatJes16Up[x],tmva_helper,"Jes16Up",versionMVA)
+            dfwzvbscatJes17Up[x] = redefineMVAVariables(dfwzvbscatJes17Up[x],tmva_helper,"Jes17Up",versionMVA)
+            dfwzvbscatJes18Up[x] = redefineMVAVariables(dfwzvbscatJes18Up[x],tmva_helper,"Jes18Up",versionMVA)
+            dfwzvbscatJes19Up[x] = redefineMVAVariables(dfwzvbscatJes19Up[x],tmva_helper,"Jes19Up",versionMVA)
+            dfwzvbscatJes20Up[x] = redefineMVAVariables(dfwzvbscatJes20Up[x],tmva_helper,"Jes20Up",versionMVA)
+            dfwzvbscatJes21Up[x] = redefineMVAVariables(dfwzvbscatJes21Up[x],tmva_helper,"Jes21Up",versionMVA)
+            dfwzvbscatJes22Up[x] = redefineMVAVariables(dfwzvbscatJes22Up[x],tmva_helper,"Jes22Up",versionMVA)
+            dfwzvbscatJes23Up[x] = redefineMVAVariables(dfwzvbscatJes23Up[x],tmva_helper,"Jes23Up",versionMVA)
+            dfwzvbscatJes24Up[x] = redefineMVAVariables(dfwzvbscatJes24Up[x],tmva_helper,"Jes24Up",versionMVA)
+            dfwzvbscatJes25Up[x] = redefineMVAVariables(dfwzvbscatJes25Up[x],tmva_helper,"Jes25Up",versionMVA)
+            dfwzvbscatJes26Up[x] = redefineMVAVariables(dfwzvbscatJes26Up[x],tmva_helper,"Jes26Up",versionMVA)
+            dfwzvbscatJes27Up[x] = redefineMVAVariables(dfwzvbscatJes27Up[x],tmva_helper,"Jes27Up",versionMVA)
+            dfwzvbscatJerUp  [x] = redefineMVAVariables(dfwzvbscatJerUp  [x],tmva_helper,"JerUp"  ,versionMVA)
 
-        dfwzbvbscatJes00Up[x] = redefineMVAVariables(dfwzbvbscatJes00Up[x],tmva_helper,"Jes00Up",versionMVA)
-        dfwzbvbscatJes01Up[x] = redefineMVAVariables(dfwzbvbscatJes01Up[x],tmva_helper,"Jes01Up",versionMVA)
-        dfwzbvbscatJes02Up[x] = redefineMVAVariables(dfwzbvbscatJes02Up[x],tmva_helper,"Jes02Up",versionMVA)
-        dfwzbvbscatJes03Up[x] = redefineMVAVariables(dfwzbvbscatJes03Up[x],tmva_helper,"Jes03Up",versionMVA)
-        dfwzbvbscatJes04Up[x] = redefineMVAVariables(dfwzbvbscatJes04Up[x],tmva_helper,"Jes04Up",versionMVA)
-        dfwzbvbscatJes05Up[x] = redefineMVAVariables(dfwzbvbscatJes05Up[x],tmva_helper,"Jes05Up",versionMVA)
-        dfwzbvbscatJes06Up[x] = redefineMVAVariables(dfwzbvbscatJes06Up[x],tmva_helper,"Jes06Up",versionMVA)
-        dfwzbvbscatJes07Up[x] = redefineMVAVariables(dfwzbvbscatJes07Up[x],tmva_helper,"Jes07Up",versionMVA)
-        dfwzbvbscatJes08Up[x] = redefineMVAVariables(dfwzbvbscatJes08Up[x],tmva_helper,"Jes08Up",versionMVA)
-        dfwzbvbscatJes09Up[x] = redefineMVAVariables(dfwzbvbscatJes09Up[x],tmva_helper,"Jes09Up",versionMVA)
-        dfwzbvbscatJes10Up[x] = redefineMVAVariables(dfwzbvbscatJes10Up[x],tmva_helper,"Jes10Up",versionMVA)
-        dfwzbvbscatJes11Up[x] = redefineMVAVariables(dfwzbvbscatJes11Up[x],tmva_helper,"Jes11Up",versionMVA)
-        dfwzbvbscatJes12Up[x] = redefineMVAVariables(dfwzbvbscatJes12Up[x],tmva_helper,"Jes12Up",versionMVA)
-        dfwzbvbscatJes13Up[x] = redefineMVAVariables(dfwzbvbscatJes13Up[x],tmva_helper,"Jes13Up",versionMVA)
-        dfwzbvbscatJes14Up[x] = redefineMVAVariables(dfwzbvbscatJes14Up[x],tmva_helper,"Jes14Up",versionMVA)
-        dfwzbvbscatJes15Up[x] = redefineMVAVariables(dfwzbvbscatJes15Up[x],tmva_helper,"Jes15Up",versionMVA)
-        dfwzbvbscatJes16Up[x] = redefineMVAVariables(dfwzbvbscatJes16Up[x],tmva_helper,"Jes16Up",versionMVA)
-        dfwzbvbscatJes17Up[x] = redefineMVAVariables(dfwzbvbscatJes17Up[x],tmva_helper,"Jes17Up",versionMVA)
-        dfwzbvbscatJes18Up[x] = redefineMVAVariables(dfwzbvbscatJes18Up[x],tmva_helper,"Jes18Up",versionMVA)
-        dfwzbvbscatJes19Up[x] = redefineMVAVariables(dfwzbvbscatJes19Up[x],tmva_helper,"Jes19Up",versionMVA)
-        dfwzbvbscatJes20Up[x] = redefineMVAVariables(dfwzbvbscatJes20Up[x],tmva_helper,"Jes20Up",versionMVA)
-        dfwzbvbscatJes21Up[x] = redefineMVAVariables(dfwzbvbscatJes21Up[x],tmva_helper,"Jes21Up",versionMVA)
-        dfwzbvbscatJes22Up[x] = redefineMVAVariables(dfwzbvbscatJes22Up[x],tmva_helper,"Jes22Up",versionMVA)
-        dfwzbvbscatJes23Up[x] = redefineMVAVariables(dfwzbvbscatJes23Up[x],tmva_helper,"Jes23Up",versionMVA)
-        dfwzbvbscatJes24Up[x] = redefineMVAVariables(dfwzbvbscatJes24Up[x],tmva_helper,"Jes24Up",versionMVA)
-        dfwzbvbscatJes25Up[x] = redefineMVAVariables(dfwzbvbscatJes25Up[x],tmva_helper,"Jes25Up",versionMVA)
-        dfwzbvbscatJes26Up[x] = redefineMVAVariables(dfwzbvbscatJes26Up[x],tmva_helper,"Jes26Up",versionMVA)
-        dfwzbvbscatJes27Up[x] = redefineMVAVariables(dfwzbvbscatJes27Up[x],tmva_helper,"Jes27Up",versionMVA)
-        dfwzbvbscatJerUp  [x] = redefineMVAVariables(dfwzbvbscatJerUp  [x],tmva_helper,"JerUp"  ,versionMVA)
+            dfwzbvbscatJes00Up[x] = redefineMVAVariables(dfwzbvbscatJes00Up[x],tmva_helper,"Jes00Up",versionMVA)
+            dfwzbvbscatJes01Up[x] = redefineMVAVariables(dfwzbvbscatJes01Up[x],tmva_helper,"Jes01Up",versionMVA)
+            dfwzbvbscatJes02Up[x] = redefineMVAVariables(dfwzbvbscatJes02Up[x],tmva_helper,"Jes02Up",versionMVA)
+            dfwzbvbscatJes03Up[x] = redefineMVAVariables(dfwzbvbscatJes03Up[x],tmva_helper,"Jes03Up",versionMVA)
+            dfwzbvbscatJes04Up[x] = redefineMVAVariables(dfwzbvbscatJes04Up[x],tmva_helper,"Jes04Up",versionMVA)
+            dfwzbvbscatJes05Up[x] = redefineMVAVariables(dfwzbvbscatJes05Up[x],tmva_helper,"Jes05Up",versionMVA)
+            dfwzbvbscatJes06Up[x] = redefineMVAVariables(dfwzbvbscatJes06Up[x],tmva_helper,"Jes06Up",versionMVA)
+            dfwzbvbscatJes07Up[x] = redefineMVAVariables(dfwzbvbscatJes07Up[x],tmva_helper,"Jes07Up",versionMVA)
+            dfwzbvbscatJes08Up[x] = redefineMVAVariables(dfwzbvbscatJes08Up[x],tmva_helper,"Jes08Up",versionMVA)
+            dfwzbvbscatJes09Up[x] = redefineMVAVariables(dfwzbvbscatJes09Up[x],tmva_helper,"Jes09Up",versionMVA)
+            dfwzbvbscatJes10Up[x] = redefineMVAVariables(dfwzbvbscatJes10Up[x],tmva_helper,"Jes10Up",versionMVA)
+            dfwzbvbscatJes11Up[x] = redefineMVAVariables(dfwzbvbscatJes11Up[x],tmva_helper,"Jes11Up",versionMVA)
+            dfwzbvbscatJes12Up[x] = redefineMVAVariables(dfwzbvbscatJes12Up[x],tmva_helper,"Jes12Up",versionMVA)
+            dfwzbvbscatJes13Up[x] = redefineMVAVariables(dfwzbvbscatJes13Up[x],tmva_helper,"Jes13Up",versionMVA)
+            dfwzbvbscatJes14Up[x] = redefineMVAVariables(dfwzbvbscatJes14Up[x],tmva_helper,"Jes14Up",versionMVA)
+            dfwzbvbscatJes15Up[x] = redefineMVAVariables(dfwzbvbscatJes15Up[x],tmva_helper,"Jes15Up",versionMVA)
+            dfwzbvbscatJes16Up[x] = redefineMVAVariables(dfwzbvbscatJes16Up[x],tmva_helper,"Jes16Up",versionMVA)
+            dfwzbvbscatJes17Up[x] = redefineMVAVariables(dfwzbvbscatJes17Up[x],tmva_helper,"Jes17Up",versionMVA)
+            dfwzbvbscatJes18Up[x] = redefineMVAVariables(dfwzbvbscatJes18Up[x],tmva_helper,"Jes18Up",versionMVA)
+            dfwzbvbscatJes19Up[x] = redefineMVAVariables(dfwzbvbscatJes19Up[x],tmva_helper,"Jes19Up",versionMVA)
+            dfwzbvbscatJes20Up[x] = redefineMVAVariables(dfwzbvbscatJes20Up[x],tmva_helper,"Jes20Up",versionMVA)
+            dfwzbvbscatJes21Up[x] = redefineMVAVariables(dfwzbvbscatJes21Up[x],tmva_helper,"Jes21Up",versionMVA)
+            dfwzbvbscatJes22Up[x] = redefineMVAVariables(dfwzbvbscatJes22Up[x],tmva_helper,"Jes22Up",versionMVA)
+            dfwzbvbscatJes23Up[x] = redefineMVAVariables(dfwzbvbscatJes23Up[x],tmva_helper,"Jes23Up",versionMVA)
+            dfwzbvbscatJes24Up[x] = redefineMVAVariables(dfwzbvbscatJes24Up[x],tmva_helper,"Jes24Up",versionMVA)
+            dfwzbvbscatJes25Up[x] = redefineMVAVariables(dfwzbvbscatJes25Up[x],tmva_helper,"Jes25Up",versionMVA)
+            dfwzbvbscatJes26Up[x] = redefineMVAVariables(dfwzbvbscatJes26Up[x],tmva_helper,"Jes26Up",versionMVA)
+            dfwzbvbscatJes27Up[x] = redefineMVAVariables(dfwzbvbscatJes27Up[x],tmva_helper,"Jes27Up",versionMVA)
+            dfwzbvbscatJerUp  [x] = redefineMVAVariables(dfwzbvbscatJerUp  [x],tmva_helper,"JerUp"  ,versionMVA)
  
         if(makeDataCards >= 3):
             dfwzcat[x] = dfwzcat[x].Filter("nvbs_jets >= 2 && vbs_mjj > 150")

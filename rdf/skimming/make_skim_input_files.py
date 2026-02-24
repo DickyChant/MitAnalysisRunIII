@@ -65,7 +65,6 @@ if __name__ == "__main__":
                 countJobs += 1
 
             countFiles += 1
-            #outputFile.writelines(lineRaw[0].replace("root://xrootd.cmsaf.mit.edu//store","gsiftp://se01.cmsaf.mit.edu:2811/cms/store"))
             outputFile.writelines(lineRaw[0])
             outputFile.writelines("\n")
 

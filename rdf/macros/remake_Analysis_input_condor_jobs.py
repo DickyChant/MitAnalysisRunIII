@@ -8,20 +8,16 @@ if __name__ == "__main__":
 
     years = [20220, 20221, 20230, 20231, 20240, 20250]
     wzPOW = ["103 ", "203 ", "303 ", "403 ", "503 ", "503 "]
-    zzPOW = ["107 ", "207 ", "307 ", "407 ", "507 ", "507 "]
     wzMG  = ["179 ", "279 ", "379 ", "479 ", "579 ", "579 "]
-    zzMG  = ["183 ", "283 ", "383 ", "483 ", "583 ", "583 "]
 
     inputCfg = "Analysis_input_condor_jobs.cfg"
-    ana  = "zz"
+    ana  = "wz"
     isWZMG = 1
-    isZZMG = 1
     inputFolder = "."
 
-    valid = ['outputDir=', "ana=", "isWZMG=", "isZZMG=", "inputFolder=", 'help']
+    valid = ['outputDir=', "ana=", "isWZMG=", "inputFolder=", 'help']
     usage  =  "Usage: ana.py --ana=<{0}>\n".format(ana)
     usage +=  "              --isWZMG=<{0}>\n".format(isWZMG)
-    usage +=  "              --isZZMG=<{0}>\n".format(isZZMG)
     usage +=  "              --inputFolder=<{0}>".format(inputFolder)
     try:
         opts, args = getopt.getopt(sys.argv[1:], "", valid)
@@ -38,8 +34,6 @@ if __name__ == "__main__":
             ana = str(arg)
         if opt == "--isWZMG":
             isWZMG = int(arg)
-        if opt == "--isZZMG":
-            isZZMG = int(arg)
         if opt == "--inputFolder":
             inputFolder = str(arg)
 
@@ -57,11 +51,6 @@ if __name__ == "__main__":
         else:
             outputSamplesFile.write("{0}{1}\n".format(wzPOW[x],years[x]))
 
-        if(isZZMG == 1):
-            outputSamplesFile.write("{0}{1}\n".format(zzMG[x],years[x]))
-        else:
-            outputSamplesFile.write("{0}{1}\n".format(zzPOW[x],years[x]))
-
     inputSamplesFile = open(inputSamplesCfg, 'r')
     while True:
         line = inputSamplesFile.readline().strip()
@@ -69,14 +58,11 @@ if __name__ == "__main__":
             break
         goodLine = True
         for x in range(len(years)):
-            # Must remove all vvMG and vvPOW lines
+            # Must remove all wzMG and wzPOW lines
             if  (wzMG[x]  in line): goodLine = False
-            elif(zzMG[x]  in line): goodLine = False
             elif(wzPOW[x] in line): goodLine = False
-            elif(zzPOW[x] in line): goodLine = False
         if(goodLine == False):
             continue
-        #print(line)
         outputSamplesFile.write(line+"\n")
 
     outputSamplesFile.close()

@@ -63,8 +63,7 @@ if __name__ == "__main__":
     #            1l     2l     3l     met    pho
     doSkimSel = [True, True, True, True, False]
 
-    outputDir = "root://submit50.mit.edu//store/user/ceballos/nanoaod/skims_submit/"
-    #outputDir = "root://submit30.mit.edu//cms/ceballos/nanoaod/skims_submit/"
+    outputDir = os.environ.get("SKIM_OUTPUT_DIR", "/home/scratch/" + os.environ.get("USER", "user") + "/skims/nanoaod/skims_submit/")
     inputSamplesCfg = "skim_input_samples.cfg"
     inputFilesCfg = "skim_input_files.cfg"
     whichSample = 1
@@ -104,19 +103,12 @@ if __name__ == "__main__":
 
     theHost = socket.gethostname()
     msgCPInput  = "xrdcp --force"
-    msgCPOutput = "xrdcp --force"
-    isLocal = False
-    if(("t3deskxxx" in theHost) or ("t3btchxxx" in theHost)):
-        outputDir = outputDir.replace("root://t3serv017.mit.edu/","/mnt/hadoop")
-        msgCPOutput = "cp"
-        isLocal = True
-        print("T3 node ({0}), outputDir = {1} / msgCPOutput = {2}".format(theHost,outputDir,msgCPOutput))
-
-    elif("submit" in theHost):
-        outputDir = outputDir.replace("root://submit50.mit.edu/","/ceph/submit/data/group/cms")
-        msgCPOutput = "cp"
-        isLocal = True
-        print("submit node ({0}), outputDir = {1} / msgCPOutput = {2}".format(theHost,outputDir,msgCPOutput))
+    msgCPOutput = "cp"
+    isLocal = True
+    if(outputDir.startswith("root://")):
+        msgCPOutput = "xrdcp --force"
+        isLocal = False
+    print("Host ({0}), outputDir = {1} / msgCPOutput = {2}".format(theHost,outputDir,msgCPOutput))
 
     # Reading which sample we want to skim
     inputSamplesFile = open(inputSamplesCfg, 'r')
