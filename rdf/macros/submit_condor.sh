@@ -68,6 +68,24 @@ if [ ! -f "${whichAna}_input_condor_jobs.cfg" ]; then
    exit 1
 fi
 
+# Pre-flight check: verify skim files exist
+echo ""
+echo "Running pre-flight skim completeness check..."
+anaShort=$(echo ${whichAna} | sed 's/Analysis//')
+python3 check_skim_completeness.py --ana=${anaShort} --group=${group} 2>/dev/null
+checkStatus=$?
+if [ $checkStatus -ne 0 ]; then
+   echo ""
+   echo "WARNING: Some skim files are missing (see above)."
+   echo "Jobs for missing samples will fail or produce incomplete results."
+   read -p "Continue submitting anyway? [y/N] " confirm
+   if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
+     echo "Aborted. Run skimming first (see rdf/skimming/)."
+     exit 1
+   fi
+fi
+echo ""
+
 # Get user proxy ID for VOMS
 USERPROXY=`id -u`
 echo "User proxy ID: ${USERPROXY}"

@@ -66,6 +66,7 @@ MitAnalysisRunIII/
 │   │   ├── analysis_condor.sh   # Worker-node environment setup
 │   │   ├── analysis_runner.sh   # Generic job runner
 │   │   ├── collect_files_for_job.py  # Resolves file lists for transfer
+│   │   ├── check_skim_completeness.py  # Pre-submission skim validation
 │   │   ├── *_input_condor_jobs.cfg   # Per-analysis sample lists
 │   │   ├── mergeHistograms.py   # Merge per-job ROOT outputs
 │   │   ├── computeYields.py     # Yield tables from merged histograms
@@ -162,7 +163,16 @@ python3 wzAnalysis.py --process=179 --year=20220 --whichJob=-1
 
 ## Skimming
 
-Skimming reduces NanoAOD to manageable size by applying loose trigger + preselection. Output is split into skim types (`1l/`, `2l/`, `3l/`, `met/`, `pho/`) used by different analyses.
+**Skimming is a prerequisite for all analyses.** The analysis code reads pre-skimmed NanoAOD files, not the original CMS datasets. Skimming reduces NanoAOD to manageable size by applying loose trigger + preselection. Output is split into skim types used by different analyses:
+
+| Skim type | Directory | Used by |
+|---|---|---|
+| `1l` | `$SKIM_BASE_DIR/1l/` | fakeAnalysis |
+| `2l` | `$SKIM_BASE_DIR/2l/` | triggerAnalysis, puAnalysis |
+| `3l` | `$SKIM_BASE_DIR/3l/` | wzAnalysis |
+| `met` | `$SKIM_BASE_DIR/met/` | metAnalysis |
+
+On CMS Connect, Condor worker nodes **do not have direct filesystem access** to the skim files. Instead, `submit_condor.sh` resolves file paths at submission time and includes them in `transfer_input_files`, so Condor ships them to worker nodes. This means **all skim files must be present on the submission node's local storage before submitting analysis jobs.**
 
 ### Submit skimming jobs
 
@@ -181,11 +191,33 @@ python3 skim.py --whichSample=0 --whichJob=0 --group=5 \
   --inputFilesCfg=skim_inputfiles_2022a
 ```
 
-### Check for missing skim files
+### Check for missing skim files (skimming-level)
 
 ```bash
 python3 check_missing_skim_files.py
 ```
+
+This checks whether all expected skim output files exist in `$SKIM_OUTPUT_DIR`.
+
+### Validate skims for analysis (pre-submission check)
+
+Before submitting analysis jobs, verify that the skims needed by each analysis are complete:
+
+```bash
+cd rdf/macros
+
+# Check skims for a specific analysis
+python3 check_skim_completeness.py --ana=wz
+python3 check_skim_completeness.py --ana=fake
+
+# Check all analyses at once
+python3 check_skim_completeness.py --ana=all
+
+# Verbose mode (shows individual file paths)
+python3 check_skim_completeness.py --ana=wz --verbose
+```
+
+This resolves the same file paths that `submit_condor.sh` will use and reports any missing or empty files. A non-zero exit code means some skims are missing. The submission script also runs this check automatically and prompts for confirmation if problems are found.
 
 ### Create a new skim folder structure
 
@@ -237,6 +269,8 @@ These produce inputs needed by the WZ analysis (fake rates, trigger SFs, pileup 
 ## Batch Submission (CMS Connect Condor)
 
 Jobs run on CMS Connect via Condor with explicit file transfer. The submission script creates a tarball of analysis code, resolves input file lists, and submits jobs inside Singularity containers.
+
+**Important**: The submission script automatically runs `check_skim_completeness.py` before submitting. If any skim files are missing, it will warn you and ask for confirmation. Always ensure skims are complete first (see [Skimming](#skimming)).
 
 ### Two-round workflow
 
