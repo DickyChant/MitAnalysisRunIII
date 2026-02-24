@@ -67,6 +67,11 @@ MitAnalysisRunIII/
 │   │   ├── analysis_runner.sh   # Generic job runner
 │   │   ├── collect_files_for_job.py  # Resolves file lists for transfer
 │   │   ├── check_skim_completeness.py  # Pre-submission skim validation
+│   │   ├── direct/                 # Direct NanoAOD mode (no skims needed)
+│   │   │   ├── submit_condor.sh    # Condor submission (XRootD streaming)
+│   │   │   ├── resolve_sample_files.py  # Generate XRootD file lists
+│   │   │   ├── filelists/          # Pre-built XRootD file lists
+│   │   │   └── README.md           # Direct mode instructions
 │   │   ├── *_input_condor_jobs.cfg   # Per-analysis sample lists
 │   │   ├── mergeHistograms.py   # Merge per-job ROOT outputs
 │   │   ├── computeYields.py     # Yield tables from merged histograms
@@ -163,7 +168,9 @@ python3 wzAnalysis.py --process=179 --year=20220 --whichJob=-1
 
 ## Skimming
 
-**Skimming is a prerequisite for all analyses.** The analysis code reads pre-skimmed NanoAOD files, not the original CMS datasets. Skimming reduces NanoAOD to manageable size by applying loose trigger + preselection. Output is split into skim types used by different analyses:
+**Skimming is a prerequisite for standard mode.** The analysis code reads pre-skimmed NanoAOD files by default. Skimming reduces NanoAOD to manageable size by applying loose trigger + preselection. Output is split into skim types used by different analyses:
+
+> **Alternative: Direct NanoAOD mode** — Skip skimming entirely. Set `USE_DIRECT_NANOAOD=1` and pre-generate XRootD file lists with `direct/resolve_sample_files.py`. Worker nodes read raw NanoAOD from the CMS grid via XRootD streaming. See `rdf/macros/direct/README.md`.
 
 | Skim type | Directory | Used by |
 |---|---|---|
@@ -268,9 +275,16 @@ These produce inputs needed by the WZ analysis (fake rates, trigger SFs, pileup 
 
 ## Batch Submission (CMS Connect Condor)
 
-Jobs run on CMS Connect via Condor with explicit file transfer. The submission script creates a tarball of analysis code, resolves input file lists, and submits jobs inside Singularity containers.
+Jobs run on CMS Connect via Condor. There are **two submission modes**:
 
-**Important**: The submission script automatically runs `check_skim_completeness.py` before submitting. If any skim files are missing, it will warn you and ask for confirmation. Always ensure skims are complete first (see [Skimming](#skimming)).
+| Mode | Script | Data access | Needs skims? |
+|---|---|---|---|
+| **Standard** | `submit_condor.sh` | File transfer (skim files shipped to worker) | Yes |
+| **Direct** | `direct/submit_condor.sh` | XRootD streaming (reads CMS grid directly) | No |
+
+**Standard mode**: The submission script creates a tarball of analysis code, resolves input file lists, and submits jobs inside Singularity containers. It automatically runs `check_skim_completeness.py` before submitting.
+
+**Direct mode**: No skim files needed. Workers read raw NanoAOD directly from the CMS grid via XRootD. See `rdf/macros/direct/README.md` for setup. Much lighter jobs (just code tarball, no data transfer), but slightly slower per-job due to network I/O.
 
 ### Two-round workflow
 
@@ -307,6 +321,18 @@ Examples:
 ./submit_condor.sh 1          # WZ, condorJob=1001, group=1
 ./submit_condor.sh 1 1001 2   # WZ, condorJob=1001, group=2 (more jobs per sample)
 ./submit_condor.sh 5 1001 9   # fake, condorJob=1001, group=9
+```
+
+### Direct mode submission (no skims)
+
+```bash
+cd direct
+
+# One-time: generate XRootD file lists
+python3 resolve_sample_files.py --config=../wzAnalysis_input_condor_jobs.cfg
+
+# Submit
+./submit_condor.sh 1 1001
 ```
 
 ### Job configuration files
@@ -373,6 +399,15 @@ submit_condor.sh  →  Condor  →  analysis_singularity_condor.sh
 
 ## Merging and Post-Processing
 
+The analysis produces two types of output per job, and they require **different merging tools**:
+
+| Output type | Files | Merging tool | Contents |
+|---|---|---|---|
+| **Histograms** | `fillhisto_wzAnalysis1001_sample*_year*_job*.root` | `mergeHistograms.py` | TH1D/TH2D histograms for yields, plots, datacards |
+| **Ntuples** | `ntupleWZAna_sample*_year*_job*.root` | `hadd` (ROOT) | Flat TTree (`events`) with 51 branches for XGBoost/BDT training |
+
+Ntuples are only produced when `doNtuples = True` in `wzAnalysis.py`.
+
 ### Merge per-job histograms
 
 After batch jobs complete, merge output ROOT files per year:
@@ -386,6 +421,34 @@ python3 mergeHistograms.py --path=fillhisto_wzAnalysis1001 --year=20240 --output
 ```
 
 Output goes to `anaWZ/fillhisto_wzAnalysis1001_<year>_<histoIdx>.root`.
+
+> **Note**: `mergeHistograms.py` only handles histograms (TH1D, TH2D). It does **not** merge ntuples/TTrees. For ntuples, use `hadd` (see below).
+
+### Merge per-job ntuples (for training)
+
+If you ran with `doNtuples = True` in batch mode (`whichJob >= 0`), each job produces a separate ntuple file. Merge them with `hadd`:
+
+```bash
+# Merge all ntuple jobs for a single sample
+hadd -f ntupleWZAna_sample179_year20220.root ntupleWZAna_sample179_year20220_job*.root
+
+# Or merge ALL samples+years into one training file
+hadd -f ntupleWZAna_year2027.root ntupleWZAna_*.root
+```
+
+For **XGBoost training**, you don't strictly need to merge — you can load multiple files directly:
+
+```python
+import uproot
+import numpy as np
+
+# Load multiple ntuple files without merging
+files = glob.glob("ntupleWZAna_sample*_year*_job*.root")
+arrays = [uproot.open(f)["events"].arrays(library="np") for f in files]
+# Or use ROOT.TChain:
+chain = ROOT.TChain("events")
+for f in files: chain.Add(f)
+```
 
 ### Merge across years (Run 3 combination)
 
@@ -429,19 +492,27 @@ The VBS EWK WZ vs QCD WZ BDT discriminant uses 15+ kinematic variables. Training
 
 ### Step 1: Produce training ntuples
 
+**Option A: Interactive (from login node)** — uses `make_mva_training_ntuples.sh`:
 ```bash
 cd rdf/mva_training
-./make_mva_training_ntuples.sh 1
+./make_mva_training_ntuples.sh 1    # runs all samples with --whichJob=-1 (all files at once)
+# Wait for all nohup jobs to finish, then:
+./make_mva_training_ntuples.sh 10   # restores wzAnalysis.py + hadd → ntupleWZAna_year2027.root
 ```
 
-This temporarily sets `doNtuples = True` in `wzAnalysis.py` and runs over all signal/background MC samples. Produces `ntupleWZAna_sample*_year*_job*.root` files.
+This runs each sample as one job (`--whichJob=-1`), so each produces a single ntuple file. The final `hadd` merges all samples into one file.
 
-When all jobs finish:
+**Option B: Batch (Condor)** — for larger datasets or CMS Connect:
+1. Set `doNtuples = True` and `useFR = 0` in `wzAnalysis.py`
+2. Submit via `./submit_condor.sh 1` (or `direct/submit_condor.sh 1` for direct mode)
+3. Each job produces `ntupleWZAna_sample{id}_year{year}_job{N}.root`
+4. After all jobs complete, merge with `hadd`:
 ```bash
-./make_mva_training_ntuples.sh 10
+hadd -f ntupleWZAna_year2027.root ntupleWZAna_*.root
 ```
+5. Restore `wzAnalysis.py` (`doNtuples = False`, `useFR = 1`)
 
-This restores `wzAnalysis.py` and hadds all ntuples into `ntupleWZAna_year2027.root`.
+> **For XGBoost**: You can skip the `hadd` step and load multiple files directly with `uproot` or `ROOT.TChain`. This is often more convenient for Python-based training.
 
 ### Step 2: Train the BDT
 

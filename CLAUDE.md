@@ -10,6 +10,7 @@ MitAnalysisRunIII is a CMS particle physics analysis framework for LHC Run 3 dat
 
 - **`rdf/macros/`** — Primary analysis code. The main analysis is `wzAnalysis.py`, with supporting analyses for fake rates (`fakeAnalysis.py`), triggers (`triggerAnalysis.py`), pileup (`puAnalysis.py`), MET (`metAnalysis.py`), and generator-level studies (`genAnalysis.py`). Core C++ functions live in `functions.h`, scale factors in `mysf.h`.
 - **`rdf/skimming/`** — Data reduction pipeline. `skim.py` reads NanoAOD from XRootD and applies loose preselection. Input sample lists are in `skim_inputfiles_*` directories organized by year/era.
+- **`rdf/macros/direct/`** — Direct NanoAOD mode: reads raw NanoAOD via XRootD, no skim files needed. Ideal for CMS Connect where local storage is limited. See `direct/README.md`.
 - **`rdf/makePlots/`** — Plotting. `finalPlot.C` generates CMS-style plots, driven by `makePlots.sh`.
 - **`rdf/mva_training/`** — BDT training for VBS jet tagging (`ewkvbsMVA.C`).
 
@@ -17,10 +18,11 @@ MitAnalysisRunIII is a CMS particle physics analysis framework for LHC Run 3 dat
 
 **Skimming → Supporting Analyses → WZ Analysis → Plotting/Datacards**
 
-1. **Skimming is required first.** All analyses read pre-skimmed NanoAOD, not raw CMS data. Skims live in `$SKIM_BASE_DIR/{1l,2l,3l,met}/` organized by dataset name.
-2. **Supporting analyses (Round 1)** produce fake rates, trigger SFs, pileup weights, MET corrections that the WZ analysis needs. These are independent of each other.
-3. **WZ analysis (Round 2)** depends on Round 1 outputs stored in `rdf/macros/data/`.
-4. On **CMS Connect**, Condor worker nodes have NO local filesystem access to skims. Files are transferred via `transfer_input_files`. The submission script resolves paths at submit time.
+1. **Skimming is required first** (standard mode). All analyses read pre-skimmed NanoAOD. Skims live in `$SKIM_BASE_DIR/{1l,2l,3l,met}/` organized by dataset name.
+2. **OR use Direct NanoAOD mode** (`USE_DIRECT_NANOAOD=1`): skip skimming entirely. Worker nodes read raw NanoAOD via XRootD. See `rdf/macros/direct/README.md`.
+3. **Supporting analyses (Round 1)** produce fake rates, trigger SFs, pileup weights, MET corrections that the WZ analysis needs. These are independent of each other.
+4. **WZ analysis (Round 2)** depends on Round 1 outputs stored in `rdf/macros/data/`.
+5. On **CMS Connect**, Condor worker nodes have NO local filesystem access to skims. Use either file transfer (standard `submit_condor.sh`) or XRootD streaming (direct mode `direct/submit_condor.sh`).
 
 ## Environment Variables
 
@@ -32,6 +34,8 @@ export SCRATCH_SAMPLE_DIR="/home/scratch/$USER/samples"    # special/test sample
 export ANALYSIS_OUTPUT_DIR="/home/scratch/$USER/analysis"  # analysis output area
 export SKIM_OUTPUT_DIR="/home/scratch/$USER/skims"         # skim job output
 export XRD_SERVER=""                                       # XRootD redirector (empty = local)
+export USE_DIRECT_NANOAOD=1                                # enable direct NanoAOD mode (no skims)
+export FILELIST_DIR="direct/filelists"                     # XRootD file lists for direct mode
 ```
 
 Defaults are in `rdf/macros/utilsAna.py` (lines 14-16).
@@ -77,6 +81,14 @@ ls jsns/Cert_Collisions*.json
 
 # Check MVA weights (empty = need to train; present = ready for inference)
 ls weights_mva/
+
+# Check direct NanoAOD mode file lists
+ls direct/filelists/*.txt 2>/dev/null | wc -l   # how many file lists exist
+wc -l direct/filelists/*.txt 2>/dev/null         # files per sample
+
+# Generate missing file lists (requires dasgoclient + VOMS proxy)
+cd direct
+python3 resolve_sample_files.py --config=../wzAnalysis_input_condor_jobs.cfg
 ```
 
 ## Running Analyses
@@ -96,6 +108,14 @@ Arguments: `--process` (sample ID from `*_input_condor_jobs.cfg`), `--year` (enc
 Analysis codes: 1=wz, 5=fake, 6=trigger, 7=met, 9=pu
 
 The submission script automatically runs `check_skim_completeness.py` and warns if skims are missing. It reads sample lists from `<analysis>_input_condor_jobs.cfg` (format: `sampleID year [no]`). Rows marked `no` are skipped. See `WZ_ANALYSIS_GUIDE.md` for full CMS Connect workflow.
+
+### Submit batch jobs (Direct NanoAOD mode — no skims needed)
+```bash
+cd direct
+python3 resolve_sample_files.py --config=../wzAnalysis_input_condor_jobs.cfg  # one-time setup
+./submit_condor.sh 1 1001   # submit WZ analysis
+```
+Workers read raw NanoAOD from the CMS grid via XRootD. No skim files needed.
 
 ### Two-round submission
 ```bash
@@ -118,6 +138,14 @@ python3 remake_Analysis_input_condor_jobs.py --ana=wz
 ```bash
 python3 mergeHistograms.py --path=fillhisto_wzAnalysis1001 --year=20220 --output=anaWZ
 ```
+**Important**: `mergeHistograms.py` only merges histograms (TH1D/TH2D), NOT ntuples/TTrees.
+
+### Merge ntuples (for XGBoost/BDT training)
+Ntuples are produced when `doNtuples = True`. Merge with `hadd`, not `mergeHistograms.py`:
+```bash
+hadd -f ntupleWZAna_year2027.root ntupleWZAna_*.root
+```
+For XGBoost, you can skip merging and load multiple files directly with `uproot` or `ROOT.TChain`.
 
 ### Compute yields and results
 ```bash
@@ -174,8 +202,15 @@ Sample IDs are integers in the `*_input_condor_jobs.cfg` files. The hundreds dig
 ### Corrections and scale factors
 POG-approved JSON corrections are in `jsonpog-integration/`. Reference histograms (fake rates, b-tag efficiencies, trigger SFs, lepton SFs) are ROOT files in `data/`. The `mysf.h` module wraps `correctionlib` for standardized access.
 
+### Output types
+The analysis produces two types of per-job output:
+- **Histograms** (`fillhisto_*_sample*_year*_job*.root`): TH1D/TH2D for yields/plots/datacards. Merge with `mergeHistograms.py`.
+- **Ntuples** (`ntupleWZAna_sample*_year*_job*.root`): flat TTree with 51 branches for ML training. Only produced when `doNtuples = True`. Merge with `hadd` (ROOT), or load directly with `uproot`/`TChain` for XGBoost training.
+
 ### Job execution model
-Batch jobs run on CMS Connect via Condor with file transfer. The submission script (`submit_condor.sh`) creates a tarball of analysis code, collects input file lists via `collect_files_for_job.py`, and submits jobs that run inside Singularity containers (`analysis_singularity_condor.sh` → `analysis_condor.sh` → `analysis_runner.sh`).
+**Standard mode**: Batch jobs run on CMS Connect via Condor with file transfer. The submission script (`submit_condor.sh`) creates a tarball of analysis code, collects input file lists via `collect_files_for_job.py`, and submits jobs that run inside Singularity containers (`analysis_singularity_condor.sh` → `analysis_condor.sh` → `analysis_runner.sh`).
+
+**Direct NanoAOD mode**: Uses `direct/submit_condor.sh`. No skim file transfer — workers read raw NanoAOD via XRootD streaming. Set `USE_DIRECT_NANOAOD=1` and pre-generate file lists with `direct/resolve_sample_files.py`. Same output format; same merging workflow.
 
 ### Skim types per analysis
 | Analysis | Code | Skim type | Default group |

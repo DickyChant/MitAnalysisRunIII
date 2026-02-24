@@ -15,6 +15,11 @@ SKIM_BASE_DIR = os.environ.get("SKIM_BASE_DIR", "/home/scratch/stqian/wz_guiller
 SCRATCH_SAMPLE_DIR = os.environ.get("SCRATCH_SAMPLE_DIR", "/home/scratch/stqian/samples")
 XRD_SERVER = os.environ.get("XRD_SERVER", "")
 
+# Direct NanoAOD mode: read raw NanoAOD via XRootD instead of local skim files
+# Set USE_DIRECT_NANOAOD=1 to enable. File lists must be pre-built in FILELIST_DIR.
+USE_DIRECT_NANOAOD = os.environ.get("USE_DIRECT_NANOAOD", "0") == "1"
+FILELIST_DIR = os.environ.get("FILELIST_DIR", "direct/filelists")
+
 def getLumi(year):
     lumi = [36.1, 41.5, 60.0, 8.1, 26.7, 18.1, 9.7, 109.6, 105.0]
 
@@ -182,8 +187,48 @@ def concatenate(result, tmp1):
     for f in tmp1:
         result.push_back(f)
 
+def _read_filelist_mc(sample_id):
+    """Read pre-built XRootD file list for an MC sample (direct NanoAOD mode)."""
+    fpath = os.path.join(FILELIST_DIR, "{0}.txt".format(sample_id))
+    if not os.path.exists(fpath):
+        raise FileNotFoundError(
+            "File list not found: {0}\n"
+            "Generate with: python3 direct/resolve_sample_files.py --sample={1}".format(fpath, sample_id))
+    files = ROOT.vector('string')()
+    with open(fpath) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#'):
+                files.push_back(line)
+    if len(files) == 0:
+        raise RuntimeError("Empty file list: {0}".format(fpath))
+    print("Direct NanoAOD mode: loaded {0} files for MC sample {1}".format(len(files), sample_id))
+    return files
+
+def _read_filelist_data(sample_type, year):
+    """Read pre-built XRootD file list for a data sample (direct NanoAOD mode)."""
+    fpath = os.path.join(FILELIST_DIR, "data_{0}_{1}.txt".format(sample_type, year))
+    if not os.path.exists(fpath):
+        raise FileNotFoundError(
+            "File list not found: {0}\n"
+            "Generate with: python3 direct/resolve_sample_files.py --data --type={1} --year={2}".format(
+                fpath, sample_type, year))
+    files = ROOT.vector('string')()
+    with open(fpath) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#'):
+                files.push_back(line)
+    if len(files) == 0:
+        raise RuntimeError("Empty file list: {0}".format(fpath))
+    print("Direct NanoAOD mode: loaded {0} files for data type={1} year={2}".format(
+        len(files), sample_type, year))
+    return files
+
 def getMClist(sampleNOW, skimType):
 
+    if USE_DIRECT_NANOAOD:
+        return _read_filelist_mc(sampleNOW)
     files = findDIR("{}".format(SwitchSample(sampleNOW, skimType)[0]))
     return files
 
@@ -214,6 +259,9 @@ def getDATAlist(type, year, skimType):
         loadJSON(os.path.join("jsns",jsnName))
     else:
         loadJSON(jsnName)
+
+    if USE_DIRECT_NANOAOD:
+        return _read_filelist_data(type, year)
 
     filesL = []
     ##### 2018 ####
