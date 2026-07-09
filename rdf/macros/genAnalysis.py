@@ -6,11 +6,9 @@ ROOT.ROOT.EnableImplicitMT(10)
 from utilsCategory import plotCategory
 from utilsAna import getMClist, getDATAlist, getTriggerFromJson, getLumi
 from utilsAna import SwitchSample
-from utilsSelection import selectionGenLepJet, selectionTheoryWeigths, makeFinalVariable
+from utilsSelection import selectionGenLepJet, selectionTheoryWeigths, makeFinalVariable, makeFinalVariableVar
 
-isRun3Sel = True
-
-def analysis(df,count,category,weight,year,PDType,nSel,isData,histo_wwpt,ewkCorrWeights,nTheoryReplicas,genEventSumLHEScaleRenorm,genEventSumPSRenorm):
+def analysis(df,count,category,weight,year,PDType,nSel,isRun3Sel,isData,histo_wwpt,ewkCorrWeights,nTheoryReplicas,genEventSumLHEScaleRenorm,genEventSumPSRenorm):
 
     xPtBins = array('d', [20,25,30,35,40,50,60,80,100,150,250,500,1000])
     xEtaBins = array('d', [0.0,0.3,0.6,0.9,1.2,1.5,1.8,2.1,2.5])
@@ -68,9 +66,10 @@ def analysis(df,count,category,weight,year,PDType,nSel,isData,histo_wwpt,ewkCorr
     minXF = -0.5
     maxXF = 0.5
 
-    startF = 140
+    # No requirements
+    startF = 0
     for nv in range(0,114):
-        histo[startF+0+nv][x] = makeFinalVariable(dfcat,"weightForBTag",theCat,startF+0,x,BinXF,minXF,maxXF,nv)
+        histo[startF+0+nv][1] = makeFinalVariable(dfcat,"weightForBTag",theCat,startF+0,1,BinXF,minXF,maxXF,nv)
 
     dfzllgen = (dfcat
           .Define("gen_z", "GenPart_pdgId == 23 && GenPart_status == 62")
@@ -86,7 +85,7 @@ def analysis(df,count,category,weight,year,PDType,nSel,isData,histo_wwpt,ewkCorr
             )
 
     dfwwxgen = dfcat.Filter("ngood_GenDressedLeptons >= 2", "ngood_GenDressedLeptons >= 2")
-    if(isRun3Sel == True):
+    if(isRun3Sel == 1):
         dfwwxgen = (dfwwxgen
                         .Define("theGenCat0", "compute_gen_category({0},ngood_GenJets,ngood_GenDressedLeptons,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass,0)-1.0".format(0))
                         .Define("theGenCat1", "compute_gen_category({0},ngood_GenJets,ngood_GenDressedLeptons,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass,1)-1.0".format(0))
@@ -124,9 +123,10 @@ def analysis(df,count,category,weight,year,PDType,nSel,isData,histo_wwpt,ewkCorr
     histo[12][x] = dfzllgen.Histo1D(("histo_{0}_{1}".format(12,x), "histo_{0}_{1}".format(12,x), 50, 0., 5.0), "Zrap","weight")
     histo2D[100][x] = dfzllgen.Histo2D(("histo2d_{0}_{1}".format(100,x),"histo2d_{0}_{1}".format(100,x),10, 0, 5, 40, 0, 100),"Zrap","Zpt","weight")
 
-    startF = 260
+    # mZ requirement
+    startF = 0
     for nv in range(0,114):
-        histo[startF+0+nv][x] = makeFinalVariable(dfzllgen,"weightForBTag",theCat,startF+0,x,BinXF,minXF,maxXF,nv)
+        histo[startF+0+nv][2] = makeFinalVariable(dfzllgen,"weightForBTag",theCat,startF+0,2,BinXF,minXF,maxXF,nv)
 
     dfzllgen = (dfzllgen
           .Define("genLep", "(abs(GenDressedLepton_pdgId) == 11 || abs(GenDressedLepton_pdgId) == 13)")
@@ -170,7 +170,7 @@ def analysis(df,count,category,weight,year,PDType,nSel,isData,histo_wwpt,ewkCorr
                         .Define("ptvvGen", "compute_gen_ptvv(good_GenDressedLepton_pt,good_GenDressedLepton_phi,GenMET_pt,GenMET_phi)")
                         )
 
-    if(isRun3Sel == True):
+    if(isRun3Sel == 1):
         dfwwxgen = (dfwwxgen
                        .Filter("mllGen > 85", "mllGen > 85")
                        )
@@ -221,9 +221,36 @@ def analysis(df,count,category,weight,year,PDType,nSel,isData,histo_wwpt,ewkCorr
     minXF = -0.5
     maxXF = 2.5
 
-    startF = 20
-    for nv in range(0,114):
-        histo[startF+nv][x] = makeFinalVariable(dfwwxgen,"theGenCat",theCat,startF,x,BinXF,minXF,maxXF,nv)
+    for whichVar in range(0,11):
+        xWWBins = array('d', [-0.5,0.5,1.5,2.5])
+        if(whichVar == 0):
+            xWWBins = array('d', [-0.5,0.5,1.5,2.5])
+        elif(whichVar == 1):
+            xWWBins = array('d', [25,40,45,50,55,60,70,80,100])
+        elif(whichVar == 2):
+            xWWBins = array('d', [20,30,35,40,45,50,55,60,100])
+        elif(whichVar == 3):
+            xWWBins = array('d', [20,30,40,45,50,55,60,70,80,100,150,200,250])
+        elif(whichVar == 4):
+            xWWBins = array('d', [30,35,40,45,50,55,60,70,80,100,120])
+        elif(whichVar == 5):
+            xWWBins = array('d', [0,20,30,35,40,50,60.80])
+        elif(whichVar == 6):
+            xWWBins = array('d', [-0.5,0.5,1.5,2.5,3.5])
+        elif(whichVar == 7):
+            xWWBins = array('d', [30,40,55,75,95,120,150,180,215,255,300,350])
+        elif(whichVar == 8):
+            xWWBins = array('d', [30,40,55,75,100,150,400])
+        elif(whichVar == 9):
+            xWWBins = array('d', [0,40,55,70,90,110,135,165,200,250,300,400])
+        elif(whichVar == 10):
+            xWWBins = array('d', [0.0000,0.4488,0.8976,1.3464,1.7952,2.2440,2.6928,3.1416,3.5904,4.0392,4.4880,4.9368,5.3856,5.8344,6.2832])
+
+        dfwwxgen = dfwwxgen.Define("diffVar{0}".format(whichVar), "compute_llgen_var(ngood_GenJets,good_GenJet_pt,good_GenJet_eta,good_GenJet_phi,good_GenJet_mass,ngood_GenDressedLeptons,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass,GenMET_pt,GenMET_phi,PDType,{0})".format(whichVar))
+        # WW fiducial
+        startF = 0
+        for nv in range(0,114):
+            histo[startF+nv][10+whichVar] = makeFinalVariableVar(dfwwxgen,"diffVar{0}".format(whichVar),theCat,startF,10+whichVar,xWWBins,nv)
 
     histo[134][x] = dfwwxgen.Histo1D(("histo_{0}_{1}".format(134,x), "histo_{0}_{1}".format(134,x),BinXF,minXF,maxXF),"theGenCat","weight")
     histo[135][x] = dfwwxgen.Histo1D(("histo_{0}_{1}".format(135,x), "histo_{0}_{1}".format(135,x),BinXF,minXF,maxXF),"theGenCat","theNNLOWeight0")
@@ -281,9 +308,10 @@ def analysis(df,count,category,weight,year,PDType,nSel,isData,histo_wwpt,ewkCorr
     BinXF = 4
     minXF = -0.5
     maxXF = 3.5
-    startF = 386
+    # mZ + 3l requirements
+    startF = 0
     for nv in range(0,114):
-        histo[startF+nv][x] = makeFinalVariable(dfvbswzgen,"theGenCat",theCat,startF,x,BinXF,minXF,maxXF,nv)
+        histo[startF+nv][3] = makeFinalVariable(dfvbswzgen,"theGenCat",theCat,startF,3,BinXF,minXF,maxXF,nv)
 
     BinXF = 4
     minXF = -0.5
@@ -366,7 +394,7 @@ def analysis(df,count,category,weight,year,PDType,nSel,isData,histo_wwpt,ewkCorr
 
     print("ending {0} / {1} / {2} / {3} / {4} / {5}".format(count,category,weight,year,PDType,isData))
 
-def readMCSample(sampleNOW, year, skimType, nSel, histo_wwpt, ewkCorrWeights):
+def readMCSample(sampleNOW, year, skimType, nSel, isRun3Sel, histo_wwpt, ewkCorrWeights):
 
     files = getMClist(sampleNOW, skimType)
     print("Total files: {0}".format(len(files)))
@@ -422,6 +450,11 @@ def readMCSample(sampleNOW, year, skimType, nSel, histo_wwpt, ewkCorrWeights):
         nTheoryReplicas[0] = 103
         nTheoryReplicas[1] = 7
         nTheoryReplicas[2] = 0
+    elif(("WZJJto3LNu-EWK" in SwitchSample(sampleNOW, skimType)[0]) and ("sherpa" in SwitchSample(sampleNOW, skimType)[0])):
+        print("WZJJto3LNu-EWK sherpa sample")
+        nTheoryReplicas[0] = 103
+        nTheoryReplicas[1] = 7
+        nTheoryReplicas[2] = 0
 
     print("Number of Theory replicas: {0} / {1} / {2}".format(nTheoryReplicas[0],nTheoryReplicas[1],nTheoryReplicas[2]))
 
@@ -449,7 +482,7 @@ def readMCSample(sampleNOW, year, skimType, nSel, histo_wwpt, ewkCorrWeights):
 
     PDType = os.path.basename(SwitchSample(sampleNOW, skimType)[0]).split('+')[0]
 
-    analysis(df, sampleNOW, SwitchSample(sampleNOW,skimType)[2], weight, year, PDType, nSel, "false",histo_wwpt,ewkCorrWeights,nTheoryReplicas,genEventSumLHEScaleRenorm,genEventSumPSRenorm)
+    analysis(df, sampleNOW, SwitchSample(sampleNOW,skimType)[2], weight, year, PDType, nSel, isRun3Sel, "false",histo_wwpt,ewkCorrWeights,nTheoryReplicas,genEventSumLHEScaleRenorm,genEventSumPSRenorm)
 
 if __name__ == "__main__":
 
@@ -457,11 +490,13 @@ if __name__ == "__main__":
     process = 399
     skimType = "2l"
     nSel = "ww"
+    isRun3Sel = 1
 
-    valid = ['year=', "process=", "sel=", 'help']
+    valid = ['year=', "process=", "sel=", 'run3sel=', 'help']
     usage  =  "Usage: ana.py --year=<{0}>\n".format(year)
     usage +=  "              --process=<{0}>\n".format(process)
-    usage +=  "              --sel=<{0}>".format(nSel)
+    usage +=  "              --sel=<{0}>\n".format(nSel)
+    usage +=  "              --run3sel=<{0}>".format(isRun3Sel)
     try:
         opts, args = getopt.getopt(sys.argv[1:], "", valid)
     except getopt.GetoptError as ex:
@@ -477,6 +512,8 @@ if __name__ == "__main__":
             process = int(arg)
         if opt == "--sel":
             nSel = str(arg)
+        if opt == "--run3sel":
+            isRun3Sel = int(arg)
 
     histo_wwpt = []
     fPtwwWeightPath = ROOT.TFile("data/MyRatioWWpTHistogramAll.root")
@@ -501,6 +538,6 @@ if __name__ == "__main__":
     fewkCorrFile.Close()
 
     try:
-        readMCSample(process,year, skimType, nSel, histo_wwpt, ewkCorrWeights)
+        readMCSample(process,year, skimType, nSel, isRun3Sel, histo_wwpt, ewkCorrWeights)
     except Exception as e:
         print("FAILED {0}".format(e))

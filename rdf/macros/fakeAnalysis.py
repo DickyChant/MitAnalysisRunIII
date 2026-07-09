@@ -224,7 +224,8 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,puWeights):
                 if(ltype == 1):
                     histo[npt+totalxPtDistBins*ltype+120][y] = dfptcat[(2*y+ltype)*totalxPtDistBins+npt].Filter("Sum(tight_el3)==1").Histo1D(("histo_{0}_{1}".format(npt+totalxPtDistBins*ltype+120,y), "histo_{0}_{1}".format(npt+totalxPtDistBins*ltype+120,y),40, 0, 200), "mtfix","weight")
 
-            dffakecat.append(dfcat[2*y+ltype].Filter("mtfix < {0} && ptl < {1}".format(mtfixCut,xPtBins[len(xPtBins)-1]), "mtfixCut < X && ptl < Y"))
+            dffakecat.append(dfcat[2*y+ltype].Filter("ptl < {0}".format(xPtBins[len(xPtBins)-1]), "ptl < {0}".format(xPtBins[len(xPtBins)-1])))
+            dffakecat[2*y+ltype] = dffakecat[2*y+ltype].Filter("mtfix < {0}".format(mtfixCut), "mtfix < {0}".format(mtfixCut))
 
             dfjet30cat .append(dffakecat[2*y+ltype].Filter("ngood_jets > 0","at least one jet30").Define("drljet","deltaR(good_Jet_eta[0],good_Jet_phi[0],etal,phil)"))
             dfjet50cat .append(dffakecat[2*y+ltype].Filter("nvbs_jets > 0","at least one jet50").Define("drljet","deltaR(vbs_Jet_eta[0],vbs_Jet_phi[0],etal,phil)"))

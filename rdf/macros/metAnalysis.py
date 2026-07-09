@@ -6,7 +6,7 @@ ROOT.ROOT.EnableImplicitMT(10)
 from utilsCategory import plotCategory
 from utilsAna import getMClist, getDATAlist, getLumi
 from utilsAna import SwitchSample, groupFiles, getTriggerFromJson, getLeptomSelFromJson
-from utilsSelection import selection2LVar, selectionElMu
+from utilsSelection import selection2LVar, selectionElMu, selectionJetMet
 
 selectionJsonPath = "config/selection.json"
 if(not os.path.exists(selectionJsonPath)):
@@ -20,11 +20,14 @@ JSON = jsonObject['JSON']
 
 VBSSEL = jsonObject['VBSSEL']
 
+bTagSel = 1
+jetEtaCut = 4.7
+
 muSelChoice = 0
 
 elSelChoice = 0
 
-def selectionLL(df,year,PDType,isData):
+def selectionLL(df,count,year,PDType,isData):
 
     overallTriggers = jsonObject['triggers']
     TRIGGERMET = getTriggerFromJson(overallTriggers, "TRIGGERMET", year)
@@ -64,6 +67,7 @@ def selectionLL(df,year,PDType,isData):
                   .Define("etalmin","compute_nl_var(fake_Muon_pt, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_pt, PuppiMET_phi,6)")
                   )
 
+    dftag = selectionJetMet(dftag,year,bTagSel,isData,count,jetEtaCut)
     dftag = selection2LVar(dftag,year,isData)
 
     return dftag
@@ -93,7 +97,7 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob):
 
     ROOT.initJSONSFs(year)
 
-    dfbase = selectionLL(df,year,PDType,isData)
+    dfbase = selectionLL(df,count,year,PDType,isData)
 
     if(theCat == plotCategory("kPlotData")):
         dfbase = dfbase.Define("weight","1.0")

@@ -171,6 +171,10 @@ if __name__ == "__main__":
                         eff = 0.0
                         unc = min(pow(1.0/den,0.5),0.999)
 
+                    if(isPseudoData == 0):
+                        if(thePlot == 0): eff = eff*0.65;
+                        elif(thePlot == 1): eff = eff*1.20;
+
                     histoFakeEffSelEtaPt[thePlot][nsel].SetBinContent(i+1,j+1,eff)
                     histoFakeEffSelEtaPt[thePlot][nsel].SetBinError  (i+1,j+1,unc)
                     print("({0},{1}): ({2:8.1f} - {3:8.1f}) / ({4:8.1f} - {5:8.1f}) = {6:8.1f} / {7:8.1f} = {8:0.3f} +/- {9:0.3f}".format(i+1,j+1,

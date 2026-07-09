@@ -237,7 +237,7 @@ Vec_b cleaningJetSelMask(unsigned int sel, Vec_f jet_eta, Vec_f jet_chHEF, Vec_f
   float result = 0.0;
 
   for(unsigned int i=0;i<jet_eta.size();i++) {
-    if(year >= 20240) {
+    if(year >= 20240 || year <= 20210) {
       result = corrSFs.eval_jetSel(sel, jet_eta[i], jet_chHEF[i], jet_neHEF[i], jet_chEmEF[i], jet_neEmEF[i], jet_muEF[i], jet_chMultiplicity[i], jet_neMultiplicity[i]);
 
       if(debug) {
@@ -364,11 +364,11 @@ float compute_JSON_MUO_SFs(std::string valType0S, std::string valType1S, std::st
   return sfTot;
 }
 
-float compute_JSON_ELE_SFs(std::string yearS, std::string valType0S, std::string valType1S, 
+float compute_JSON_ELE_SFs(const int yearValue, std::string yearS, std::string valType0S, std::string valType1S, 
                            std::string workingPointS, const Vec_f& el_pt, const Vec_f& el_eta, const Vec_f& el_phi){
   if(el_pt.size() == 0) return 1.0;
   bool debug = false;
-  if(debug) printf("eleeff: %lu\n",el_pt.size());
+  if(debug) printf("eleeff: %lu / %d\n",el_pt.size(),yearValue);
   double sfTot = 1.0;
 
   const char *year = yearS.c_str();
@@ -381,6 +381,8 @@ float compute_JSON_ELE_SFs(std::string yearS, std::string valType0S, std::string
     double pt_used = max(el_pt[i],10.001f);
     if     (pt_used < 20) recoNameAux = (char*)"RecoBelow20";
     else if(pt_used < 75) recoNameAux = (char*)"Reco20to75";
+    if     (yearValue <  20210 && pt_used >= 20) recoNameAux = (char*)"RecoAbove20";
+    else if(yearValue >= 20250 && pt_used  < 20) {recoNameAux = (char*)"Reco20to75"; pt_used = 20.001;}
     const char *recoName = recoNameAux;
     double sf0 = corrSFs.eval_electronTRKSF(year,valType0,    recoName,el_eta[i],pt_used,el_phi[i]);
     double sf1 = 1.0;
@@ -530,7 +532,11 @@ float compute_JSON_MET(const std::string pt_phiS, const std::string met_typeS, c
   const char *pt_phi = pt_phiS.c_str();
   const char *met_type = met_typeS.c_str();
   const char *epoch = "";
-  if     (year == 20220) epoch = (char*)"2022";
+  if     (year == 20160) epoch = (char*)"2022";
+  else if(year == 20161) epoch = (char*)"2022";
+  else if(year == 20170) epoch = (char*)"2022";
+  else if(year == 20180) epoch = (char*)"2022";
+  else if(year == 20220) epoch = (char*)"2022";
   else if(year == 20221) epoch = (char*)"2022EE";
   else if(year == 20230) epoch = (char*)"2023";
   else if(year == 20231) epoch = (char*)"2023BPix";
@@ -542,8 +548,8 @@ float compute_JSON_MET(const std::string pt_phiS, const std::string met_typeS, c
   float result = corrSFs.eval_met_corr(pt_phi, met_type, epoch, dtmc, variation, met_pt,met_phi,npvGood);
 
   // NO CORRECTION APPLIED FOR >= 2024!!!
-  if     (year >= 20240 && pt_phiS == "pt") result = met_pt;
-  else if(year >= 20240 && pt_phiS == "phi") result = met_phi;
+  if     ((year >= 20240 || year <= 20210) && pt_phiS == "pt") result = met_pt;
+  else if((year >= 20240 || year <= 20210) && pt_phiS == "phi") result = met_phi;
 
   bool debug = false;
   if(debug) printf("MET: %s / %s / %s / %s / %s / %.2f / %.2f / %.2f: %.2f\n",pt_phi,met_type,epoch,dtmc,variation,met_pt,met_phi,npvGood,result);
@@ -554,7 +560,11 @@ float compute_JSON_MET(const std::string pt_phiS, const std::string met_typeS, c
 Vec_b cleaningJetVetoMapMask(const Vec_f& jet_eta, const Vec_f& jet_phi, int jetTypeCorr, const int year) {
   Vec_b jet_vetoMap_mask(jet_eta.size(), true);
 
-  if     (jetTypeCorr == -1 && year == 20220) jetTypeCorr = 0;
+  if     (jetTypeCorr == -1 && year == 20160) jetTypeCorr = 0;
+  else if(jetTypeCorr == -1 && year == 20161) jetTypeCorr = 0;
+  else if(jetTypeCorr == -1 && year == 20170) jetTypeCorr = 0;
+  else if(jetTypeCorr == -1 && year == 20180) jetTypeCorr = 0;
+  else if(jetTypeCorr == -1 && year == 20220) jetTypeCorr = 0;
   else if(jetTypeCorr == -1 && year == 20221) jetTypeCorr = 4;
   else if(jetTypeCorr == -1 && year == 20230) jetTypeCorr = 2;
   else if(jetTypeCorr == -1 && year == 20231) jetTypeCorr = 3;
@@ -875,17 +885,24 @@ float compute_EWKCorr(const int type, const TString theCat, const float mjjGen){
         const TH1D& hcorr = hVV_KF_EWK_unc[0];
         sf = getValFromTH1(hcorr, mjjGen);
       }
+      // Further correction on polarized samples
+      float SFS[3] = {0.188/0.145, 0.188/0.173, 0.188/0.208};
+      if     (theCat.Contains("VBS-SSWW") && theCat.Contains("LL")) sf = sf * SFS[0];
+      else if(theCat.Contains("VBS-SSWW") && theCat.Contains("TL")) sf = sf * SFS[1];
+      else if(theCat.Contains("VBS-SSWW") && theCat.Contains("TT")) sf = sf * SFS[2];
     }
   }
   else if(theCat.Contains("WZto3LNu-2Jets_EW")
        || theCat.Contains("WZJJto3LNu-EWK")) {
-    if(type == 0) {
-      const TH1D& hcorr = hVV_KF_EWK[1];
-      sf = getValFromTH1(hcorr, mjjGen);
-    }
-    else if(type == 1) {
-      const TH1D& hcorr = hVV_KF_EWK_unc[1];
-      sf = getValFromTH1(hcorr, mjjGen);
+    if(!theCat.Contains("sherpa")){ // no sherpa correction
+      if(type == 0) {
+        const TH1D& hcorr = hVV_KF_EWK[1];
+        sf = getValFromTH1(hcorr, mjjGen);
+      }
+      else if(type == 1) {
+        const TH1D& hcorr = hVV_KF_EWK_unc[1];
+        sf = getValFromTH1(hcorr, mjjGen);
+      }
     }
   }
 
@@ -916,8 +933,8 @@ float compute_PTWWCorr(const int type, const TString theCat, const float ptww){
 }
 
 float compute_fakeRate(const bool isData,
-                       const Vec_f& mu_pt, const Vec_f& mu_eta, const Vec_f& mu_jetRelIso, const Vec_i& tight_mu, const int mType,
-                       const Vec_f& el_pt, const Vec_f& el_eta, const Vec_f& el_jetRelIso, const Vec_i& tight_el, const int eType,
+                       const Vec_f& mu_pt, const Vec_f& mu_eta, const Vec_f& mu_jetRelIso, const Vec_i& tight_mu, int mType,
+                       const Vec_f& el_pt, const Vec_f& el_eta, const Vec_f& el_jetRelIso, const Vec_i& tight_el, int eType,
                        const int whichAna){
 
   bool debug = false;
@@ -929,7 +946,8 @@ float compute_fakeRate(const bool isData,
   // def 2, unc 5 / 1 / 8
 
   double addSF[2] {1.0, 1.0};
-  if(whichAna == 1) {addSF[0] = 1.0; addSF[1] = 1.0;}
+  if(whichAna >= 10 && mType == -1 && mType == -1) {mType = whichAna - 10; eType = whichAna - 10;}
+  else if(mType == -1 || mType == -1) {printf("PROBLEM in compute_fakeRate\n");}
 
   if(mu_pt.size() != tight_mu.size() || el_pt.size() != tight_el.size()) {
     printf("PROBLEM in compute_fakeRate (%zu/%zu) (%zu/%zu)!\n",mu_pt.size(),tight_mu.size(),el_pt.size(),tight_el.size());
@@ -1127,7 +1145,9 @@ float compute_TriggerForSingleLegsSF(float ptl1, float ptl2, float etal1, float 
 float compute_lumiFakeRate(const Vec_f& mu_pt, const Vec_f& el_pt, const int nTrigger, const int year){
   double lumiPrescalesM[3] = {0.182/1000., 0.769/1000., 0.769/1000.}; // Mu8/17/19
   double lumiPrescalesE[3] = {0.134/1000., 0.754/1000., 0.754/1000.}; // El8/12/23
-  if     (year == 20220 || year == 20221){
+  if     (year == 20160 || year == 20161 || year == 20170 || year == 20180){
+  }
+  else if(year == 20220 || year == 20221){
   }
   else if(year == 20230 || year == 20231){
     lumiPrescalesM[0] =  5.8/27693.1;
@@ -1435,6 +1455,7 @@ float compute_met_lepton_var(Vec_f pt, Vec_f eta, Vec_f phi, Vec_f mass,
   }
 
   PtEtaPhiMVector p4jetmom = PtEtaPhiMVector(met_pt,0.0,met_phi,0.0);
+  PtEtaPhiMVector p4llMETmom = p4llmom + p4jetmom;
   float dPhiJMET = 999.;
   for(unsigned int i=0;i<pt.size();i++) {
     HT[1] += pt[i];
@@ -1450,6 +1471,7 @@ float compute_met_lepton_var(Vec_f pt, Vec_f eta, Vec_f phi, Vec_f mass,
   else if(var == 4) theVar = sqrt(2*p4llmom.Pt()*met_pt*(1-cos(deltaPhi(p4llmom.Phi(),met_phi))));
   else if(var == 5) theVar = HT[1]/(HT[0]+HT[1]);
   else if(var == 6) theVar = dPhiJMET;
+  else if(var == 7) theVar = p4llMETmom.M();
   return theVar;
 }
 
@@ -1498,7 +1520,7 @@ float compute_jet_x_gamma_var(Vec_f pt, Vec_f eta, Vec_f phi, Vec_f mass,
   return theVar;
 }
 // Jet-lepton final variables
-float compute_jet_lepton_final_var(const float mjj, const float detajj, const float dphijj, const float zepvv, const float bdt, const float mll, const int njets, unsigned int var)
+float compute_jet_lepton_final_var(const float mjj, const float detajj, const float dphijj, const float zepvv, const float bdt_inc, const float mll, const int njets, unsigned int var, const float bdt_pol0 = -999.0, const float bdt_pol1 = -999.0)
 {
   if     (var < 10){
     int typeSelAux1 = -1;
@@ -1588,16 +1610,16 @@ float compute_jet_lepton_final_var(const float mjj, const float detajj, const fl
     }
   }
   else if(var == 12){ // VBS WZ SR MVA based (2D)
-    float bdtNew = std::min(std::max(bdt+1.0,0.001),1.999)/2.0;
+    float bdt_incNew = std::min(std::max(bdt_inc+1.0,0.001),1.999)/2.0;
     float typeSelAux3 = -1;
     if     (zepvv >= 0.25) typeSelAux3 = 0;
     else                   typeSelAux3 = 1;
 
-    return (float)(bdtNew+typeSelAux3);
+    return (float)(bdt_incNew+typeSelAux3);
   }
   else if(var == 13){ // VBS WZ SR MVA based (1D)
-    float bdtNew = std::min(std::max(bdt+1.0,0.001),1.999)/2.0;
-    return (float)(bdtNew);
+    float bdt_incNew = std::min(std::max(bdt_inc+1.0,0.001),1.999)/2.0;
+    return (float)(bdt_incNew);
   }
   else if(var == 14){ // VBS WZ SR MVA X mjj (2D)
     int typeSelAux1 = -1;
@@ -1606,9 +1628,78 @@ float compute_jet_lepton_final_var(const float mjj, const float detajj, const fl
     else if(mjj < 2000) typeSelAux1 = 2;
     else                typeSelAux1 = 3;
 
-    float bdtNew = (std::min(std::max(bdt+1.0,0.001),1.999)/2.0)+typeSelAux1;
+    float bdt_incNew = (std::min(std::max(bdt_inc+1.0,0.001),1.999)/2.0)+typeSelAux1;
 
-    return (float)(bdtNew);
+    return (float)(bdt_incNew);
+  }
+  else if(var == 31){ // VBS BDT pol v0 3D
+    // > 50 GeV cut
+    float xBDT0Bins[3] = { 0.230, 0.710, 9.000};
+    float xBDT1Bins[4] = {-0.030, 0.300, 0.570, 9.000};
+    float xBDT2Bins[4] = { 0.100, 0.400, 0.600, 9.000};
+    // > 30 GeV cut
+    //float xBDT0Bins[3] = {0.250, 0.790, 9.000};
+    //float xBDT1Bins[4] = {0.050, 0.340, 0.570, 9.000};
+    //float xBDT2Bins[4] = {0.060, 0.340, 0.540, 9.000};
+
+    int typeSelAux0 = -1;
+    if     (bdt_inc < xBDT0Bins[0]) typeSelAux0 = 0;
+    else if(bdt_inc < xBDT0Bins[1]) typeSelAux0 = 1;
+    else                            typeSelAux0 = 2;
+
+    int typeSelAux1 = -1;
+    if     (bdt_pol0 < xBDT1Bins[0]) typeSelAux1 = 0;
+    else if(bdt_pol0 < xBDT1Bins[1]) typeSelAux1 = 1;
+    else if(bdt_pol0 < xBDT1Bins[2]) typeSelAux1 = 2;
+    else                             typeSelAux1 = 3;
+
+    int typeSelAux2 = -1;
+    if     (bdt_pol1 < xBDT2Bins[0]) typeSelAux2 = 0;
+    else if(bdt_pol1 < xBDT2Bins[1]) typeSelAux2 = 1;
+    else if(bdt_pol1 < xBDT2Bins[2]) typeSelAux2 = 2;
+    else                             typeSelAux2 = 3;
+
+    float typeSelAux = (float)(16*typeSelAux0 + 4*typeSelAux1 + typeSelAux2);
+
+    return (float)(typeSelAux);
+  }
+  else if(var == 32 || var == 33){ // VBS BDT pol v0 2D
+    // > 50 GeV cut
+    float xBDT0Bins[4] = { 0.040, 0.520, 0.780, 9.000};
+    float xBDT1Bins[6] = {-0.190, 0.100, 0.300, 0.480, 0.670, 9.000};
+    float xBDT2Bins[6] = {-0.100, 0.200, 0.400, 0.500, 0.700, 9.000};
+    // > 30 GeV cut
+    //float xBDT0Bins[4] = { 0.050, 0.580, 0.870, 9.000};
+    //float xBDT1Bins[6] = {-0.090, 0.170, 0.340, 0.490, 0.670, 9.000};
+    //float xBDT2Bins[6] = {-0.100, 0.170, 0.340, 0.470, 0.600, 9.000};
+
+    int typeSelAux0 = -1;
+    if     (bdt_inc < xBDT0Bins[0]) typeSelAux0 = 0;
+    else if(bdt_inc < xBDT0Bins[1]) typeSelAux0 = 1;
+    else if(bdt_inc < xBDT0Bins[2]) typeSelAux0 = 2;
+    else                            typeSelAux0 = 3;
+
+    int typeSelAux1 = -1;
+    if     (bdt_pol0 < xBDT1Bins[0]) typeSelAux1 = 0;
+    else if(bdt_pol0 < xBDT1Bins[1]) typeSelAux1 = 1;
+    else if(bdt_pol0 < xBDT1Bins[2]) typeSelAux1 = 2;
+    else if(bdt_pol0 < xBDT1Bins[3]) typeSelAux1 = 3;
+    else if(bdt_pol0 < xBDT1Bins[4]) typeSelAux1 = 4;
+    else                             typeSelAux1 = 5;
+
+    int typeSelAux2 = -1;
+    if     (bdt_pol1 < xBDT2Bins[0]) typeSelAux2 = 0;
+    else if(bdt_pol1 < xBDT2Bins[1]) typeSelAux2 = 1;
+    else if(bdt_pol1 < xBDT2Bins[2]) typeSelAux2 = 2;
+    else if(bdt_pol1 < xBDT2Bins[3]) typeSelAux2 = 3;
+    else if(bdt_pol1 < xBDT2Bins[4]) typeSelAux2 = 4;
+    else                             typeSelAux2 = 5;
+
+    float typeSelAux = -1.0;
+    if     (var == 32) typeSelAux = (float)(6*typeSelAux0 + typeSelAux1);
+    else if(var == 33) typeSelAux = (float)(6*typeSelAux0 + typeSelAux2);
+
+    return (float)(typeSelAux);
   }
   return 0.0;
 }
@@ -1676,6 +1767,7 @@ float compute_jet_lepton_var(Vec_f pt, Vec_f eta, Vec_f phi, Vec_f mass,
   else if(var == 6) theVar = fabs(p4momVV.Eta()-p2.Eta());
   else if(var == 7) theVar = (p4momVV.Pt()-(p1+p2).Pt())/(p1+p2).Pt();
   else if(var == 8) theVar = deltaPhi(p4momJJ.Phi(), p4momLL.Phi());
+  else if(var == 9) {if(p4mom.size() < 2) theVar = 1.0; else theVar = (p4mom[0].Pt()*p4mom[1].Pt())/(p1.Pt()*p2.Pt());}
   return theVar;
 }
 
@@ -2154,6 +2246,16 @@ float compute_nl_var(const Vec_f& mu_pt, const Vec_f& mu_eta, const Vec_f& mu_ph
      else if(var ==  10) {
        theVar = p4momTot.M()/sqrt((p4mom[0].Pt()/(p4mom[0].Pt()+met_pt))*(p4mom[1].Pt()/(p4mom[1].Pt()+met_pt)));
      }
+     else if(var ==  11 || var ==  12) {
+       float MTWMax = 0.0; float MTWMin = 10000.0; 
+       for(unsigned int i=0; i<p4mom.size(); i++){
+         float theMTW = sqrt(2*p4mom[i].Pt()*met_pt*(1-cos(deltaPhi(p4mom[i].Phi(),met_phi))));
+	 if(theMTW > MTWMax) MTWMax = theMTW;
+	 if(theMTW < MTWMin) MTWMin = theMTW;
+       }
+       if     (var ==  11) theVar = MTWMax;
+       else if(var ==  12) theVar = MTWMin;
+     }
    }
    return theVar;
 }
@@ -2484,6 +2586,77 @@ int compute_vbs_gen_category(const int nSel, const int ngood_GenJets, const Vec_
   return 0;
 }
 
+// compute vbs gen category
+float compute_llgen_var(const int ngood_GenJets, const Vec_f& good_GenJet_pt, const Vec_f& good_GenJet_eta,  const Vec_f& good_GenJet_phi, const Vec_f& good_GenJet_mass,
+                        const int ngood_GenDressedLeptons, const Vec_i& GenDressedLepton_pdgId, const Vec_b& GenDressedLepton_hasTauAnc,
+                        const Vec_f& GenDressedLepton_pt, const Vec_f& GenDressedLepton_eta, const Vec_f& GenDressedLepton_phi, const Vec_f& GenDressedLepton_mass,
+                        const float met_pt, const float met_phi, const TString theCat, const int whichVar){
+
+  if(ngood_GenDressedLeptons <= 1) return -1;
+  float theVar = -1;
+
+  if(whichVar == 0){
+    theVar = (float)ngood_GenJets;
+    if(theVar >= 2) theVar = 2;
+  }
+  else if(whichVar == 1){
+    theVar = GenDressedLepton_pt[0];
+    if(theVar >= 100) theVar = 99.999;
+  }
+  else if(whichVar == 2){
+    theVar = GenDressedLepton_pt[1];
+    if(theVar >= 100) theVar = 99.999;
+  }
+  else if(whichVar == 3){
+    theVar = Minv2(GenDressedLepton_pt[0], GenDressedLepton_eta[0], GenDressedLepton_phi[0], GenDressedLepton_mass[0],
+                   GenDressedLepton_pt[1], GenDressedLepton_eta[1], GenDressedLepton_phi[1], GenDressedLepton_mass[1]).first;
+    if(theVar >= 250) theVar = 249.999;
+  }
+  else if(whichVar == 4){
+    theVar = Minv2(GenDressedLepton_pt[0], GenDressedLepton_eta[0], GenDressedLepton_phi[0], GenDressedLepton_mass[0],
+                   GenDressedLepton_pt[1], GenDressedLepton_eta[1], GenDressedLepton_phi[1], GenDressedLepton_mass[1]).second;
+    if(theVar >= 120) theVar = 119.999;
+  }
+  else if(whichVar == 5){
+      PtEtaPhiMVector p4mom = PtEtaPhiMVector(met_pt,0.0,met_phi,0.0);
+      for(unsigned int i=0; i<GenDressedLepton_pt.size(); i++){
+        p4mom = p4mom + PtEtaPhiMVector(GenDressedLepton_pt[i],0.0,GenDressedLepton_phi[i],0.0);
+      }
+      theVar = std::min(p4mom.Pt(),79.999);
+  }
+  else if(whichVar == 6){
+    theVar = (float)ngood_GenJets;
+    if(theVar >= 3) theVar = 3;
+  }
+  else if(whichVar == 7){
+    if(ngood_GenJets >= 1){
+      theVar = good_GenJet_pt[0];
+      if(theVar >= 350) theVar = 349.999;
+    }
+  }
+  else if(whichVar == 8){
+    if(ngood_GenJets >= 2){
+      theVar = good_GenJet_pt[1];
+      if(theVar >= 400) theVar = 399.999;
+    }
+  }
+  else if(whichVar == 9){
+    if(ngood_GenJets >= 2){
+      theVar =  Minv2(good_GenJet_pt[0], good_GenJet_eta[0], good_GenJet_phi[0], good_GenJet_mass[0],
+                      good_GenJet_pt[1], good_GenJet_eta[1], good_GenJet_phi[1], good_GenJet_mass[1]).first;
+      if(theVar >= 400) theVar = 399.999;
+    }
+  }
+  else if(whichVar == 10){
+    if(ngood_GenJets >= 2){
+      theVar = (good_GenJet_eta[0] > good_GenJet_eta[1] ? TVector2::Phi_0_2pi(good_GenJet_phi[0] - good_GenJet_phi[1]) : TVector2::Phi_0_2pi(good_GenJet_phi[1] - good_GenJet_phi[0]));
+      if(theCat.Contains("WW_MINNLO")) theVar = TVector2::Phi_0_2pi(theVar + TMath::Pi());
+    }
+  }
+  
+  return theVar;
+}
+
 // compute mll gen category
 int compute_mll_gen_category(const int var, 
                              const Vec_i& GenDressedLepton_pdgId, const Vec_b& GenDressedLepton_hasTauAnc,
@@ -2560,7 +2733,7 @@ float compute_weights(const float weight, const float genWeight, const TString t
     if(isRealGenLep == false) return 0.0;
 
     for(unsigned int i=0;i<el_genPartFlav.size();i++) {
-       if(el_genPartFlav[i] != 1 && el_genPartFlav[i] != 15) {isRealGenLep = false; break;}
+       if(el_genPartFlav[i] != 1 && el_genPartFlav[i] != 15 && el_genPartFlav[i] != 22) {isRealGenLep = false; break;}
     }
     if(isRealGenLep == false) return 0.0;
   }

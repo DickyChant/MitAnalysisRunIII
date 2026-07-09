@@ -1,11 +1,63 @@
 import ROOT
 import correctionlib
+import argparse
 
-year=20250
+# Parse command-line argument
+parser = argparse.ArgumentParser(description="Run with a configurable year.")
+parser.add_argument(
+    "--year",
+    type=int,
+    required=True,
+    help="Year to use (e.g. 2018, 2022, 2026)"
+)
+
+args = parser.parse_args()
+year = args.year
+
+# Setup
 correctionlib.register_pyroot_binding()
 ROOT.gInterpreter.Declare('#include "mysf.h"')
-print("eval_{0}".format(year))
-if(year==20220):
+
+# Use the year
+print(f"eval_{year}")
+
+if(year==20160):
+    ROOT.gInterpreter.ProcessLine('auto corr = MyCorrections(20160);')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2016preVFP", (char*)"sf", (char*)"wp80iso", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2016preVFP", (char*)"sfup", (char*)"wp80iso", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2016preVFP", (char*)"sfdown", (char*)"Medium", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2016preVFP", (char*)"sf", (char*)"RecoBelow20", 1.1, 19.999,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2016preVFP", (char*)"sf", (char*)"RecoAbove20", 1.1, 20.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_photonSF((char*)"2016preVFP", (char*)"sf", (char*)"Medium", 1.1, 30.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_jetCORR(0.5,1.,2.,150,15,397853,3)')
+elif(year==20161):
+    ROOT.gInterpreter.ProcessLine('auto corr = MyCorrections(20161);')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2016postVFP", (char*)"sf", (char*)"wp80iso", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2016postVFP", (char*)"sfup", (char*)"wp80iso", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2016postVFP", (char*)"sfdown", (char*)"Medium", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2016postVFP", (char*)"sf", (char*)"RecoBelow20", 1.1, 19.999,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2016postVFP", (char*)"sf", (char*)"RecoAbove20", 1.1, 20.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_photonSF((char*)"2016postVFP", (char*)"sf", (char*)"Medium", 1.1, 30.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_jetCORR(0.5,1.,2.,150,15,397853,5)')
+elif(year==20170):
+    ROOT.gInterpreter.ProcessLine('auto corr = MyCorrections(20170);')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2017", (char*)"sf", (char*)"wp80iso", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2017", (char*)"sfup", (char*)"wp80iso", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2017", (char*)"sfdown", (char*)"Medium", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2017", (char*)"sf", (char*)"RecoBelow20", 1.1, 19.999,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2017", (char*)"sf", (char*)"RecoAbove20", 1.1, 20.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_photonSF((char*)"2017", (char*)"sf", (char*)"Medium", 1.1, 30.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_jetCORR(0.5,1.,2.,150,15,397853,3)')
+elif(year==20180):
+    ROOT.gInterpreter.ProcessLine('auto corr = MyCorrections(20180);')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2018", (char*)"sf", (char*)"wp80iso", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2018", (char*)"sfup", (char*)"wp80iso", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2018", (char*)"sfdown", (char*)"Medium", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2018", (char*)"sf", (char*)"RecoBelow20", 1.1, 19.999,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2018", (char*)"sf", (char*)"RecoAbove20", 1.1, 20.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_photonSF((char*)"2018", (char*)"sf", (char*)"Medium", 1.1, 30.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_jetCORR(0.5,1.,2.,150,15,397853,3)')
+elif(year==20220):
     ROOT.gInterpreter.ProcessLine('auto corr = MyCorrections(20220);')
     ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2022Re-recoBCD", (char*)"sf", (char*)"wp80iso", 1.1, 34.0,0.3)')
     ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2022Re-recoBCD", (char*)"sfup", (char*)"wp80iso", 1.1, 34.0,0.3)')
@@ -20,6 +72,7 @@ if(year==20220):
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2022", (char*)"MC",(char*)"nom", 100, 1.5, 45)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2022", (char*)"MC",(char*)"pu_dn", 100, 1.5, 45)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2022", (char*)"MC",(char*)"pu_up", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_jetCORR(0.5,1.,2.,150,15,357486,3)')
 elif(year==20221):
     ROOT.gInterpreter.ProcessLine('auto corr = MyCorrections(20221);')
     ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2022Re-recoE+PromptFG", (char*)"sf", (char*)"wp80iso", 1.1, 34.0,0.3)')
@@ -35,6 +88,7 @@ elif(year==20221):
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2022EE", (char*)"MC",(char*)"nom", 100, 1.5, 45)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2022EE", (char*)"MC",(char*)"pu_dn", 100, 1.5, 45)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2022EE", (char*)"MC",(char*)"pu_up", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_jetCORR(0.5,1.,2.,150,15,359022,4)')
 elif(year==20230):
     ROOT.gInterpreter.ProcessLine('auto corr = MyCorrections(20230);')
     ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2023PromptC", (char*)"sf", (char*)"wp80iso", 1.1, 34.0,0.3)')
@@ -51,6 +105,7 @@ elif(year==20230):
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023", (char*)"MC",(char*)"nom", 100, 1.5, 45)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023", (char*)"MC",(char*)"pu_dn", 100, 1.5, 45)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023", (char*)"MC",(char*)"pu_up", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_jetCORR(0.5,1.,2.,150,15,367515,2)')
 elif(year==20231):
     ROOT.gInterpreter.ProcessLine('auto corr = MyCorrections(20231);')
     ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2023PromptD", (char*)"sf", (char*)"wp80iso", 1.1, 34.0,0.3)')
@@ -66,6 +121,7 @@ elif(year==20231):
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"nom", 100, 1.5, 45)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_dn", 100, 1.5, 45)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_up", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_jetCORR(0.5,1.,2.,150,15,370602,3)')
 elif(year==20240):
     ROOT.gInterpreter.ProcessLine('auto corr = MyCorrections(20240);')
     ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2024Prompt", (char*)"sf", (char*)"wp80iso", 1.1, 34.0,0.3)')
@@ -80,20 +136,52 @@ elif(year==20240):
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"nom", 100, 1.5, 45)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_dn", 100, 1.5, 45)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_up", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_jetCORR(0.5,1.,2.,150,15,383779,3)')
 elif(year==20250):
     ROOT.gInterpreter.ProcessLine('auto corr = MyCorrections(20250);')
-    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2024Prompt", (char*)"sf", (char*)"wp80iso", 1.1, 34.0,0.3)')
-    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2024Prompt", (char*)"sfup", (char*)"wp80iso", 1.1, 34.0,0.3)')
-    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2024Prompt", (char*)"sfdown", (char*)"Medium", 1.1, 34.0,0.3)')
-    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2024Prompt", (char*)"sf", (char*)"Reco20to75", 1.1, 20.0,0.3)')
-    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2024Prompt", (char*)"sf", (char*)"RecoAbove75", 1.1, 75.0,0.3)')
-    ROOT.gInterpreter.ProcessLine('corr.eval_photonSF((char*)"2024Prompt", (char*)"sf", (char*)"Medium", 1.1, 30.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2025Prompt", (char*)"sf", (char*)"wp80iso", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2025Prompt", (char*)"sfup", (char*)"wp80iso", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2025Prompt", (char*)"sfdown", (char*)"Medium", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2025Prompt", (char*)"sf", (char*)"Reco20to75", 1.1, 20.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2025Prompt", (char*)"sf", (char*)"RecoAbove75", 1.1, 75.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_photonSF((char*)"2025Prompt", (char*)"sf", (char*)"Medium", 1.1, 30.0,0.3)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"pt", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"nom", 100, 1.5, 45)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"pt", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_dn", 100, 1.5, 45)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"pt", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_up", 100, 1.5, 45)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"nom", 100, 1.5, 45)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_dn", 100, 1.5, 45)')
     ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_up", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_jetCORR(0.5,1.,2.,150,15,396597,3)')
+elif(year==20260):
+    ROOT.gInterpreter.ProcessLine('auto corr = MyCorrections(20260);')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2025Prompt", (char*)"sf", (char*)"wp80iso", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2025Prompt", (char*)"sfup", (char*)"wp80iso", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2025Prompt", (char*)"sfdown", (char*)"Medium", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2025Prompt", (char*)"sf", (char*)"Reco20to75", 1.1, 20.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2025Prompt", (char*)"sf", (char*)"RecoAbove75", 1.1, 75.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_photonSF((char*)"2025Prompt", (char*)"sf", (char*)"Medium", 1.1, 30.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"pt", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"nom", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"pt", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_dn", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"pt", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_up", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"nom", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_dn", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_up", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_jetCORR(0.5,1.,2.,150,15,402513,3)')
+elif(year==20261):
+    ROOT.gInterpreter.ProcessLine('auto corr = MyCorrections(20261);')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2025Prompt", (char*)"sf", (char*)"wp80iso", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2025Prompt", (char*)"sfup", (char*)"wp80iso", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronIDSF ((char*)"2025Prompt", (char*)"sfdown", (char*)"Medium", 1.1, 34.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2025Prompt", (char*)"sf", (char*)"Reco20to75", 1.1, 20.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_electronTRKSF((char*)"2025Prompt", (char*)"sf", (char*)"RecoAbove75", 1.1, 75.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_photonSF((char*)"2025Prompt", (char*)"sf", (char*)"Medium", 1.1, 30.0,0.3)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"pt", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"nom", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"pt", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_dn", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"pt", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_up", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"nom", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_dn", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_met_corr((char*)"phi", (char*)"PuppiMET", (char*)"2023BPix", (char*)"MC",(char*)"pu_up", 100, 1.5, 45)')
+    ROOT.gInterpreter.ProcessLine('corr.eval_jetCORR(0.5,1.,2.,150,15,402513,3)')
 print("eval_el_EtDependent_scale_smeaer")
 ROOT.gInterpreter.ProcessLine('corr.eval_electronEtDependentScale((char*)"scale", 357900, 0.5, 0.99, 40, 1.0)')
 ROOT.gInterpreter.ProcessLine('corr.eval_electronEtDependentSmearing((char*)"smear", 40, 0.99, 0.5)')
@@ -160,7 +248,6 @@ ROOT.gInterpreter.ProcessLine('corr.eval_jesUnc(1.5,30,25)')
 ROOT.gInterpreter.ProcessLine('corr.eval_jesUnc(1.5,30,26)')
 ROOT.gInterpreter.ProcessLine('corr.eval_jesUnc(1.5,30,27)')
 print("eval_jetCORR_others")
-ROOT.gInterpreter.ProcessLine('corr.eval_jetCORR(0.5,1.,2.,150,15,397853,3)')
 ROOT.gInterpreter.ProcessLine('corr.eval_jerScaleFactor(1.5,30, 0)')
 ROOT.gInterpreter.ProcessLine('corr.eval_jerScaleFactor(1.5,30,+1)')
 ROOT.gInterpreter.ProcessLine('corr.eval_jerScaleFactor(1.5,30,-1)')

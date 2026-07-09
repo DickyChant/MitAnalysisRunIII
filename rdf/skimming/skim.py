@@ -57,6 +57,28 @@ def getTriggerFromJson(overall, type, year ):
     for trigger in overall:
         if(trigger['name'] == type and trigger['year'] == year): return trigger['definition']
 
+def getPrunedTriggers(df,TRIGGERXXX):
+    list_TRIGGERXXX = TRIGGERXXX.split('(')[1].split(')')[0].split('||')
+    list_pruned_TRIGGERXXX = []
+
+    TRIGGERPRUNED = "(0)"
+
+    for x in range(len(list_TRIGGERXXX)):
+        try:
+            ColumnType = df.GetColumnType(list_TRIGGERXXX[x])
+            list_pruned_TRIGGERXXX.append(list_TRIGGERXXX[x])
+        except Exception as e:
+            print("No {0} weights: {1}".format(list_TRIGGERXXX[x],e))
+
+        if(len(list_pruned_TRIGGERXXX) != 0):
+            TRIGGERPRUNED = "("
+            for x in range(len(list_pruned_TRIGGERXXX)):
+                TRIGGERPRUNED += list_pruned_TRIGGERXXX[x]
+                if(x < len(list_pruned_TRIGGERXXX)-1):
+                    TRIGGERPRUNED += "||"
+            TRIGGERPRUNED += ")"
+    return TRIGGERPRUNED
+
 if __name__ == "__main__":
 
     copyFilesToFS = True
@@ -142,6 +164,9 @@ if __name__ == "__main__":
     elif("Run2025" in sampleToSkim):
         year = 2025
         isSkimData = 1
+    elif("Run2026" in sampleToSkim):
+        year = 2026
+        isSkimData = 1
     elif("RunIISummer20UL16" in sampleToSkim):
         year = 2016
         isSkimData = 0
@@ -163,6 +188,9 @@ if __name__ == "__main__":
     elif("2025Summer25" in sampleToSkim):
         year = 2025
         isSkimData = 0
+    elif("2026Summer26" in sampleToSkim):
+        year = 2026
+        isSkimData = 0
 
     if(year == -1 or isSkimData == -1):
         print("Incorrect year/isSkimData: {0} / {1}".format(year, isSkimData))
@@ -183,6 +211,8 @@ if __name__ == "__main__":
         jsnName = "Collisions24_13p6TeV_DCSOnly_TkPx.json"
     elif(year == 2025):
         jsnName = "Collisions25_13p6TeV_DCSOnly_TkPx.json"
+    elif(year == 2026):
+        jsnName = "Collisions26_13p6TeV_DCSOnly_TkPx.json"
 
     if os.path.exists(os.path.join("jsns",jsnName)):
         loadJSON(os.path.join("jsns",jsnName))
@@ -304,6 +334,28 @@ if __name__ == "__main__":
                 rdf = ROOT.RDataFrame("Events", inputSingleFileBase)\
                             .Define("isSkimData","{}".format(isSkimData))\
                             .Define("applyDataJson","{}".format(JSON)).Filter("applyDataJson","pass JSON")
+
+                if(year == 2016 or year == 2017 or year == 2018):
+                    TRIGGERMUEG  = getPrunedTriggers(rdf,TRIGGERMUEG  )
+                    TRIGGERDMU   = getPrunedTriggers(rdf,TRIGGERDMU   )
+                    TRIGGERSMU   = getPrunedTriggers(rdf,TRIGGERSMU   )
+                    TRIGGERDEL   = getPrunedTriggers(rdf,TRIGGERDEL   )
+                    TRIGGERSEL   = getPrunedTriggers(rdf,TRIGGERSEL   )
+                    TRIGGERFAKEMU= getPrunedTriggers(rdf,TRIGGERFAKEMU)
+                    TRIGGERFAKEEL= getPrunedTriggers(rdf,TRIGGERFAKEEL)
+                    TRIGGERMET   = getPrunedTriggers(rdf,TRIGGERMET   )
+                    TRIGGERPHO   = getPrunedTriggers(rdf,TRIGGERPHO   )
+
+                    TRIGGERLEP = "{0} or {1} or {2} or {3} or {4}".format(TRIGGERSEL,TRIGGERDEL,TRIGGERSMU,TRIGGERDMU,TRIGGERMUEG)
+
+                    TRIGGERFAKE = "{0} or {1}".format(TRIGGERFAKEMU,TRIGGERFAKEEL)
+
+                    TRIGGERLEP    = "{0} or {1} or {2} or {3} or {4}".format(TRIGGERSEL,TRIGGERDEL,TRIGGERSMU,TRIGGERDMU,TRIGGERMUEG)
+                    TRIGGERALLLEP = "{0} or {1} or {2} or {3} or {4}".format(TRIGGERSEL,TRIGGERDEL,TRIGGERSMU,TRIGGERDMU,TRIGGERMUEG)
+
+                    print("TRIGGERLEP: {0}".format(TRIGGERLEP))
+
+                    print("TRIGGERFAKE: {0}".format(TRIGGERFAKE))
 
                 print("Processing({0}): {1} / {2}".format(nf,inputSingleFile,rdf.Count().GetValue()))
                 nonZeroEvents = True

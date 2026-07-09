@@ -96,6 +96,46 @@ do
 
 done
 
+elif [ ${theYear} = 2019 ]; then
+
+    if [[ -f anaZ/${theAna}${theCondor}_20180_nonprompt.root ]]; then
+
+    hadd -f anaZ/${theAna}${theCondor}_${theYear}_nonprompt.root anaZ/${theAna}${theCondor}_201??_nonprompt.root
+
+    fi
+
+    if [[ -f anaZ/${theAna}${theCondor}_20180_wrongsign.root ]]; then
+
+    hadd -f anaZ/${theAna}${theCondor}_${theYear}_wrongsign.root anaZ/${theAna}${theCondor}_201??_wrongsign.root
+
+    fi
+
+for i in `seq 0 999`;
+do
+    if [[ -f anaZ/${theAna}${theCondor}_20180_${i}.root ]]; then
+
+    hadd -f anaZ/${theAna}${theCondor}_${theYear}_${i}.root anaZ/${theAna}${theCondor}_201??_${i}.root
+
+    fi
+ 
+    if [[ -f anaZ/${theAna}${theCondor}_20180_${i}_2d.root ]]; then
+
+    hadd -f anaZ/${theAna}${theCondor}_${theYear}_${i}_2d.root anaZ/${theAna}${theCondor}_201??_${i}_2d.root
+
+    fi
+ 
+    if [[ ${OPTIONMVA} == 1 ]]; then
+
+        if [[ -f anaZ/${theAna}${theCondor}_20180_${i}_mva.root ]]; then
+
+        hadd -f anaZ/${theAna}${theCondor}_${theYear}_${i}_mva.root anaZ/${theAna}${theCondor}_201??_${i}_mva.root
+
+        fi
+
+    fi
+
+done
+
 else
 
     if [[ -f anaZ/${theAna}${theCondor}_${theYear}0_nonprompt.root ]]; then
