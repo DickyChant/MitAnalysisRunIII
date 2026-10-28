@@ -4,13 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MitAnalysisRunIII is a CMS particle physics analysis framework for LHC Run 3 data, focused on VBS-WZ (vector boson scattering in the WZ channel) using ROOT RDataFrame in Python+C++. Data spans 2022-2025 eras in NanoAOD format (v12 for ≤2023, v15 for ≥2024).
+MitAnalysisRunIII is a CMS particle physics analysis framework for LHC Run 3 data, focused on VBS-WZ (vector boson scattering in the WZ channel) using ROOT RDataFrame in Python+C++. Data spans 2022-2026 eras in NanoAOD format (v12 for ≤2023, v15 for ≥2024).
+
+This fork (`DickyChant/MitAnalysisRunIII`, working branch `fuse_skim_analyze`) tracks `GuillelmoGomezCeballos/MitAnalysisRunIII` master (remote `upstream`) but is **WZ-only**: the ssWW/WW/Z/ZZ analyses, top-level `macros/` and `plotting/` were deleted. When merging upstream, resolve modify/delete conflicts on those files by keeping them deleted, and keep the env-configurable paths (`SKIM_BASE_DIR`, `SCRATCH_SAMPLE_DIR`, `SKIM_OUTPUT_DIR`) instead of upstream's hardcoded MIT `/ceph`, `/scratch/submit` paths.
 
 ## Repository Structure
 
 - **`rdf/macros/`** — Primary analysis code. The main analysis is `wzAnalysis.py`, with supporting analyses for fake rates (`fakeAnalysis.py`), triggers (`triggerAnalysis.py`), pileup (`puAnalysis.py`), MET (`metAnalysis.py`), and generator-level studies (`genAnalysis.py`). Core C++ functions live in `functions.h`, scale factors in `mysf.h`.
 - **`rdf/skimming/`** — Data reduction pipeline. `skim.py` reads NanoAOD from XRootD and applies loose preselection. Input sample lists are in `skim_inputfiles_*` directories organized by year/era.
-- **`rdf/macros/direct/`** — Direct NanoAOD mode: reads raw NanoAOD via XRootD, no skim files needed. Ideal for CMS Connect where local storage is limited. See `direct/README.md`.
+- **`rdf/macros/direct/`** — Direct NanoAOD mode: reads raw NanoAOD via XRootD, no skim files needed. Ideal for CMS Connect where local storage is limited. See `direct/README.md`. Use it for **private samples** (not in DAS).
+- **`rdf/macros/crab/`** — CRAB submission for every sample that **is in DAS** (official MC and data). One task per DAS dataset, derived from `SwitchSample`/`getDATAlist`. See `crab/README.md`.
 - **`rdf/makePlots/`** — Plotting. `finalPlot.C` generates CMS-style plots, driven by `makePlots.sh`.
 - **`rdf/mva_training/`** — BDT training for VBS jet tagging (`ewkvbsMVA.C`).
 
@@ -60,7 +63,7 @@ ls data/puWeights_UL_*.root          # pileup weights by year
 ls data/histoLepSFEtaPt_*.root       # lepton SFs by year
 ls data/histoBtagEffSelEtaPt_*.root  # b-tag efficiencies by year
 
-# Check which years have data files (expected: 20220, 20221, 20230, 20231, 20240, 20250, 2027)
+# Check which years have data files (expected: 20220, 20221, 20230, 20231, 20240, 20250, 20260, 20261, 2027)
 ls data/histoFakeEtaPt_*.root | sed 's/.*_//' | sed 's/\.root//' | sort -u
 
 # Check what samples are configured for an analysis
@@ -134,6 +137,14 @@ Workers read raw NanoAOD from the CMS grid via XRootD. No skim files needed.
 python3 remake_Analysis_input_condor_jobs.py --ana=wz
 ```
 
+### Submit to CRAB (official samples)
+```bash
+cd crab   # after cmsenv + crab-setup.sh + voms proxy
+python3 submit_crab.py --tag=v1 --years=20240 --dry-run         # list tasks, build sandbox
+python3 submit_crab.py --tag=v1 --years=20240 --site=T2_XX_Site  # submit
+```
+CRAB jobs see only a slice of a dataset, so MC normalization comes from `NORM_FILELIST` (full-dataset list, via `getMCnormList` in `utilsAna.py`). Any new analysis must build its `Runs` dataframe through `getMCnormList(files)`, or CRAB output will be overweighted by the number of jobs.
+
 ### Merge output histograms
 ```bash
 python3 mergeHistograms.py --path=fillhisto_wzAnalysis1001 --year=20220 --output=anaWZ
@@ -176,10 +187,10 @@ root -q -b -l ewkvbsMVA.C          # train BDT
 ## Architecture Details
 
 ### Year encoding
-Years encode sub-eras: `20220` = 2022 CD, `20221` = 2022 EFG, `20230` = 2023 BCD, `20231` = 2023 D, `20240` = 2024 BCDEFGHI, `20250` = 2025. Special code `2027` = all Run 3 combined.
+Years encode sub-eras: `20220` = 2022 CD, `20221` = 2022 EFG, `20230` = 2023 BCD, `20231` = 2023 D, `20240` = 2024 BCDEFGHI, `20250` = 2025, `20260`/`20261` = 2026. Special code `2027` = all Run 3 combined. Run-2 codes are `20160/20161/20170/20180`. `getDATAlist` and the golden-JSON choice use `year // 10`. A data year whose golden JSON is missing from `jsns/` gets only a printed warning, and then the lumi filter (`functions.h`, `jsonMap`) rejects every event.
 
 ### Sample numbering
-Sample IDs are integers in the `*_input_condor_jobs.cfg` files. The hundreds digit generally encodes the era (1xx=20220, 2xx=20221, 3xx=20230, etc.). IDs ≥1000 are data samples; IDs < 1000 are MC.
+Sample IDs are integers in the `*_input_condor_jobs.cfg` files. The hundreds digit generally encodes the era (1xx=20220, 2xx=20221, 3xx=20230, etc.). IDs ≥1000 are data samples; IDs < 1000 are MC. For data the tens digit is the PD (`102x` MuonEG, `103x` EGamma, `104x` Muon, …) and the units digit the run era (A/B/C/D…). One ID can cover several DAS datasets (e.g. EGamma0–5).
 
 ### Selection flow (in `wzAnalysis.py`)
 1. Trigger selection → `selectionTrigger2L()`

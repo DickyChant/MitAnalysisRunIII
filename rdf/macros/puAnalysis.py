@@ -4,7 +4,7 @@ from array import array
 
 ROOT.ROOT.EnableImplicitMT(10)
 from utilsCategory import plotCategory
-from utilsAna import getMClist, getDATAlist, groupFiles, getTriggerFromJson, getLeptomSelFromJson, getLumi
+from utilsAna import getMClist, getMCnormList, getDATAlist, groupFiles, getTriggerFromJson, getLeptomSelFromJson, getLumi
 from utilsAna import SwitchSample
 #from utilsSelectionNanoV9 import getBTagCut
 #from utilsSelectionNanoV9 import selectionTrigger2L,selectionElMu,selection2LVar,selectionJetMet
@@ -415,7 +415,7 @@ def readMCSample(sampleNOW, year, PDType, skimType, whichJob, group, histo_wwpt,
     genEventSumLHEScaleWeight = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     genEventSumPSWeight = [0, 0, 0, 0, 0]
 
-    dfRuns = ROOT.RDataFrame("Runs", files)
+    dfRuns = ROOT.RDataFrame("Runs", getMCnormList(files))
     genEventSumWeight = dfRuns.Sum("genEventSumw").GetValue()
     genEventSumNoWeight = dfRuns.Sum("genEventCount").GetValue()
     try:

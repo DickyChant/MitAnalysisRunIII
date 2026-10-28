@@ -251,6 +251,26 @@ def _read_filelist_data(sample_type, year):
         len(files), sample_type, year))
     return files
 
+def getMCnormList(files):
+    """Files whose Runs tree sets the MC normalization (genEventSumw, theory sums).
+
+    Defaults to the files being processed. CRAB jobs only see a slice of the
+    dataset, so they set NORM_FILELIST to a list of the full dataset.
+    """
+    fpath = os.environ.get("NORM_FILELIST", "")
+    if not fpath:
+        return files
+    normFiles = ROOT.vector('string')()
+    with open(fpath) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#'):
+                normFiles.push_back(line)
+    if len(normFiles) == 0:
+        raise RuntimeError("Empty normalization file list: {0}".format(fpath))
+    print("Normalization from {0}: {1} files".format(fpath, len(normFiles)))
+    return normFiles
+
 def getMClist(sampleNOW, skimType):
 
     if USE_DIRECT_NANOAOD:
