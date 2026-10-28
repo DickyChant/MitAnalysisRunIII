@@ -71,7 +71,6 @@ normalization, so a plain sum is correct.
 
 - Data years need their golden JSON in `jsns/` (the name is in `getDATAlist`).
   Without it `loadJSON` only warns and the lumi filter then rejects every event.
-  The submitter refuses such years. `Cert_Collisions2026_401624_403937_golden.json`
-  is referenced but not committed.
+  The submitter refuses such years.
 - Data events that fire several PDs are written once per PD in the ntuple path,
   so de-duplicate on `(run, luminosityBlock, event)` after merging data tasks.
