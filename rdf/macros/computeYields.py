@@ -138,9 +138,9 @@ if __name__ == "__main__":
             for i in range(nCat):
                 if(histoSel[i].GetSumOfWeights() > 0 or i == plotCategory("kPlotData")):
                     if(showUnc == 0):
-                        streamYield += " {0:7.1f}".format(histoSel[i].GetBinContent(nb))
+                        streamYield += " {0:9.1f}".format(histoSel[i].GetBinContent(nb))
                     else:
-                        streamYield += " {0:7.1f} +/- {1:5.1f}".format(histoSel[i].GetBinContent(nb),histoSel[i].GetBinError(nb))
+                        streamYield += " {0:9.1f} +/- {1:5.1f}".format(histoSel[i].GetBinContent(nb),histoSel[i].GetBinError(nb))
                     processesWithEvents.append(i)
                 theYieldsProcess[i]     += histoSel[i].GetBinContent(nb)
                 theYieldsProcessUnc[i]  += histoSel[i].GetBinError(nb)
@@ -155,11 +155,11 @@ if __name__ == "__main__":
                     theYields[2]  += histoSel[i].GetBinContent(nb)
                     theYieldsE[2] += histoSel[i].GetBinError(nb)*histoSel[i].GetBinError(nb)
                     mcYield += histoSel[i].GetBinContent(nb)
-            streamYield = "({0:2d}) {1:7.1f}".format(nb,mcYield) + streamYield
+            streamYield = "({0:2d}) {1:9.1f}".format(nb,mcYield) + streamYield
             if(nb == 1):
                 streamProcess = "         "
                 for pr in range(len(processesWithEvents)):
-                    streamProcess += " {0:7d}".format(processesWithEvents[pr])
+                    streamProcess += " {0:9d}".format(processesWithEvents[pr])
                 print(streamProcess)
             print(streamYield)
 
@@ -167,15 +167,17 @@ if __name__ == "__main__":
         for i in range(nCat):
             if(histoSel[i].GetSumOfWeights() > 0 or i == plotCategory("kPlotData")):
                 if(showUnc == 0):
-                    streamYield += " {0:7.1f}".format(theYieldsProcess[i])
+                    streamYield += " {0:9.1f}".format(theYieldsProcess[i])
                 else:
-                    streamYield += " {0:7.1f} +/- {1:5.1f}".format(theYieldsProcess[i],theYieldsProcessUnc[i])
+                    streamYield += " {0:9.1f} +/- {1:5.1f}".format(theYieldsProcess[i],theYieldsProcessUnc[i])
         for i in range(3):
             theYieldsE[i] = pow(theYieldsE[i],0.5)
-        streamYield = "(xx) {0:7.1f}".format(theYields[1]+theYields[2]) + streamYield
+        streamYield = "(xx) {0:9.1f}".format(theYields[1]+theYields[2]) + streamYield
         print(streamYield)
-        print("DA: {0:7.1f} +/- {1:4.1f} / SIG: {2:7.1f} +/- {3:4.1f} / BG: {4:7.1f} +/- {5:4.1f}".format(theYields[0],theYieldsE[0],theYields[1],theYieldsE[1],theYields[2],theYieldsE[2]))
+        print("DA: {0:9.1f} +/- {1:4.1f} / SIG: {2:9.1f} +/- {3:4.1f} / BG: {4:9.1f} +/- {5:4.1f}".format(theYields[0],theYieldsE[0],theYields[1],theYieldsE[1],theYields[2],theYieldsE[2]))
+        if(theYields[2] <= 0): theYields[2] = 1
         SB = theYields[1]/theYields[2]
         DataVsPred = theYields[0]/(theYields[1]+theYields[2])
+        if(theYields[0] <= 0): theYields[0] = 1
         DataVsPredE = DataVsPred*pow(pow(theYieldsE[0]/theYields[0],2)+pow(theYieldsE[1]/(theYields[1]+theYields[2]),2)+pow(theYieldsE[2]/(theYields[1]+theYields[2]),2),0.5)
         print("SB: {0:.2f} / DataVsPred: {1:.2f} +/- {2:.2f}".format(SB,DataVsPred,DataVsPredE))

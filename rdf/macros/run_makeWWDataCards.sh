@@ -12,7 +12,7 @@ if [ $theOption -eq 0 ]; then
   export theAna=wwAnalysis$1
   export whichAna=0
 
-  for year in 20220 20221 20230 20231 20240;
+  for year in 20220 20221 20230 20231 20240 20250;
   do
 
   for bin in 1 2 3 4;
@@ -36,7 +36,7 @@ elif [ $theOption -eq 1 ]; then
   export theAna=wwAnalysis$1
   export whichAna=$3
 
-  for year in 20220 20221 20230 20231 20240;
+  for year in 20220 20221 20230 20231 20240 20250;
   do
 
   for bin in 1 2 3;
@@ -54,7 +54,7 @@ elif [ $theOption -eq 1 ]; then
 elif [ $theOption -eq 2 ]; then
 
 
-  for year in 20220 20221 20230 20231 20240;
+  for year in 20220 20221 20230 20231 20240 20250;
   do
 
   export theAnaWZ=wzAnalysis$1

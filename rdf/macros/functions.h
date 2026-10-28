@@ -542,6 +542,8 @@ float compute_JSON_MET(const std::string pt_phiS, const std::string met_typeS, c
   else if(year == 20231) epoch = (char*)"2023BPix";
   else if(year == 20240) epoch = (char*)"2023BPix";
   else if(year == 20250) epoch = (char*)"2023BPix";
+  else if(year == 20260) epoch = (char*)"2023BPix";
+  else if(year == 20261) epoch = (char*)"2023BPix";
   const char *dtmc = dtmcS.c_str();
   const char *variation = variationS.c_str();
 
@@ -570,6 +572,8 @@ Vec_b cleaningJetVetoMapMask(const Vec_f& jet_eta, const Vec_f& jet_phi, int jet
   else if(jetTypeCorr == -1 && year == 20231) jetTypeCorr = 3;
   else if(jetTypeCorr == -1 && year == 20240) jetTypeCorr = 0;
   else if(jetTypeCorr == -1 && year == 20250) jetTypeCorr = 0;
+  else if(jetTypeCorr == -1 && year == 20260) jetTypeCorr = 0;
+  else if(jetTypeCorr == -1 && year == 20261) jetTypeCorr = 0;
   else if(jetTypeCorr == -1) return jet_vetoMap_mask;
 
   bool debug = false;
@@ -669,7 +673,7 @@ Vec_f compute_ELEPT_Unc(const int year, const int type, const Vec_i& gain, const
   bool debug = false;
   if(debug) printf("eleEnergy: %lu %d\n",pt.size(),type);
 
-  if(year == 20220 || year == 20221 || year == 20230 || year == 20231 || year == 20240 || year == 20250){
+  if(year == 20220 || year == 20221 || year == 20230 || year == 20231 || year == 20240 || year == 20250 || year == 20260 || year == 20261){
     if    (type == 10) { // data
       for(unsigned int i=0;i<pt.size();i++) {
         new_pt[i] = pt[i]*corrSFs.eval_electronEtDependentScale((char*)"scale", (double)run, eta[i], r9[i], pt[i], gain[i]);
@@ -1165,7 +1169,7 @@ float compute_lumiFakeRate(const Vec_f& mu_pt, const Vec_f& el_pt, const int nTr
     lumiPrescalesE[1] =  70.5/109329.6;
     lumiPrescalesE[2] =  70.5/109329.6;
   }
-  else if(year == 20250){
+  else if(year == 20250 || year == 20260 || year == 20261){
     lumiPrescalesM[0] =  13.7/60261.0;
     lumiPrescalesM[1] = 369.7/60261.0;
     lumiPrescalesM[2] = 369.7/60261.0;
@@ -1585,6 +1589,9 @@ float compute_jet_lepton_final_var(const float mjj, const float detajj, const fl
   }
   else if(var == 24){ // dphijj
     return dphijj;
+  }
+  else if(var == 25){ // zepvv
+    return zepvv;
   }
   else if(var == 10 || var == 11){
     int typeSelAux1 = -1;

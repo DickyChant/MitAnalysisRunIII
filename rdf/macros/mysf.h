@@ -76,6 +76,7 @@ class MyCorrections {
     correction::Correction::Ref jetVetoMap_[10];
     correction::Correction::Ref jesSourcesUnc_[28];
     correction::Correction::Ref jerScaleFactor_;
+    correction::Correction::Ref jerScaleFactorUnc_;
     correction::Correction::Ref jerPtResolution__;
     correction::Correction::Ref puJetIDSF_;
     correction::Correction::Ref jetTightSel_;
@@ -102,9 +103,9 @@ MyCorrections::MyCorrections(int the_input_year) {
   else if(year == 20230) subDirName = "Run3-23CSep23-Summer23-NanoAODv12/";
   else if(year == 20231) subDirName = "Run3-23DSep23-Summer23BPix-NanoAODv12/";
   else if(year == 20240) subDirName = "Run3-24CDEReprocessingFGHIPrompt-Summer24-NanoAODv15/";
-  else if(year == 20250 ||
-          year == 20260 ||
-          year == 20261) subDirName = "Run3-25Prompt-Summer24-NanoAODv15/";
+  else if(year == 20250) subDirName = "Run3-25Prompt-Summer24-NanoAODv15/";
+  else if(year == 20260 ||
+          year == 20261) subDirName = "Run3-26Prompt-Summer24-NanoAODv15/";
   else return;
 
   std::cout << "subDirName/year: " << subDirName << " " << year << std::endl;
@@ -120,10 +121,10 @@ MyCorrections::MyCorrections(int the_input_year) {
   else if(year == 20221) corrNameLUM = "Collisions2022_359022_362760_eraEFG_GoldenJson";
   else if(year == 20230) corrNameLUM = "Collisions2023_366403_369802_eraBC_GoldenJson";
   else if(year == 20231) corrNameLUM = "Collisions2023_369803_370790_eraD_GoldenJson";
-  else if(year == 20240 ||
-          year == 20250 ||
+  else if(year == 20240) corrNameLUM = "Collisions24_BCDEFGHI_goldenJSON";
+  else if(year == 20250 ||
           year == 20260 ||
-          year == 20261) corrNameLUM = "Collisions24_BCDEFGHI_goldenJSON";
+          year == 20261) corrNameLUM = "Collisions25_goldenJSON";
   
   auto csetPU = correction::CorrectionSet::from_file(fileNameLUM);
   puSF_ = csetPU->at(corrNameLUM);
@@ -268,70 +269,83 @@ MyCorrections::MyCorrections(int the_input_year) {
     jecDATAName[3] = "Summer19UL18_RunD_V5_DATA";   jetVetoMapName[3] = "Summer19UL18_V1"; // D
   }
   else if(year == 20220)  {
-    jecMCName = "Summer22_22Sep2023_V3_MC"; jerName = "Summer22_22Sep2023_JRV1_MC";
-    jecDATAName[0] = "Summer22_22Sep2023_V3_DATA";   jetVetoMapName[0] = "Summer22_23Sep2023_RunCD_V1"; // A
-    jecDATAName[1] = "Summer22_22Sep2023_V3_DATA";   jetVetoMapName[1] = "Summer22_23Sep2023_RunCD_V1"; // B
-    jecDATAName[2] = "Summer22_22Sep2023_V3_DATA";   jetVetoMapName[2] = "Summer22_23Sep2023_RunCD_V1"; // C
-    jecDATAName[3] = "Summer22_22Sep2023_V3_DATA";   jetVetoMapName[3] = "Summer22_23Sep2023_RunCD_V1"; // D
+    jecMCName = "Summer22_22Sep2023_V4_MC"; jerName = "Summer22_22Sep2023_JRV2_MC";
+    jecDATAName[0] = "Summer22_22Sep2023_V4_DATA";   jetVetoMapName[0] = "Summer22_23Sep2023_RunCD_V1"; // A
+    jecDATAName[1] = "Summer22_22Sep2023_V4_DATA";   jetVetoMapName[1] = "Summer22_23Sep2023_RunCD_V1"; // B
+    jecDATAName[2] = "Summer22_22Sep2023_V4_DATA";   jetVetoMapName[2] = "Summer22_23Sep2023_RunCD_V1"; // C
+    jecDATAName[3] = "Summer22_22Sep2023_V4_DATA";   jetVetoMapName[3] = "Summer22_23Sep2023_RunCD_V1"; // D
     jecDATAName[4] = "NULL"; jetVetoMapName[4] = "NULL";  // E
     jecDATAName[5] = "NULL"; jetVetoMapName[5] = "NULL";  // F
     jecDATAName[6] = "NULL"; jetVetoMapName[6] = "NULL";  // G
   }
   else if(year == 20221)  {
-    jecMCName = "Summer22EE_22Sep2023_V3_MC"; jerName = "Summer22EE_22Sep2023_JRV1_MC";
+    jecMCName = "Summer22EE_22Sep2023_V4_MC"; jerName = "Summer22EE_22Sep2023_JRV2_MC";
     jecDATAName[0] = "NULL";   jetVetoMapName[0] = "NULL"; // A
     jecDATAName[1] = "NULL";   jetVetoMapName[1] = "NULL"; // B
     jecDATAName[2] = "NULL";   jetVetoMapName[2] = "NULL"; // C
     jecDATAName[3] = "NULL";   jetVetoMapName[3] = "NULL"; // D
-    jecDATAName[4] = "Summer22EE_22Sep2023_V3_DATA"; jetVetoMapName[4] = "Summer22EE_23Sep2023_RunEFG_V1";  // E
-    jecDATAName[5] = "Summer22EE_22Sep2023_V3_DATA"; jetVetoMapName[5] = "Summer22EE_23Sep2023_RunEFG_V1";  // F
-    jecDATAName[6] = "Summer22EE_22Sep2023_V3_DATA"; jetVetoMapName[6] = "Summer22EE_23Sep2023_RunEFG_V1";  // G
+    jecDATAName[4] = "Summer22EE_22Sep2023_V4_DATA"; jetVetoMapName[4] = "Summer22EE_23Sep2023_RunEFG_V1";  // E
+    jecDATAName[5] = "Summer22EE_22Sep2023_V4_DATA"; jetVetoMapName[5] = "Summer22EE_23Sep2023_RunEFG_V1";  // F
+    jecDATAName[6] = "Summer22EE_22Sep2023_V4_DATA"; jetVetoMapName[6] = "Summer22EE_23Sep2023_RunEFG_V1";  // G
   }
   else if(year == 20230)  {
-    jecMCName = "Summer23Prompt23_V3_MC"; jerName = "Summer23Prompt23_RunCv1234_JRV1_MC";
+    jecMCName = "Summer23Prompt23_V4_MC"; jerName = "Summer23Prompt23_RunCv4_JRV3_MC";
     jecDATAName[0] = "NULL";   jetVetoMapName[0] = "NULL"; // A
     jecDATAName[1] = "NULL";   jetVetoMapName[1] = "NULL"; // B
-    jecDATAName[2] = "Summer23Prompt23_V3_DATA";   jetVetoMapName[2] = "Summer23Prompt23_RunC_V1"; // C
+    jecDATAName[2] = "Summer23Prompt23_V4_DATA";   jetVetoMapName[2] = "Summer23Prompt23_RunC_V1"; // C
     jecDATAName[3] = "NULL";   jetVetoMapName[3] = "NULL"; // D
     jecDATAName[4] = "NULL";   jetVetoMapName[4] = "NULL"; // E
     jecDATAName[5] = "NULL";   jetVetoMapName[5] = "NULL"; // F
     jecDATAName[6] = "NULL";   jetVetoMapName[6] = "NULL"; // G
   }
   else if(year == 20231)  {
-    jecMCName = "Summer23BPixPrompt23_V3_MC"; jerName = "Summer23BPixPrompt23_RunD_JRV1_MC";
+    jecMCName = "Summer23BPixPrompt23_V4_MC"; jerName = "Summer23BPixPrompt23_RunD_JRV3_MC";
     jecDATAName[0] = "NULL";   jetVetoMapName[0] = "NULL"; // A
     jecDATAName[1] = "NULL";   jetVetoMapName[1] = "NULL"; // B
     jecDATAName[2] = "NULL";   jetVetoMapName[2] = "NULL"; // C
-    jecDATAName[3] = "Summer23BPixPrompt23_V3_DATA";   jetVetoMapName[3] = "Summer23BPixPrompt23_RunD_V1"; // D
+    jecDATAName[3] = "Summer23BPixPrompt23_V4_DATA";   jetVetoMapName[3] = "Summer23BPixPrompt23_RunD_V1"; // D
     jecDATAName[4] = "NULL";   jetVetoMapName[4] = "NULL"; // E
     jecDATAName[5] = "NULL";   jetVetoMapName[5] = "NULL"; // F
     jecDATAName[6] = "NULL";   jetVetoMapName[6] = "NULL"; // G
   }
   else if(year == 20240)  {
-    jecMCName = "Summer24Prompt24_V2_MC"; jerName = "Summer23BPixPrompt23_RunD_JRV1_MC";
+    jecMCName = "Summer24Prompt24_V5_MC"; jerName = "Summer24Prompt24_JRV2_MC";
     jecDATAName[0] = "NULL";                     jetVetoMapName[0] = "Summer24Prompt24_RunBCDEFGHI_V1"; // A
-    jecDATAName[1] = "Summer24Prompt24_V2_DATA"; jetVetoMapName[1] = "Summer24Prompt24_RunBCDEFGHI_V1"; // B
-    jecDATAName[2] = "Summer24Prompt24_V2_DATA"; jetVetoMapName[2] = "Summer24Prompt24_RunBCDEFGHI_V1"; // C
-    jecDATAName[3] = "Summer24Prompt24_V2_DATA"; jetVetoMapName[3] = "Summer24Prompt24_RunBCDEFGHI_V1"; // D
-    jecDATAName[4] = "Summer24Prompt24_V2_DATA"; jetVetoMapName[4] = "Summer24Prompt24_RunBCDEFGHI_V1"; // E
-    jecDATAName[5] = "Summer24Prompt24_V2_DATA"; jetVetoMapName[5] = "Summer24Prompt24_RunBCDEFGHI_V1"; // F
-    jecDATAName[6] = "Summer24Prompt24_V2_DATA"; jetVetoMapName[6] = "Summer24Prompt24_RunBCDEFGHI_V1"; // G
-    jecDATAName[7] = "Summer24Prompt24_V2_DATA"; jetVetoMapName[7] = "Summer24Prompt24_RunBCDEFGHI_V1"; // H
-    jecDATAName[8] = "Summer24Prompt24_V2_DATA"; jetVetoMapName[8] = "Summer24Prompt24_RunBCDEFGHI_V1"; // I
+    jecDATAName[1] = "Summer24Prompt24_V5_DATA"; jetVetoMapName[1] = "Summer24Prompt24_RunBCDEFGHI_V1"; // B
+    jecDATAName[2] = "Summer24Prompt24_V5_DATA"; jetVetoMapName[2] = "Summer24Prompt24_RunBCDEFGHI_V1"; // C
+    jecDATAName[3] = "Summer24Prompt24_V5_DATA"; jetVetoMapName[3] = "Summer24Prompt24_RunBCDEFGHI_V1"; // D
+    jecDATAName[4] = "Summer24Prompt24_V5_DATA"; jetVetoMapName[4] = "Summer24Prompt24_RunBCDEFGHI_V1"; // E
+    jecDATAName[5] = "Summer24Prompt24_V5_DATA"; jetVetoMapName[5] = "Summer24Prompt24_RunBCDEFGHI_V1"; // F
+    jecDATAName[6] = "Summer24Prompt24_V5_DATA"; jetVetoMapName[6] = "Summer24Prompt24_RunBCDEFGHI_V1"; // G
+    jecDATAName[7] = "Summer24Prompt24_V5_DATA"; jetVetoMapName[7] = "Summer24Prompt24_RunBCDEFGHI_V1"; // H
+    jecDATAName[8] = "Summer24Prompt24_V5_DATA"; jetVetoMapName[8] = "Summer24Prompt24_RunBCDEFGHI_V1"; // I
     jecDATAName[9] = "NULL";                     jetVetoMapName[9] = "Summer24Prompt24_RunBCDEFGHI_V1"; // J
   }
-  else if(year == 20250 || year == 20260 || year == 20261)  {
-    jecMCName = "Winter25Prompt25_V3_MC"; jerName = "Summer23BPixPrompt23_RunD_JRV1_MC";
-    jecDATAName[0] = "NULL";                     jetVetoMapName[0] = "Winter25Prompt25_RunCDEFG_V1"; // A
-    jecDATAName[1] = "Winter25Prompt25_V3_DATA"; jetVetoMapName[1] = "Winter25Prompt25_RunCDEFG_V1"; // B
-    jecDATAName[2] = "Winter25Prompt25_V3_DATA"; jetVetoMapName[2] = "Winter25Prompt25_RunCDEFG_V1"; // C
-    jecDATAName[3] = "Winter25Prompt25_V3_DATA"; jetVetoMapName[3] = "Winter25Prompt25_RunCDEFG_V1"; // D
-    jecDATAName[4] = "Winter25Prompt25_V3_DATA"; jetVetoMapName[4] = "Winter25Prompt25_RunCDEFG_V1"; // E
-    jecDATAName[5] = "Winter25Prompt25_V3_DATA"; jetVetoMapName[5] = "Winter25Prompt25_RunCDEFG_V1"; // F
-    jecDATAName[6] = "Winter25Prompt25_V3_DATA"; jetVetoMapName[6] = "Winter25Prompt25_RunCDEFG_V1"; // G
-    jecDATAName[7] = "Winter25Prompt25_V3_DATA"; jetVetoMapName[7] = "Winter25Prompt25_RunCDEFG_V1"; // H
-    jecDATAName[8] = "Winter25Prompt25_V3_DATA"; jetVetoMapName[8] = "Winter25Prompt25_RunCDEFG_V1"; // I
-    jecDATAName[9] = "NULL";                     jetVetoMapName[9] = "Winter25Prompt25_RunCDEFG_V1"; // J
+  else if(year == 20250)  {
+    jecMCName = "Summer24Prompt25_V3_MC"; jerName = "Summer24Prompt25_JRV2_MC";
+    jecDATAName[0] = "NULL";                     jetVetoMapName[0] = "Summer24Prompt25_RunCDEFG_V1"; // A
+    jecDATAName[1] = "Summer24Prompt25_V3_DATA"; jetVetoMapName[1] = "Summer24Prompt25_RunCDEFG_V1"; // B
+    jecDATAName[2] = "Summer24Prompt25_V3_DATA"; jetVetoMapName[2] = "Summer24Prompt25_RunCDEFG_V1"; // C
+    jecDATAName[3] = "Summer24Prompt25_V3_DATA"; jetVetoMapName[3] = "Summer24Prompt25_RunCDEFG_V1"; // D
+    jecDATAName[4] = "Summer24Prompt25_V3_DATA"; jetVetoMapName[4] = "Summer24Prompt25_RunCDEFG_V1"; // E
+    jecDATAName[5] = "Summer24Prompt25_V3_DATA"; jetVetoMapName[5] = "Summer24Prompt25_RunCDEFG_V1"; // F
+    jecDATAName[6] = "Summer24Prompt25_V3_DATA"; jetVetoMapName[6] = "Summer24Prompt25_RunCDEFG_V1"; // G
+    jecDATAName[7] = "Summer24Prompt25_V3_DATA"; jetVetoMapName[7] = "Summer24Prompt25_RunCDEFG_V1"; // H
+    jecDATAName[8] = "Summer24Prompt25_V3_DATA"; jetVetoMapName[8] = "Summer24Prompt25_RunCDEFG_V1"; // I
+    jecDATAName[9] = "NULL";                     jetVetoMapName[9] = "Summer24Prompt25_RunCDEFG_V1"; // J
+  }
+  else if(year == 20260 || year == 20261)  {
+    jecMCName = "Summer24Prompt26_V1_MC"; jerName = "Summer24Prompt26_RunBD_JRV1_MC";
+    jecDATAName[0] = "Summer24Prompt26_V1_DATA"; jetVetoMapName[0] = "Summer24Prompt26_RunBCD_V1"; // A
+    jecDATAName[1] = "Summer24Prompt26_V1_DATA"; jetVetoMapName[1] = "Summer24Prompt26_RunBCD_V1"; // B
+    jecDATAName[2] = "Summer24Prompt26_V1_DATA"; jetVetoMapName[2] = "Summer24Prompt26_RunBCD_V1"; // C
+    jecDATAName[3] = "Summer24Prompt26_V1_DATA"; jetVetoMapName[3] = "Summer24Prompt26_RunBCD_V1"; // D
+    jecDATAName[4] = "Summer24Prompt26_V1_DATA"; jetVetoMapName[4] = "Summer24Prompt26_RunBCD_V1"; // E
+    jecDATAName[5] = "Summer24Prompt26_V1_DATA"; jetVetoMapName[5] = "Summer24Prompt26_RunBCD_V1"; // F
+    jecDATAName[6] = "Summer24Prompt26_V1_DATA"; jetVetoMapName[6] = "Summer24Prompt26_RunBCD_V1"; // G
+    jecDATAName[7] = "Summer24Prompt26_V1_DATA"; jetVetoMapName[7] = "Summer24Prompt26_RunBCD_V1"; // H
+    jecDATAName[8] = "Summer24Prompt26_V1_DATA"; jetVetoMapName[8] = "Summer24Prompt26_RunBCD_V1"; // I
+    jecDATAName[9] = "NULL";                     jetVetoMapName[9] = "Summer24Prompt26_RunBCD_V1"; // J
   }
 
   std::string tagName = jecMCName + "_" + "L1L2L3Res" + "_" + algoName;
@@ -432,6 +446,10 @@ MyCorrections::MyCorrections(int the_input_year) {
   tagName = jerName + "_" + "ScaleFactor" + "_" + algoName;
   //std::cout << tagName << std::endl;
   jerScaleFactor_ = csetJER->at(tagName);
+
+  tagName = jerName + "_" + "SFUncertainty" + "_" + algoName;
+  //std::cout << tagName << std::endl;
+  jerScaleFactorUnc_ = csetJER->at(tagName);
 
   tagName = jerName + "_" + "PtResolution" + "_" + algoName;
   jerPtResolution__ = csetJER->at(tagName);
@@ -536,8 +554,7 @@ double MyCorrections::eval_btvSF(const char *valType, char *workingPoint, double
   eta = std::min(std::abs(eta),2.399);
   pt = std::min(pt,999.999);
   if(flavor != 0) {
-    if(year == 20240 || year == 20250 || year == 20260 || year == 20261) return btvHFSF_->evaluate({valType, workingPoint, flavor, eta, pt});
-    else                                                                 return btvHFSF_->evaluate({valType, workingPoint, flavor, eta, pt});
+    return btvHFSF_->evaluate({valType, workingPoint, flavor, eta, pt});
   }
   else {
     return btvLFSF_->evaluate({valType, workingPoint, flavor, eta, pt});
@@ -548,13 +565,13 @@ double MyCorrections::eval_jetCORR(double area, double eta, double phi, double p
   int theRun = run;
   if(year == 20250 && theRun < 392159) theRun = 392159;
   // data
-  if(type >= 0 && (year == 20260 || year == 20261))                       return 1.0;
-  else if(type >= 0 && (year == 20231 || year == 20240 || year == 20250)) return JECDATA_[type]->evaluate({area, eta, pt, rho, phi, (float)theRun});
-  else if(type >= 0 && (year == 20220 || year == 20221 || year == 20230)) return JECDATA_[type]->evaluate({area, eta, pt, rho,      (float)theRun});
-  else if(type >= 0)                                                      return JECDATA_[type]->evaluate({area, eta, pt, rho});
+  if     (type >= 0 && (year == 20220 || year == 20221 || year == 20230)) return JECDATA_[type]->evaluate({area, eta, pt, rho,      (float)theRun});
+  else if(type >= 0)                                                      return JECDATA_[type]->evaluate({area, eta, pt, rho, phi, (float)theRun});
+
   // MC
-  if     (year == 20231 || year == 20240 || year == 20250 || year == 20260 || year == 20261) return JECMC_->evaluate({area, eta, pt, rho, phi});
-  else                                                                                       return JECMC_->evaluate({area, eta, pt, rho});
+  if     (type < 0 && (year == 20220 || year == 20221 || year == 20230))  return JECMC_->evaluate({area, eta, pt, rho});
+  else if(type < 0)                                                       return JECMC_->evaluate({area, eta, pt, rho, phi});
+
   printf("ERROR in eval_jetCORR!\n");
   return 1.0;
 };
@@ -569,9 +586,9 @@ double MyCorrections::eval_jerScaleFactor(double eta, double pt, int type) {
     else if(type == +1) return jerScaleFactor_->evaluate({eta,"up"});
     else if(type == -1) return jerScaleFactor_->evaluate({eta,"down"});
   } else {
-    if     (type ==  0) return jerScaleFactor_->evaluate({eta,pt,"nom"});
-    else if(type == +1) return jerScaleFactor_->evaluate({eta,pt,"up"});
-    else if(type == -1) return jerScaleFactor_->evaluate({eta,pt,"down"});
+    if     (type ==  0) return (jerScaleFactor_->evaluate({eta,pt}));
+    else if(type == +1) return (jerScaleFactor_->evaluate({eta,pt}) + jerScaleFactorUnc_->evaluate({eta,pt}));
+    else if(type == -1) return (jerScaleFactor_->evaluate({eta,pt}) - jerScaleFactorUnc_->evaluate({eta,pt}));
   }
   std::cout << "0 JER correction!" << std::endl;
   return 0.0;
