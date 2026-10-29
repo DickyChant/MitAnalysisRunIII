@@ -86,7 +86,9 @@ export USE_DIRECT_NANOAOD=1
 export FILELIST_DIR=crab_filelists
 if [ ${process} -lt 1000 ]; then
   [ -n "${normlist}" ] && [ -s "${normlist}" ] || fail 84 "MC job without normalization list (${normlist})"
-  export NORM_FILELIST=${normlist}
+  # the list holds bare LFNs from DAS; prefix them like the job's own input files
+  sed "s#^/store/#${redirector}/store/#" ${normlist} > crab_normlist_xrd.txt
+  export NORM_FILELIST=$(pwd)/crab_normlist_xrd.txt
 fi
 
 export XRD_NETWORKSTACK=IPv4
