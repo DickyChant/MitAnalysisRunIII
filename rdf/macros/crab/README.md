@@ -51,6 +51,8 @@ python3 submit_crab.py --tag=v1 --years=20240 --dry-run         # list tasks, bu
 python3 submit_crab.py --tag=v1 --years=20240 --site=T2_XX_Site  # submit
 python3 submit_crab.py --tag=v1 --processes=503,510 --site=T2_XX_Site
 python3 submit_crab.py --help                                    # all options
+# FNAL LPC stage-out: the FNAL username differs from the CERN one, so give the path
+python3 submit_crab.py --tag=v1 --site=T3_US_FNALLPC --lfn-base=/store/user/<FNAL user>/wzAnalysis_crab
 
 crab status -d crab_projects/crab_<task>
 crab resubmit -d crab_projects/crab_<task>

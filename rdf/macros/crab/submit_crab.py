@@ -23,6 +23,7 @@ Options:
     --tag=<str>            production tag, part of task names and output path (required)
     --site=<CMS site>      Site.storageSite (required unless --dry-run)
     --lfn-base=<path>      Data.outLFNDirBase (default /store/user/<CERN user>/<ana>_crab)
+                           (required for T3_US_FNALLPC, whose usernames differ)
     --ana=<name>           analysis driver (default wzAnalysis)
     --cfg=<file>           sample list (default ../<ana>_input_condor_jobs.cfg)
     --years=a,b            only these year codes
@@ -260,6 +261,9 @@ def main():
         sys.exit("ERROR: --tag is required\n" + __doc__)
     if not opts["dry_run"] and not opts["site"]:
         sys.exit("ERROR: --site is required for submission")
+    # the default LFN uses the CERN username; FNAL usernames differ
+    if opts["site"] == "T3_US_FNALLPC" and not opts["lfn_base"]:
+        sys.exit("ERROR: T3_US_FNALLPC needs --lfn-base=/store/user/<FNAL username>/...")
     if opts["ana"] not in SKIM_TYPE:
         sys.exit("ERROR: unknown analysis {0}".format(opts["ana"]))
     if not opts["cfg"]:
