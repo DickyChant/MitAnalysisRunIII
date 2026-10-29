@@ -41,8 +41,10 @@ FAILED, 87 no fillhisto, 88 no ntuple, 89 integrity check.
 ## Usage
 
 ```bash
-# CMSSW area (any recent el9 release with python3 ROOT + correctionlib), then:
+# CMSSW area: CMSSW_16_0_10 (el9_amd64_gcc13) and CMSSW_15_0_22 are tested; 13_3_1
+# fails (its boost rejects muonCrystalBall.h). CRAB ships the submitter's release.
 cmsenv
+export PYTHONNOUSERSITE=1   # a ~/.local correctionlib breaks the functions.h JIT link
 source /cvmfs/cms.cern.ch/common/crab-setup.sh
 voms-proxy-init --voms cms --valid 168:00
 cd rdf/macros/crab

@@ -80,6 +80,8 @@ echo "Input files for this job:"
 cat ${listName}
 [ -s ${listName} ] || fail 83 "no input files in PSet.py"
 
+# use the release's python packages only (a user-site correctionlib breaks the JIT link)
+export PYTHONNOUSERSITE=1
 export USE_DIRECT_NANOAOD=1
 export FILELIST_DIR=crab_filelists
 if [ ${process} -lt 1000 ]; then
