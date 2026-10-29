@@ -143,7 +143,10 @@ def build_payload(ana, years, mc_norm):
         shutil.rmtree(BUILD_DIR)
     os.makedirs(BUILD_DIR)
     payload = os.path.join(BUILD_DIR, "payload.tgz")
-    code = [ana + ".py", "functions.h", "mysf.h", "tmva_helper_xml.h", "tmva_helper_xml.py"]
+    # every local header: functions.h/mysf.h include others (e.g. muonCrystalBall.h), and a
+    # missing one only shows up as a JIT failure on the worker
+    code = [ana + ".py", "tmva_helper_xml.py"]
+    code += sorted(f for f in os.listdir(".") if f.endswith(".h"))
     code += sorted(f for f in os.listdir(".") if f.startswith("utils") and f.endswith(".py"))
 
     def keep_jsns(info):
