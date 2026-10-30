@@ -15,17 +15,24 @@ makeDataCards = 1 # 1 (mjj diff), 2 (mll diff), 3 (njets diff), 4 (detajj diff),
 genVBSSel = makeDataCards
 if(genVBSSel == 6):
     genVBSSel = 1
+    genVBSSel = 0
 elif(genVBSSel == 7):
     genVBSSel = 2
+    genVBSSel = 0
 elif(genVBSSel == 8):
     genVBSSel = 3
+    genVBSSel = 0
 elif(genVBSSel == 9):
     genVBSSel = 4
+    genVBSSel = 0
 elif(genVBSSel == 10):
     genVBSSel = 5
-elif(genVBSSel == 14):
+    genVBSSel = 0
+elif(genVBSSel == 11):
     genVBSSel = 1
+    genVBSSel = 0
 
+versionCharges = 0
 versionWG = False
 versionDoEWKQCD = False
 doNtuples = False
@@ -113,6 +120,11 @@ def selectionLL(df,year,PDType,isData,count):
                  .Filter("Sum(fake_Muon_charge)+Sum(fake_Electron_charge) != 0", "Sign-sign leptons")
                  .Define("eventNum", "event")
                  )
+
+    if(versionCharges > 0):
+        dftag = dftag.Filter("Sum(fake_Muon_charge)+Sum(fake_Electron_charge) > 0", "Positive events")
+    elif(versionCharges < 0):
+        dftag = dftag.Filter("Sum(fake_Muon_charge)+Sum(fake_Electron_charge) < 0", "Negative events")
 
     if(versionWG == True):
         dftag = dftag.Filter("Sum(fake_Muon_charge) == 1 and Sum(fake_Electron_charge) == 1","emu events only")
@@ -288,6 +300,18 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
                     .Define("theCat","compute_category({0},kPlotNonPrompt,kPlotWS,nFake,nTight,nWS)".format(theCat))
                    #.Define("bdt_vbfinc", ROOT.computeModel, ROOT.model.GetVariableNames())
                     )
+
+    if(versionCharges > 0):
+        dfbase = (dfbase.Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKSSWW"),plotCategory("kPlotSignal0")))
+                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKWZ")  ,plotCategory("kPlotSignal2")))
+                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotWZ")     ,plotCategory("kPlotSignal4")))
+                        )
+    elif(versionCharges < 0):
+        dfbase = (dfbase.Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKSSWW"),plotCategory("kPlotSignal1")))
+                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKWZ")  ,plotCategory("kPlotSignal3")))
+                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotWZ")     ,plotCategory("kPlotSignal5")))
+                        )
+
     dfbase = tmva_helperType0.run_inference(dfbase,"bdt_vbfinc")
     dfbase = tmva_helperType1.run_inference(dfbase,"bdt_vbfpol0",1)
     dfbase = tmva_helperType2.run_inference(dfbase,"bdt_vbfpol1",1)
@@ -484,9 +508,9 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
         dfwwvbscatJes26Up       [x] = dfwwvbscatJes26Up       [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjetJes26Up == 0 && nvbs_jetsJes26Up >= 2 && vbs_mjjJes26Up > 500 && vbs_detajjJes26Up > 2.5 && vbs_zepvvJes26Up < 0.75 && PuppiMET_ptJes26Up > {1}".format(altMass,metCut))
         dfwwvbscatJes27Up       [x] = dfwwvbscatJes27Up       [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjetJes27Up == 0 && nvbs_jetsJes27Up >= 2 && vbs_mjjJes27Up > 500 && vbs_detajjJes27Up > 2.5 && vbs_zepvvJes27Up < 0.75 && PuppiMET_ptJes27Up > {1}".format(altMass,metCut))
         dfwwvbscatJerUp         [x] = dfwwvbscatJerUp         [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjetJerUp   == 0 && nvbs_jetsJerUp   >= 2 && vbs_mjjJerUp   > 500 && vbs_detajjJerUp   > 2.5 && vbs_zepvvJerUp   < 0.75 && PuppiMET_ptJerUp	 > {1}".format(altMass,metCut))
-        dfwwvbscatJERUp         [x] = dfwwvbscatJERUp         [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjet        == 0 && nvbs_jets        >= 2 && vbs_mjj        > 500 && vbs_detajj        > 2.5 && vbs_zepvv        < 0.75 && PuppiMET_ptDef	 > {1}".format(altMass,metCut))
-        dfwwvbscatJESUp         [x] = dfwwvbscatJESUp         [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjet        == 0 && nvbs_jets        >= 2 && vbs_mjj        > 500 && vbs_detajj        > 2.5 && vbs_zepvv        < 0.75 && PuppiMET_ptDef	 > {1}".format(altMass,metCut))
-        dfwwvbscatUnclusteredUp [x] = dfwwvbscatUnclusteredUp [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjet        == 0 && nvbs_jets        >= 2 && vbs_mjj        > 500 && vbs_detajj        > 2.5 && vbs_zepvv        < 0.75 && PuppiMET_ptUnclUp	 > {1}".format(altMass,metCut))
+        dfwwvbscatJERUp         [x] = dfwwvbscatJERUp         [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjet        == 0 && nvbs_jets        >= 2 && vbs_mjj        > 500 && vbs_detajj        > 2.5 && vbs_zepvv        < 0.75 && PuppiMET_ptJESlUp  > {1}".format(altMass,metCut))
+        dfwwvbscatJESUp         [x] = dfwwvbscatJESUp         [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjet        == 0 && nvbs_jets        >= 2 && vbs_mjj        > 500 && vbs_detajj        > 2.5 && vbs_zepvv        < 0.75 && PuppiMET_ptJERlUp  > {1}".format(altMass,metCut))
+        dfwwvbscatUnclusteredUp [x] = dfwwvbscatUnclusteredUp [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjet        == 0 && nvbs_jets        >= 2 && vbs_mjj        > 500 && vbs_detajj        > 2.5 && vbs_zepvv        < 0.75 && PuppiMET_ptUnclUp  > {1}".format(altMass,metCut))
 
         dfwwbvbscatMuonMomUp    [x] = dfwwbvbscatMuonMomUp    [x].Filter("mllMuonMomUp     > 20 && ptl1MuonMomUp     > 25 && ptl2MuonMomUp     > 20 && (DiLepton_flavor != 2 || abs(mllMuonMomUp     -91.1876) > 15) && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets        >= 2 && vbs_mjj        > 500 && vbs_detajj        > 2.5 && vbs_zepvv        < 0.75 && PuppiMET_ptDef	> {1}".format(altMass,metCut))
         dfwwbvbscatElectronMomUp[x] = dfwwbvbscatElectronMomUp[x].Filter("mllElectronMomUp > 20 && ptl1ElectronMomUp > 25 && ptl2ElectronMomUp > 20 && (DiLepton_flavor != 2 || abs(mllElectronMomUp -91.1876) > 15) && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets        >= 2 && vbs_mjj        > 500 && vbs_detajj        > 2.5 && vbs_zepvv        < 0.75 && PuppiMET_ptDef	> {1}".format(altMass,metCut))
@@ -519,9 +543,9 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
         dfwwbvbscatJes26Up      [x] = dfwwbvbscatJes26Up      [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjetJes26Up >  0 && nvbs_jetsJes26Up >= 2 && vbs_mjjJes26Up > 500 && vbs_detajjJes26Up > 2.5 && vbs_zepvvJes26Up < 0.75 && PuppiMET_ptJes26Up > {1}".format(altMass,metCut))
         dfwwbvbscatJes27Up      [x] = dfwwbvbscatJes27Up      [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjetJes27Up >  0 && nvbs_jetsJes27Up >= 2 && vbs_mjjJes27Up > 500 && vbs_detajjJes27Up > 2.5 && vbs_zepvvJes27Up < 0.75 && PuppiMET_ptJes27Up > {1}".format(altMass,metCut))
         dfwwbvbscatJerUp        [x] = dfwwbvbscatJerUp        [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjetJerUp   >  0 && nvbs_jetsJerUp   >= 2 && vbs_mjjJerUp   > 500 && vbs_detajjJerUp   > 2.5 && vbs_zepvvJerUp   < 0.75 && PuppiMET_ptJerUp	 > {1}".format(altMass,metCut))
-        dfwwbvbscatJERUp        [x] = dfwwbvbscatJERUp        [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets        >= 2 && vbs_mjj        > 500 && vbs_detajj        > 2.5 && vbs_zepvv        < 0.75 && PuppiMET_ptDef	 > {1}".format(altMass,metCut))
-        dfwwbvbscatJESUp        [x] = dfwwbvbscatJESUp        [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets        >= 2 && vbs_mjj        > 500 && vbs_detajj        > 2.5 && vbs_zepvv        < 0.75 && PuppiMET_ptDef	 > {1}".format(altMass,metCut))
-        dfwwbvbscatUnclusteredUp[x] = dfwwbvbscatUnclusteredUp[x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets        >= 2 && vbs_mjj        > 500 && vbs_detajj        > 2.5 && vbs_zepvv        < 0.75 && PuppiMET_ptUnclUp	 > {1}".format(altMass,metCut))
+        dfwwbvbscatJERUp        [x] = dfwwbvbscatJERUp        [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets        >= 2 && vbs_mjj        > 500 && vbs_detajj        > 2.5 && vbs_zepvv        < 0.75 && PuppiMET_ptJESlUp  > {1}".format(altMass,metCut))
+        dfwwbvbscatJESUp        [x] = dfwwbvbscatJESUp        [x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets        >= 2 && vbs_mjj        > 500 && vbs_detajj        > 2.5 && vbs_zepvv        < 0.75 && PuppiMET_ptJERlUp  > {1}".format(altMass,metCut))
+        dfwwbvbscatUnclusteredUp[x] = dfwwbvbscatUnclusteredUp[x].Filter("mll{0}           > 20 && ptl1{0}           > 25 && ptl2{0}           > 20 && (DiLepton_flavor != 2 || abs(mll{0}           -91.1876) > 15) && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets        >= 2 && vbs_mjj        > 500 && vbs_detajj        > 2.5 && vbs_zepvv        < 0.75 && PuppiMET_ptUnclUp  > {1}".format(altMass,metCut))
 
         histo[ 0][x] = dfwwcat[x].Histo1D(("histo_{0}_{1}".format( 0,x), "histo_{0}_{1}".format( 0,x),40, 20, 220), "mll{0}".format(altMass),"weightNoBTag")
         dfwwcat[x] = dfwwcat[x].Filter("DiLepton_flavor != 2 || abs(mll{0}-91.1876) > 15".format(altMass),"Z veto")
@@ -946,7 +970,7 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
             elif(makeDataCards == 10):
                 x1Bins = array('d', [0.0,0.9,1.8,2.1,2.5,2.7,2.9,3.0,3.1416])
             elif(makeDataCards == 11):
-                x1Bins = array('d', [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0])
+                x1Bins = array('d', [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.75])
             elif(makeDataCards == 12):
                 #x1Bins = array('d', [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5,16.5,17.5,18.5,19.5,20.5,21.5,22.5,23.5,24.5,25.5,26.5,27.5,28.5,29.5,30.5,31.5,32.5,33.5,34.5,35.5,36.5,37.5,38.5,39.5,40.5,41.5,42.5,43.5,44.5,45.5,46.5,47.5,48.5,49.5,50.5,51.5,52.5,53.5,54.5,55.5,56.5,57.5,58.5,59.5,60.5,61.5,62.5,63.5])
                 x1Bins = array('d', [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5,16.5,17.5,18.5,19.5,20.5,21.5,22.5,23.5,24.5,25.5,26.5,27.5,28.5,29.5,30.5,31.5,32.5,33.5,34.5,35.5,36.5,37.5,38.5,39.5,40.5,41.5,42.5,43.5,44.5,45.5,46.5,47.5])

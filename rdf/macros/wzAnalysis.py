@@ -14,6 +14,7 @@ makeDataCards = 4 # 1 (njets), 2-1006 (lepton flavor), 3-1002 (3D), 4-1001 (BDT 
 genVBSSel = 1
 correctionString = "_correction"
 
+versionCharges = 0
 versionDoEWKQCD = False
 doNtuples = False
 # 0 = T, 1 = M, 2 = L
@@ -209,8 +210,10 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
     #variables = ROOT.model.GetVariableNames()
     #print(variables)
 
-    #MVAweights = "weights_mva/bdt_BDTG_vbfinc_v0.weights.xml"
-    MVAweights = "weights_mva/bdt_BDTG_vbfinc_nsel0_v0.weights.xml"
+    MVAweights = "weights_mva/bdt_BDTG_vbfinc_pcut50_nsel0_v0.weights.xml"
+    #MVAweights = "weights_mva/bdt_BDTG_vbfinc_pcut50_nsel1_v0.weights.xml"
+    #MVAweights = "weights_mva/bdt_BDTG_vbfinc_pcut30_nsel0_v0.weights.xml"
+    #MVAweights = "weights_mva/bdt_BDTG_vbfinc_pcut30_nsel1_v0.weights.xml"
     tmva_helper = tmva_helper_xml.TMVAHelperXML(MVAweights)
     print(tmva_helper.variables)
 
@@ -232,6 +235,17 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
                     .Filter("{0} != kPlotEWKWZ || nGenJet_bParton == 0".format(theCat), "EWKWZ requirement")
                     .Define("theCat","compute_category({0},kPlotNonPrompt,kPlotWS,nFake,nTight,0)".format(theCat))
                     )
+
+    if(versionCharges > 0):
+        dfbase = (dfbase.Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKSSWW"),plotCategory("kPlotSignal0")))
+                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKWZ")  ,plotCategory("kPlotSignal2")))
+                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotWZ")     ,plotCategory("kPlotSignal4")))
+                        )
+    elif(versionCharges < 0):
+        dfbase = (dfbase.Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKSSWW"),plotCategory("kPlotSignal1")))
+                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKWZ")  ,plotCategory("kPlotSignal3")))
+                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotWZ")     ,plotCategory("kPlotSignal5")))
+                        )
 
     dfbase = tmva_helper.run_inference(dfbase,"bdt_vbfinc",0)
 
@@ -333,6 +347,12 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
         dfsscat.append(dfwzcat[x].Filter("abs(Sum(fake_Muon_charge)+Sum(fake_Electron_charge)) == 3", "+/- 3 net charge"))
 
         dfwzcat[x] = dfwzcat[x].Filter("abs(Sum(fake_Muon_charge)+Sum(fake_Electron_charge)) == 1", "+/- 1 net charge")
+
+        if(versionCharges > 0):
+            dfwzcat[x] = dfwzcat[x].Filter("Sum(fake_Muon_charge)+Sum(fake_Electron_charge) > 0", "Positive events")
+        elif(versionCharges < 0):
+            dfwzcat[x] = dfwzcat[x].Filter("Sum(fake_Muon_charge)+Sum(fake_Electron_charge) < 0", "Negative events")
+
 
         if((x == plotCategory("kPlotEWKWZ") or (x == plotCategory("kPlotWZ") and versionDoEWKQCD == True)) and isData == "false"):
             dfwzcat[x] = (dfwzcat[x].Define("theGenCat",   "compute_vbs_gen_category({0},ngood_GenJets,good_GenJet_pt,good_GenJet_eta,good_GenJet_phi,good_GenJet_mass,ngood_GenDressedLeptons,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass,11)".format(genVBSSel))
@@ -442,9 +462,9 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
         dfwzvbscatJes26Up       [x] = dfwzvbscatJes26Up       [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjetJes26Up == 0 && nvbs_jetsJes26Up >= 2 && vbs_mjjJes26Up > 500 && vbs_detajjJes26Up > 2.5 && vbs_zepvvJes26Up < 1.0 && PuppiMET_ptJes26Up > {1}".format(altMass,metCut))
         dfwzvbscatJes27Up       [x] = dfwzvbscatJes27Up       [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjetJes27Up == 0 && nvbs_jetsJes27Up >= 2 && vbs_mjjJes27Up > 500 && vbs_detajjJes27Up > 2.5 && vbs_zepvvJes27Up < 1.0 && PuppiMET_ptJes27Up > {1}".format(altMass,metCut))
         dfwzvbscatJerUp         [x] = dfwzvbscatJerUp         [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjetJerUp   == 0 && nvbs_jetsJerUp	>= 2 && vbs_mjjJerUp   > 500 && vbs_detajjJerUp   > 2.5 && vbs_zepvvJerUp   < 1.0 && PuppiMET_ptJerUp	> {1}".format(altMass,metCut))
-        dfwzvbscatJERUp         [x] = dfwzvbscatJERUp         [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjet        == 0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptDef	> {1}".format(altMass,metCut))
-        dfwzvbscatJESUp         [x] = dfwzvbscatJESUp         [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjet        == 0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptDef	> {1}".format(altMass,metCut))
-        dfwzvbscatUnclusteredUp [x] = dfwzvbscatUnclusteredUp [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjet        == 0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptUnclUp	> {1}".format(altMass,metCut))
+        dfwzvbscatJERUp         [x] = dfwzvbscatJERUp         [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjet        == 0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptJESlUp  > {1}".format(altMass,metCut))
+        dfwzvbscatJESUp         [x] = dfwzvbscatJESUp         [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjet        == 0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptJERlUp  > {1}".format(altMass,metCut))
+        dfwzvbscatUnclusteredUp [x] = dfwzvbscatUnclusteredUp [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjet        == 0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptUnclUp  > {1}".format(altMass,metCut))
 
         dfwzbvbscatMuonMomUp    [x] = dfwzbvbscatMuonMomUp    [x].Filter("mllZMuonMomUp     < 15 && m3lMuonMomUp     > 100 && ptlWMuonMomUp     > 20 && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptDef	> {0}".format(metCut))
         dfwzbvbscatElectronMomUp[x] = dfwzbvbscatElectronMomUp[x].Filter("mllZElectronMomUp < 15 && m3lElectronMomUp > 100 && ptlWElectronMomUp > 20 && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptDef	> {0}".format(metCut))
@@ -477,9 +497,9 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
         dfwzbvbscatJes26Up      [x] = dfwzbvbscatJes26Up      [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjetJes26Up >  0 && nvbs_jetsJes26Up >= 2 && vbs_mjjJes26Up > 500 && vbs_detajjJes26Up > 2.5 && vbs_zepvvJes26Up < 1.0 && PuppiMET_ptJes26Up > {1}".format(altMass,metCut))
         dfwzbvbscatJes27Up      [x] = dfwzbvbscatJes27Up      [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjetJes27Up >  0 && nvbs_jetsJes27Up >= 2 && vbs_mjjJes27Up > 500 && vbs_detajjJes27Up > 2.5 && vbs_zepvvJes27Up < 1.0 && PuppiMET_ptJes27Up > {1}".format(altMass,metCut))
         dfwzbvbscatJerUp        [x] = dfwzbvbscatJerUp        [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjetJerUp   >  0 && nvbs_jetsJerUp	>= 2 && vbs_mjjJerUp   > 500 && vbs_detajjJerUp   > 2.5 && vbs_zepvvJerUp   < 1.0 && PuppiMET_ptJerUp	> {1}".format(altMass,metCut))
-        dfwzbvbscatJERUp        [x] = dfwzbvbscatJERUp        [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptDef	> {1}".format(altMass,metCut))
-        dfwzbvbscatJESUp        [x] = dfwzbvbscatJESUp        [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptDef	> {1}".format(altMass,metCut))
-        dfwzbvbscatUnclusteredUp[x] = dfwzbvbscatUnclusteredUp[x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptUnclUp	> {1}".format(altMass,metCut))
+        dfwzbvbscatJERUp        [x] = dfwzbvbscatJERUp        [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptJESlUp  > {1}".format(altMass,metCut))
+        dfwzbvbscatJESUp        [x] = dfwzbvbscatJESUp        [x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptJERlUp  > {1}".format(altMass,metCut))
+        dfwzbvbscatUnclusteredUp[x] = dfwzbvbscatUnclusteredUp[x].Filter("mllZ{0}           < 15 && m3l{0}           > 100 && ptlW{0}           > 20 && nbtag_goodbtag_Jet_bjet        >  0 && nvbs_jets	>= 2 && vbs_mjj        > 500 && vbs_detajj	  > 2.5 && vbs_zepvv	    < 1.0 && PuppiMET_ptUnclUp  > {1}".format(altMass,metCut))
 
         dfwzvbscatJes00Up[x] = redefineVBSIncMVAVariables(dfwzvbscatJes00Up[x],tmva_helper,"Jes00Up")
         dfwzvbscatJes01Up[x] = redefineVBSIncMVAVariables(dfwzvbscatJes01Up[x],tmva_helper,"Jes01Up")
