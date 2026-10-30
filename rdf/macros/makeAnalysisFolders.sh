@@ -27,6 +27,10 @@ rm -rf ${OUTPUTFOLDER}/macros1012
 rm -rf ${OUTPUTFOLDER}/macros1013
 rm -rf ${OUTPUTFOLDER}/macros1014
 
+rm -rf ${OUTPUTFOLDER}/macros1020
+rm -rf ${OUTPUTFOLDER}/macros1021
+rm -rf ${OUTPUTFOLDER}/macros1022
+
 cp -r ../macros ${OUTPUTFOLDER}/macros1001
 cp -r ../macros ${OUTPUTFOLDER}/macros1002
 cp -r ../macros ${OUTPUTFOLDER}/macros1003
@@ -41,6 +45,10 @@ cp -r ../macros ${OUTPUTFOLDER}/macros1011
 cp -r ../macros ${OUTPUTFOLDER}/macros1012
 cp -r ../macros ${OUTPUTFOLDER}/macros1013
 cp -r ../macros ${OUTPUTFOLDER}/macros1014
+
+cp -r ../macros ${OUTPUTFOLDER}/macros1020
+cp -r ../macros ${OUTPUTFOLDER}/macros1021
+cp -r ../macros ${OUTPUTFOLDER}/macros1022
 
 #makeDataCards = 1 # 1 (mjj diff), 2 (mll diff), 3 (njets diff), 4 (detajj diff), 5 (dphijj diff), 6 (mjj), 7 (mll), 8 (njets), 9 (detajj), 10 (dphijj), 11 (zepvv), 12 (pol3D), 13 (pol2DLX), 14 (polLL)
 sed -i 's/makeDataCards = 1/makeDataCards = 2/'  ${OUTPUTFOLDER}/macros1002/sswwAnalysis.py 
@@ -57,6 +65,13 @@ sed -i 's/makeDataCards = 1/makeDataCards = 12/' ${OUTPUTFOLDER}/macros1012/ssww
 sed -i 's/makeDataCards = 1/makeDataCards = 13/' ${OUTPUTFOLDER}/macros1013/sswwAnalysis.py 
 sed -i 's/makeDataCards = 1/makeDataCards = 14/' ${OUTPUTFOLDER}/macros1014/sswwAnalysis.py 
 
+sed -i 's/makeDataCards = 1/makeDataCards = 6/'  ${OUTPUTFOLDER}/macros1020/sswwAnalysis.py
+sed -i 's/makeDataCards = 1/makeDataCards = 6/'  ${OUTPUTFOLDER}/macros1021/sswwAnalysis.py
+sed -i 's/makeDataCards = 1/makeDataCards = 6/'  ${OUTPUTFOLDER}/macros1022/sswwAnalysis.py
+
+sed -i 's/versionCharges = 0/versionCharges = +1/' ${OUTPUTFOLDER}/macros1021/sswwAnalysis.py
+sed -i 's/versionCharges = 0/versionCharges = -1/' ${OUTPUTFOLDER}/macros1022/sswwAnalysis.py
+
 #makeDataCards = 4 # 1 (njets), 2-1006 (lepton flavor), 3-1002 (3D), 4-1001 (BDT 2D), 5-1003 (BDT 1D), 6-1004 (mjj), 7-1005 (mjj diff)
 sed -i 's/makeDataCards = 4/makeDataCards = 3/'  ${OUTPUTFOLDER}/macros1002/wzAnalysis.py
 sed -i 's/makeDataCards = 4/makeDataCards = 5/'  ${OUTPUTFOLDER}/macros1003/wzAnalysis.py
@@ -67,6 +82,9 @@ rm -f ${OUTPUTFOLDER}/macros1007/wzAnalysis.py
 rm -f ${OUTPUTFOLDER}/macros1008/wzAnalysis.py
 rm -f ${OUTPUTFOLDER}/macros1009/wzAnalysis.py
 rm -f ${OUTPUTFOLDER}/macros1010/wzAnalysis.py
+
+sed -i 's/versionCharges = 0/versionCharges = +1/' ${OUTPUTFOLDER}/macros1021/wzAnalysis.py
+sed -i 's/versionCharges = 0/versionCharges = -1/' ${OUTPUTFOLDER}/macros1022/wzAnalysis.py
 
 #makeDataCards = 3 # 1 (njets), 2 (lepton flavor), 3 (mjj)
 rm -f ${OUTPUTFOLDER}/macros1002/zzAnalysis.py
@@ -121,5 +139,9 @@ diff -r ../macros ${OUTPUTFOLDER}/macros1011
 diff -r ../macros ${OUTPUTFOLDER}/macros1012
 diff -r ../macros ${OUTPUTFOLDER}/macros1013
 diff -r ../macros ${OUTPUTFOLDER}/macros1014
+
+diff -r ../macros ${OUTPUTFOLDER}/macros1020
+diff -r ../macros ${OUTPUTFOLDER}/macros1021
+diff -r ../macros ${OUTPUTFOLDER}/macros1022
 
 fi

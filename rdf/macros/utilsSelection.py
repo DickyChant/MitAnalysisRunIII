@@ -387,7 +387,11 @@ def selectionJetMet(df,year,bTagSel,isData,count,jetEtaCut):
                      #.Define("thePuppiMET_ptJERUp"         ,"compute_JSON_MET(\"pt\",\"PuppiMET\",{0},\"MC\",\"pu_up\",PuppiMET_pt,PuppiMET_phi,PV_npvsGood)".format(year))
                      #.Define("thePuppiMET_ptJESUp"         ,"compute_JSON_MET(\"pt\",\"PuppiMET\",{0},\"MC\",\"pu_dn\",PuppiMET_pt,PuppiMET_phi,PV_npvsGood)".format(year))
                      #.Define("thePuppiMET_ptUnclusteredUp" ,"compute_JSON_MET(\"pt\",\"PuppiMET\",{0},\"MC\",\"nom\",PuppiMET_ptUnclusteredUp,PuppiMET_phiUnclusteredUp,PV_npvsGood)".format(year))
+                     .Define("PuppiMET_phiJESlUp","PuppiMET_phi")
+                     .Define("PuppiMET_phiJERlUp","PuppiMET_phi")
                      .Define("PuppiMET_phiUnclUp","PuppiMET_phiUnclusteredUp")
+                     .Define("PuppiMET_ptJESlUp" ,"PuppiMET_pt")
+                     .Define("PuppiMET_ptJERlUp" ,"PuppiMET_pt")
                      .Define("PuppiMET_ptUnclUp" ,"PuppiMET_ptUnclusteredUp")
                      )
 
@@ -434,7 +438,11 @@ def selectionJetMet(df,year,bTagSel,isData,count,jetEtaCut):
                      #.Define("thePuppiMET_ptJERUp"         ,"thePuppiMET_pt")
                      #.Define("thePuppiMET_ptJESUp"         ,"thePuppiMET_pt")
                      #.Define("thePuppiMET_ptUnclusteredUp" ,"thePuppiMET_pt")
+                     .Define("PuppiMET_phiJESlUp","PuppiMET_phi")
+                     .Define("PuppiMET_phiJERlUp","PuppiMET_phi")
                      .Define("PuppiMET_phiUnclUp","PuppiMET_phi")
+                     .Define("PuppiMET_ptJESlUp" ,"PuppiMET_pt")
+                     .Define("PuppiMET_ptJERlUp" ,"PuppiMET_pt")
                      .Define("PuppiMET_ptUnclUp" ,"PuppiMET_pt")
                      )
 

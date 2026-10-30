@@ -301,17 +301,6 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
                    #.Define("bdt_vbfinc", ROOT.computeModel, ROOT.model.GetVariableNames())
                     )
 
-    if(versionCharges > 0):
-        dfbase = (dfbase.Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKSSWW"),plotCategory("kPlotSignal0")))
-                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKWZ")  ,plotCategory("kPlotSignal2")))
-                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotWZ")     ,plotCategory("kPlotSignal4")))
-                        )
-    elif(versionCharges < 0):
-        dfbase = (dfbase.Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKSSWW"),plotCategory("kPlotSignal1")))
-                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKWZ")  ,plotCategory("kPlotSignal3")))
-                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotWZ")     ,plotCategory("kPlotSignal5")))
-                        )
-
     dfbase = tmva_helperType0.run_inference(dfbase,"bdt_vbfinc")
     dfbase = tmva_helperType1.run_inference(dfbase,"bdt_vbfpol0",1)
     dfbase = tmva_helperType2.run_inference(dfbase,"bdt_vbfpol1",1)

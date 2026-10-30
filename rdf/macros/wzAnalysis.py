@@ -236,17 +236,6 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
                     .Define("theCat","compute_category({0},kPlotNonPrompt,kPlotWS,nFake,nTight,0)".format(theCat))
                     )
 
-    if(versionCharges > 0):
-        dfbase = (dfbase.Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKSSWW"),plotCategory("kPlotSignal0")))
-                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKWZ")  ,plotCategory("kPlotSignal2")))
-                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotWZ")     ,plotCategory("kPlotSignal4")))
-                        )
-    elif(versionCharges < 0):
-        dfbase = (dfbase.Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKSSWW"),plotCategory("kPlotSignal1")))
-                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotEWKWZ")  ,plotCategory("kPlotSignal3")))
-                        .Redefine("theCat","theCat == {0} ? {1} : theCat".format(plotCategory("kPlotWZ")     ,plotCategory("kPlotSignal5")))
-                        )
-
     dfbase = tmva_helper.run_inference(dfbase,"bdt_vbfinc",0)
 
     dfwzcatMuonMomUp        = []
