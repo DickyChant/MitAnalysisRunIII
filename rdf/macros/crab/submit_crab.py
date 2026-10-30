@@ -27,7 +27,7 @@ Options:
     --cfg=<file>           sample list (default ../<ana>_input_condor_jobs.cfg)
     --years=a,b            only these year codes
     --processes=a,b        only these sample IDs
-    --mc-files-per-job=N   (default 5)   --data-files-per-job=N (default 10)
+    --mc-files-per-job=N   (default 5)   --data-files-per-job=N (default 3)
     --no-ntuples           histograms only (keep doNtuples as in the code)
     --redirector=<url>     prefix for LFNs on the worker (default root://cms-xrd-global.cern.ch/)
     --work-area=<dir>      CRAB project dir (default crab_projects)
@@ -204,7 +204,7 @@ def make_config(opts, task, payload):
     cfg.JobType.scriptArgs = args
     cfg.JobType.inputFiles = [payload]
     cfg.JobType.outputFiles = ["fillhisto.root"] + (["ntuple.root"] if opts["ntuples"] else [])
-    cfg.JobType.maxMemoryMB = 2500
+    cfg.JobType.maxMemoryMB = 3000   # test3 jobs peaked at 2.1 GB
     cfg.JobType.allowUndistributedCMSSW = True
 
     cfg.Data.inputDataset = task["dataset"]
@@ -231,7 +231,7 @@ def submit_one(opts, task, payload):
 
 def main():
     opts = {"tag": None, "site": None, "lfn_base": None, "ana": "wzAnalysis", "cfg": None,
-            "years": set(), "processes": set(), "mc_fpj": 5, "data_fpj": 10, "ntuples": True,
+            "years": set(), "processes": set(), "mc_fpj": 5, "data_fpj": 3, "ntuples": True,
             "redirector": "root://cms-xrd-global.cern.ch/", "work_area": "crab_projects",
             "dry_run": False}
     valid = ["tag=", "site=", "lfn-base=", "ana=", "cfg=", "years=", "processes=",
