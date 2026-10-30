@@ -271,6 +271,47 @@ def getMCnormList(files):
     print("Normalization from {0}: {1} files".format(fpath, len(normFiles)))
     return normFiles
 
+def readRunsSums(normFiles, nTheoryReplicas):
+    """genEventSum* of the Runs trees in ONE read.
+
+    Same results as booking dfRuns.Sum/Min/Count one by one, but those each trigger
+    their own event loop (~30 per sample), re-opening every file each time; over
+    xrootd that dominated CRAB job runtimes. Returns (sumW, sumNoW, sumLHEScale[9],
+    sumPS[5], nRuns) and updates nTheoryReplicas in place.
+    """
+    import numpy as np
+    dfRuns = ROOT.RDataFrame("Runs", normFiles)
+    have = set(str(c) for c in dfRuns.GetColumnNames())
+    cols = [c for c in ("genEventSumw", "genEventCount", "nLHEPdfSumw", "nLHEScaleSumw",
+                        "LHEScaleSumw", "nPSSumw", "PSSumw") if c in have]
+    a = dfRuns.AsNumpy(cols)
+    nRuns = len(a["genEventSumw"])
+    sumW = float(np.sum(a["genEventSumw"]))
+    sumNoW = float(np.sum(a["genEventCount"]))
+    if "nLHEPdfSumw" in a:
+        if a["nLHEPdfSumw"].min() < nTheoryReplicas[0]:
+            nTheoryReplicas[0] = int(a["nLHEPdfSumw"].min())
+    else:
+        nTheoryReplicas[0] = 0
+
+    def arraySums(nCol, col, nMax, slot):
+        out = [0] * nMax
+        for n in range(nMax):
+            if nCol not in a or col not in a:
+                out[n] = nRuns
+                nTheoryReplicas[slot] = n
+                print("Problem with {0}: column missing".format(col))
+            elif a[nCol].min() > n:
+                out[n] = float(sum(v[n] for v in a[col]))
+            else:
+                out[n] = nRuns
+                nTheoryReplicas[slot] = int(a[nCol].min())
+        return out
+
+    sumLHEScale = arraySums("nLHEScaleSumw", "LHEScaleSumw", 9, 1)
+    sumPS = arraySums("nPSSumw", "PSSumw", 4, 2) + [nRuns]
+    return sumW, sumNoW, sumLHEScale, sumPS, nRuns
+
 def getMClist(sampleNOW, skimType):
 
     if USE_DIRECT_NANOAOD:
