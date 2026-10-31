@@ -1,3 +1,10 @@
+"""Run WZ analysis from rdf/macros/ with ROOT and correctionlib:
+
+python3 wzAnalysis.py --process=802 --year=20160 --whichJob=-1
+
+For direct NanoAOD input set USE_DIRECT_NANOAOD=1 and FILELIST_DIR first;
+see crab/README.md for Run 2 datasets, v9 compatibility and calibration caveats.
+"""
 import ROOT
 import os, sys, getopt, json
 from array import array
@@ -8,6 +15,7 @@ from utilsAna import getMClist, getMCnormList, getDATAlist, readRunsSums
 from utilsAna import SwitchSample, groupFiles, getTriggerFromJson, getLeptomSelFromJson, getLumi
 from utilsSelection import selectionTauVeto, selectionPhoton, selectionJetMet, selection3LVar, selectionLGVar, selectionTrigger2L, selectionElMu, selectionWeigths, selectionGenLepJet, makeFinalVariableVar, makeFinalVariable2DVar
 from utilsMVA import redefineVBSIncMVAVariables
+from utilsNanoAOD import prepareWZNanoAOD, hasLegacyLeptonMVA, pruneWZTrigger
 import tmva_helper_xml
 
 makeDataCards = 4 # 1 (njets), 2-1006 (lepton flavor), 3-1002 (3D), 4-1001 (BDT 2D), 5-1003 (BDT 1D), 6-1004 (mjj), 7-1005 (mjj diff)
@@ -72,21 +80,26 @@ elif(elSelChoice == 9):
 
 def selectionLL(df,year,PDType,isData,count):
 
+    # Legacy mvaTTH scores need their existing version-12 selection thresholds.
+    # Do not apply v15 promptMVA thresholds to a differently trained classifier.
+    leptonVersion = 12 if year < 20200 and hasLegacyLeptonMVA(df) else None
+    df = prepareWZNanoAOD(df, year)
+
     overallTriggers = jsonObject['triggers']
-    TRIGGERMUEG = getTriggerFromJson(overallTriggers, "TRIGGERMUEG", year)
-    TRIGGERDMU  = getTriggerFromJson(overallTriggers, "TRIGGERDMU", year)
-    TRIGGERSMU  = getTriggerFromJson(overallTriggers, "TRIGGERSMU", year)
-    TRIGGERDEL  = getTriggerFromJson(overallTriggers, "TRIGGERDEL", year)
-    TRIGGERSEL  = getTriggerFromJson(overallTriggers, "TRIGGERSEL", year)
+    TRIGGERMUEG = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERMUEG", year))
+    TRIGGERDMU  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERDMU", year))
+    TRIGGERSMU  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERSMU", year))
+    TRIGGERDEL  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERDEL", year))
+    TRIGGERSEL  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERSEL", year))
 
     dftag = selectionTrigger2L(df,year,PDType,JSON,isData,TRIGGERSEL,TRIGGERDEL,TRIGGERSMU,TRIGGERDMU,TRIGGERMUEG)
 
     overallLeptonSel = jsonObject['leptonSel']
-    FAKE_MU   = getLeptomSelFromJson(overallLeptonSel, "FAKE_MU",   year)
-    TIGHT_MU  = getLeptomSelFromJson(overallLeptonSel, "TIGHT_MU{0}".format(muSelChoice),  year, 1)
+    FAKE_MU   = getLeptomSelFromJson(overallLeptonSel, "FAKE_MU",   year, version=leptonVersion)
+    TIGHT_MU  = getLeptomSelFromJson(overallLeptonSel, "TIGHT_MU{0}".format(muSelChoice),  year, 1, version=leptonVersion)
 
-    FAKE_EL   = getLeptomSelFromJson(overallLeptonSel, "FAKE_EL",   year)
-    TIGHT_EL  = getLeptomSelFromJson(overallLeptonSel, "TIGHT_EL{0}".format(elSelChoice),  year, 1)
+    FAKE_EL   = getLeptomSelFromJson(overallLeptonSel, "FAKE_EL",   year, version=leptonVersion)
+    TIGHT_EL  = getLeptomSelFromJson(overallLeptonSel, "TIGHT_EL{0}".format(elSelChoice),  year, 1, version=leptonVersion)
 
     dftag = selectionElMu(dftag,year,FAKE_MU,TIGHT_MU,FAKE_EL,TIGHT_EL)
 
@@ -1476,8 +1489,8 @@ def readDASample(sampleNOW,year,skimType,whichJob,group,ewkCorrWeights,wsWeights
     if  (sampleNOW >= 1000 and sampleNOW <= 1009): PDType = "SingleMuon"
     elif(sampleNOW >= 1010 and sampleNOW <= 1019): PDType = "DoubleMuon"
     elif(sampleNOW >= 1020 and sampleNOW <= 1029): PDType = "MuonEG"
-    elif(sampleNOW >= 1030 and sampleNOW <= 1039): PDType = "EGamma"
-    elif(sampleNOW >= 1040 and sampleNOW <= 1049): PDType = "Muon"
+    elif(sampleNOW >= 1030 and sampleNOW <= 1039): PDType = "DoubleEG" if year // 10 in (2016, 2017) else "EGamma"
+    elif(sampleNOW >= 1040 and sampleNOW <= 1049): PDType = "SingleElectron" if year // 10 in (2016, 2017) else "Muon"
     elif(sampleNOW >= 1050 and sampleNOW <= 1059): PDType = "MET"
 
     files = getDATAlist(sampleNOW, year, skimType)

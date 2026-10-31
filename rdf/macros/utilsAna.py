@@ -100,11 +100,11 @@ def getPrunedTriggers(df,TRIGGERXXX):
             TRIGGERPRUNED += ")"
     return TRIGGERPRUNED
 
-def getLeptomSelFromJson(overall, type, year, debug = 0):
+def getLeptomSelFromJson(overall, type, year, debug = 0, version = None):
 
     if(year > 10000): year = year // 10
-    version = 12
-    if(year >= 2024 or year <= 2021): version = 15
+    if version is None:
+        version = 15 if (year >= 2024 or year <= 2021) else 12
 
     for leptonSel in overall:
         if(leptonSel['name'] == type and leptonSel['version'] == version):

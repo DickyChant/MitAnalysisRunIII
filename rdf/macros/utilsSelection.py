@@ -40,22 +40,15 @@ def getBTagCut_DeepJet(type,year):
        value[1] = 0.2435
        value[2] = 0.0480
 
+    # UL DeepJet T/M/L working points (BTV recommendations).
     elif(year == 20160):
-       value[0] = 0.6563
-       value[1] = 0.2435
-       value[2] = 0.0480
+       value = [0.6502, 0.2598, 0.0508]
     elif(year == 20161):
-       value[0] = 0.6563
-       value[1] = 0.2435
-       value[2] = 0.0480
+       value = [0.6377, 0.2489, 0.0480]
     elif(year == 20170):
-       value[0] = 0.6563
-       value[1] = 0.2435
-       value[2] = 0.0480
+       value = [0.7476, 0.3040, 0.0532]
     elif(year == 20180):
-       value[0] = 0.6563
-       value[1] = 0.2435
-       value[2] = 0.0480
+       value = [0.7100, 0.2783, 0.0490]
 
     return value[type]
 
@@ -119,6 +112,9 @@ def getBTagCut_PNet(type,year):
 # UnifiedParT
 def getBTagCut(type,year):
 
+    if year in (20160, 20161, 20170, 20180):
+        return getBTagCut_DeepJet(type, year)
+
     if(type < 0 or type > 2): return 100
     value = [0.8482, 0.4319, 0.0849]
     if(year == 20220):
@@ -154,22 +150,6 @@ def getBTagCut(type,year):
        value[1] = 0.1272
        value[2] = 0.0246
 
-    elif(year == 20160):
-       value[0] = 0.4648
-       value[1] = 0.1272
-       value[2] = 0.0246
-    elif(year == 20161):
-       value[0] = 0.4648
-       value[1] = 0.1272
-       value[2] = 0.0246
-    elif(year == 20170):
-       value[0] = 0.4648
-       value[1] = 0.1272
-       value[2] = 0.0246
-    elif(year == 20180):
-       value[0] = 0.4648
-       value[1] = 0.1272
-       value[2] = 0.0246
 
     return value[type]
 
@@ -313,10 +293,10 @@ def makeJES(df,year,postFix,bTagSel,jetEtaCut,jetTypeCorr):
 def selectionJetMet(df,year,bTagSel,isData,count,jetEtaCut):
 
     jetTypeCorr = -1
-    if(count > 1000): jetTypeCorr = count%10
+    if(isData == "true"): jetTypeCorr = count%10
     print("jetTypeCorr: {0}".format(jetTypeCorr))
 
-    BTAGName = "UParTAK4"
+    BTAGName = "DeepFlav" if year in (20160, 20161, 20170, 20180) else "UParTAK4"
     if((year // 10) > 2021 and (year // 10) < 2024): BTAGName = "RobustParTAK4"
 
     JMEName0 = "Jet_chMultiplicity"
@@ -327,11 +307,20 @@ def selectionJetMet(df,year,bTagSel,isData,count,jetEtaCut):
         JMEName1 = "Jet_nElectrons" # dummy
         JMEName2 = "Jet_jetId"
 
+    # v9 lacks jet multiplicities. Use its stored UL tight/tight-lepton-veto
+    # bits instead of fabricating multiplicities for the v15 jet-ID evaluator.
+    if not df.HasColumn(JMEName0) or not df.HasColumn(JMEName1):
+        if not df.HasColumn("Jet_jetId"):
+            raise ValueError("WZ jets require multiplicities or legacy Jet_jetId")
+        df = (df.Define("jet_SelMask0", "(Jet_jetId & 2) != 0")
+                .Define("jet_SelMask1", "(Jet_jetId & 4) != 0"))
+    else:
+        df = (df.Define("jet_SelMask0", "cleaningJetSelMask(0,Jet_eta,Jet_chHEF,Jet_neHEF,Jet_chEmEF,Jet_neEmEF,Jet_muEF,{0},{1},{2},{3})".format(JMEName0,JMEName1,JMEName2,year))
+                .Define("jet_SelMask1", "cleaningJetSelMask(1,Jet_eta,Jet_chHEF,Jet_neHEF,Jet_chEmEF,Jet_neEmEF,Jet_muEF,{0},{1},{2},{3})".format(JMEName0,JMEName1,JMEName2,year)))
+
     dftag =(df.Define("jet_mask1", "cleaningMask(Muon_jetIdx[fake_mu],nJet)")
               .Define("jet_mask2", "cleaningMask(Electron_jetIdx[fake_el],nJet)")
               .Define("jet_VetoMapMask", "cleaningJetVetoMapMask(Jet_eta,Jet_phi,{0},{1})".format(jetTypeCorr,year))
-              .Define("jet_SelMask0", "cleaningJetSelMask(0,Jet_eta,Jet_chHEF,Jet_neHEF,Jet_chEmEF,Jet_neEmEF,Jet_muEF,{0},{1},{2},{3})".format(JMEName0,JMEName1,JMEName2,year))
-              .Define("jet_SelMask1", "cleaningJetSelMask(1,Jet_eta,Jet_chHEF,Jet_neHEF,Jet_chEmEF,Jet_neEmEF,Jet_muEF,{0},{1},{2},{3})".format(JMEName0,JMEName1,JMEName2,year))
               #.Define("clean_jet", "Jet_pt > 10 && jet_mask1 && jet_mask2 && jet_VetoMapMask > 0 && jet_SelMask0 && jet_SelMask1")
               .Define("clean_jet", "Jet_pt > 10 && jet_mask1 && jet_mask2 && jet_VetoMapMask > 0 && jet_SelMask0") # No Tight lepton veto
               .Define("clean_Jet_pt", "Jet_pt[clean_jet]")
