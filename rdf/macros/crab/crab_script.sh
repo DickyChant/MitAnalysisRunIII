@@ -64,6 +64,12 @@ fail() {
 
 tar xzf payload.tgz || fail 82 "cannot extract payload.tgz"
 
+export XRD_NETWORKSTACK=IPv4
+export XRD_REQUESTTIMEOUT=600
+export XRD_REDIRECTLIMIT=255
+export XRD_CONNECTIONRETRY=4
+export XRD_STREAMTIMEOUT=120
+
 # Input files assigned by CRAB -> direct-mode file list
 mkdir -p crab_filelists
 if [ ${process} -lt 1000 ]; then
@@ -71,11 +77,49 @@ if [ ${process} -lt 1000 ]; then
 else
   listName="crab_filelists/data_${process}_$((year / 10)).txt"
 fi
+# Prefer the site's own copy (CRAB runs jobs where the data are), fall back to the
+# redirector: the global redirector sometimes sends the open to a remote site that
+# times out (exit 5 for ~7% of the v1 jobs, with the file on disk at the running site).
+# The local PFN prefix comes from the site-local config via edmFileUtil.
 python3 -c "
 import PSet
 for f in PSet.process.source.fileNames:
-    print(f if f.startswith('root://') else '${redirector}' + f)
-" > ${listName} || fail 83 "cannot read input files from PSet.py"
+    print(f)
+" > crab_lfns.txt || fail 83 "cannot read input files from PSet.py"
+[ -s crab_lfns.txt ] || fail 83 "no input files in PSet.py"
+firstLFN=$(grep -m1 '^/store/' crab_lfns.txt)
+localPrefix=""
+if [ -n "${firstLFN}" ]; then
+  firstPFN=$(edmFileUtil -d ${firstLFN} 2>/dev/null | tail -1)
+  case "${firstPFN}" in
+    *"${firstLFN}") localPrefix=${firstPFN%"${firstLFN}"} ;;
+  esac
+fi
+echo "site-local prefix: '${localPrefix}'"
+
+# resolveLFN <lfn>: local PFN if the site has the file, else the redirector URL
+resolveLFN() {
+  local lfn=$1
+  case "${lfn}" in
+    root://*) echo "${lfn}"; return ;;
+  esac
+  if [ -n "${localPrefix}" ]; then
+    case "${localPrefix}" in
+      root://*)
+        local host=${localPrefix#root://}; host=${host%%/*}
+        local path=${localPrefix#root://${host}}${lfn}
+        if timeout 30 xrdfs ${host} stat ${path} > /dev/null 2>&1; then
+          echo "${localPrefix}${lfn}"; return
+        fi ;;
+      *)
+        local pfn=${localPrefix#file:}${lfn}
+        if [ -r "${pfn}" ]; then echo "${pfn}"; return; fi ;;
+    esac
+  fi
+  echo "${redirector}${lfn}"
+}
+
+while read lfn; do resolveLFN ${lfn}; done < crab_lfns.txt > ${listName}
 echo "Input files for this job:"
 cat ${listName}
 [ -s ${listName} ] || fail 83 "no input files in PSet.py"
@@ -86,16 +130,11 @@ export USE_DIRECT_NANOAOD=1
 export FILELIST_DIR=crab_filelists
 if [ ${process} -lt 1000 ]; then
   [ -n "${normlist}" ] && [ -s "${normlist}" ] || fail 84 "MC job without normalization list (${normlist})"
-  # the list holds bare LFNs from DAS; prefix them like the job's own input files
-  sed "s#^/store/#${redirector}/store/#" ${normlist} > crab_normlist_xrd.txt
+  # the list holds bare LFNs from DAS; resolve them like the job's own input files
+  while read lfn; do resolveLFN ${lfn}; done < ${normlist} > crab_normlist_xrd.txt
+  echo "Normalization files: $(wc -l < crab_normlist_xrd.txt), site-local: $(grep -c -v "^${redirector}" crab_normlist_xrd.txt)"
   export NORM_FILELIST=$(pwd)/crab_normlist_xrd.txt
 fi
-
-export XRD_NETWORKSTACK=IPv4
-export XRD_REQUESTTIMEOUT=600
-export XRD_REDIRECTLIMIT=255
-export XRD_CONNECTIONRETRY=4
-export XRD_STREAMTIMEOUT=120
 
 if [ "${ntuples}" = "1" ]; then
   sed -i 's/^doNtuples = False/doNtuples = True/' ${ana}.py
