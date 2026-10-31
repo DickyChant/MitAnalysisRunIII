@@ -83,3 +83,100 @@ normalization, so a plain sum is correct.
   so de-duplicate on `(run, luminosityBlock, eventNum)` after merging data tasks.
   The WZ ntuples carry `run` and `luminosityBlock` from this version on; outputs from
   earlier campaigns (v1/v2) do not.
+
+## Run 2 WZ catalog
+
+Run 2 year codes are `20160` (UL16 preVFP/APV), `20161` (UL16 postVFP),
+`20170` (UL17), and `20180` (UL18). New MC definitions use the exact nominal
+NanoAODv15/150X datasets in the supplied `run2_survey.out`, except the four
+official WZ helicity samples, which use NanoAODv9/106X. No DAS queries were
+used to construct this catalog.
+
+| Era | Year | Main block | Overflow block | Preserved DY/DY/TT ids |
+|---|---:|---|---|---|
+| 2016APV | 20160 | 800–819 | 720–739 | 800 / 801 / 808 |
+| 2016 | 20161 | 820–839 | 740–759 | 820 / 821 / 828 |
+| 2017 | 20170 | 840–859 | 760–779 | 840 / 841 / 848 |
+| 2018 | 20180 | 860–879 | 780–799 | 860 / 861 / 868 |
+
+The 17 free main-block positions are filled first, then overflow offsets 0–18;
+overflow offset 19 is spare. All MC ids remain below 1000. The overflow starts
+above private Run 2 ids 700–719, avoids 600–643, and leaves existing 9xx test
+samples untouched. DY/TT definitions and normalization are unchanged.
+
+[run2_samples.csv](run2_samples.csv) is the complete 144-row report: every id,
+era, exact DAS name, cross section in pb, expression, category, source and cfg
+status. `SwitchSample` converts pb to fb with `*1000`, for luminosity in fb⁻¹.
+The CSV is a review manifest, not a second input to the submitter.
+
+The default cfg enables 30 new MC processes per era. The four helicity samples
+and `InclusivePolarization` are **alternative signal productions**, and have
+`no` rows: remove `no` in a dedicated polarization cfg to submit them. They use
+`kPlotEWKWZ`, like Run 3 WZjj; never add their histograms to nominal WLLJJ or add
+the inclusive polarization sample to the four helicities. The lowMLL/lowGPt
+Zγ sample is also defined but disabled pending phase-space/overlap validation;
+it is not an exact replacement for Run 3 x39. DY/TT are already available and
+are not added to the default WZ cfg, which estimates nonprompt from data.
+
+Dataset choices and omissions:
+
+- QCD WZ is the requested POWHEG `WZTo3LNu_mllmin4p0` sample.
+- `ZZJJTo4L_TuneCP5_13TeV-madgraph-pythia8` **does** exist in v15 for all eras.
+  It overlaps inclusive QCD ZZ and is not added alongside `ZZTo4L`.
+- Only nominal M125 Higgs tunes are used; ggH is not minloHJJ. VH covers the
+  three H→ZZ samples and `HZJ_HToWWTo2L2Nu_ZTo2L`. These do not exhaust VH non-bb.
+- `HWplusJ`/`HWminusJ` H→WW appear only in older v2/v9 campaigns in this survey;
+  they are omitted to respect the v15 rule (whose only exception is polarized WZ).
+- No WZ interference dataset is in the survey; no x90 equivalent is invented.
+- Extensions are not independently normalized/added. Exact exceptional versions
+  include UL16 postVFP ZZ `-v2`, APV ggZZ→4τ `-v2`, and APV LL/TL v9 `-v2`.
+
+### Cross-section provenance and open normalization questions
+
+The survey contains no cross sections. Sources checked are the
+[CMS Run 2 sample table in Guiang's VBS presentation](https://uaf-10.t2.ucsd.edu/~jguiang/presentations/vbswh/vbswh_02-10-2023.pdf)
+(tribosons), the [LHCHXSWG YR4 13 TeV tables](https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt13TeV)
+(Higgs production), and [CMS Open Data cms-72727](https://opendata.cern.ch/record/cms-72727)
+(0.01630 pb inclusive polarized WZ, generator cross section). Higgs H→4l uses
+BR=0.0002745 for e/μ/τ; ttH non-bb uses BR(bb)=0.5824. The 4LFilter ZH value
+includes an extra filter and must not be replaced by an unfiltered ZH×BR blindly.
+
+Other entries carry remembered CMS Run 2 generator/convention values, explicitly
+marked `TODO verify xsec` where an exact XSDB/GenXSecAnalyzer record could not be
+confirmed. These are provisional inputs, not newly measured generator results.
+In particular the LL/LT/TL/TT rates (0.0016/0.0033/0.0033/0.0081 pb) are only
+rounded estimates at the inclusive 0.0163 pb scale; their fractions were **not**
+verified. Obtain all four generator rates before using polarization yields or
+fractions. The disabled cfg rows allow defining/submitting these samples without
+silently putting the estimates into a nominal prediction. Also verify WZG decay
+filters, Zγ lowMLL overlap, ZH 4LFilter efficiency, HZJ branching fractions, ggZZ
+K factors, and whether QCD WZ/ZZ require analysis-specific higher-order factors.
+No extra K factor is applied to ggZZ.
+
+### Run 2 data mapping
+
+`getDATAlist` reduces the year code with `year // 10`; the **id** carries the
+2016 HIPM split. The cfg therefore uses suffixes 1–5 (B–F HIPM) only with
+`20160`, and suffixes 6–8 (F non-HIPM/G/H) only with `20161`. For each suffix,
+100x/101x/102x/103x/104x are SingleMuon/DoubleMuon/MuonEG/DoubleEG/SingleElectron.
+The typo `10388` for 2016 DoubleEG H is corrected to `1038`.
+2017 uses suffixes 1–5, and 2018 uses 0–3 with 103x=EGamma and no separate
+SingleElectron. MET is excluded. [run2_data.csv](run2_data.csv) lists every data id/year/DAS mapping.
+The 81 data cfg rows expand to 86 datasets
+because 2016B has two HIPM processing chunks per PD. They all occur in the
+survey. As before, do not reuse an APV data id with the postVFP year code:
+`getDATAlist` itself does not enforce that pairing.
+
+### Offline validation
+
+From the repository root (standard-library Python only):
+
+```bash
+python3 rdf/macros/crab/validate_run2.py --survey ../run2/run2_survey.out
+```
+
+This executes `SwitchSample` and `getDATAlist` with file discovery intercepted,
+uses the actual submitter's `DAS_DIR` regex, checks every cfg id/year including
+`no` rows, rejects duplicate MC ids and reserved-range additions, and checks
+all new MC and Run 2 lepton-data names against the survey verbatim. It does not
+establish physics validity or substitute for an event-level CMSSW run.
