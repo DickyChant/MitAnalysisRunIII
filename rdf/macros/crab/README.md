@@ -180,3 +180,111 @@ uses the actual submitter's `DAS_DIR` regex, checks every cfg id/year including
 `no` rows, rejects duplicate MC ids and reserved-range additions, and checks
 all new MC and Run 2 lepton-data names against the survey verbatim. It does not
 establish physics validity or substitute for an event-level CMSSW run.
+
+### NanoAODv9 compatibility and physics differences
+
+`wzAnalysis.selectionLL` calls `prepareWZNanoAOD` before booking selections.
+Every alias/default is guarded by `HasColumn`; existing v15 columns survive
+unchanged. The audit expands the actual selection/weight helper expressions,
+including formatted branch names, against `branches_v9.txt`, `branches_v15.txt`
+and `only_in_v15.txt`. The required missing columns and treatments are:
+
+| Missing v15 column(s) | v9 treatment | Physics consequence |
+|---|---|---|
+| `Rho_fixedGridRhoFastjetAll` | Alias `fixedGridRhoFastjetAll` | Naming change; same event density input. |
+| `Electron_mvaIso`, `Electron_mvaNoIso` | Alias `Electron_mvaFall17V2Iso`, `Electron_mvaFall17V2noIso` | Legacy electron ID scores; no new classifier inferred. |
+| `Electron_mvaIso_WP80`, `Electron_mvaIso_WP90`, `Electron_mvaNoIso_WP80` | Alias corresponding Fall17V2 working points | Retains published legacy working points. |
+| `Electron_superclusterEta` | `Electron_eta + Electron_deltaEtaSC` | Reconstructs the supercluster direction. |
+| `Electron_promptMVA`, `Muon_promptMVA` | Alias legacy `Electron_mvaTTH`, `Muon_mvaTTH` | **Not equivalent trainings.** For v9, select existing version-12 lepton definitions (electron threshold 0.0 instead of v15 0.8; muon threshold stays 0.7). Fake rates and SFs must be validated for this selection. |
+| `Muon_mvaMuID` | Float vector filled with -1 | No continuous-score equivalent; `Muon_mvaId` is not that score. Diagnostic unavailable; no effect on the default WZ ID cuts. |
+| `Tau_idDeepTau2018v2p5VSjet`, `Tau_idDeepTau2018v2p5VSe`, `Tau_idDeepTau2018v2p5VSmu` | Decode cumulative v9 `Tau_idDeepTau2017v2p1*` WP bits to ordinal WP indices | Preserves the named Tight working points (6/6/4), **not** the new training. Tau-veto acceptance can differ; do not compare raw bit masks to ordinal cut values. |
+| `Jet_chMultiplicity`, `Jet_neMultiplicity` | When absent, use stored `Jet_jetId` tight (bit 2) and tight-lepton-veto (bit 4) decisions | Multiplicities cannot be reconstructed. No fabricated counts; the stored UL jet ID is used. |
+| `Jet_btagUParTAK4B` (formatted name in helper) | Use `Jet_btagDeepFlavB` with UL DeepJet T/M/L thresholds for **all Run 2** samples | UParT cannot be emulated. A common tagger across v9 and v15 changes Run 2 b-veto acceptance relative to the previous Run 3-style selection; requires UL DeepJet SFs and efficiencies. |
+
+The un-emulatable quantities are the v15 prompt-MVA/DeepTau/UParT responses,
+`Muon_mvaMuID`, and the two jet multiplicities. Their explicit substitutions
+above are an executable schema bridge, not a claim of identical efficiencies.
+No other branches unique to v15 are consumed by the default WZ graph. In
+particular its MET uses PuppiMET branches already present in v9, not PFMET.
+
+Missing HLT paths are replaced with `false` before composing the trigger ORs
+and data-PD vetoes; an absent whole group yields false. Run 2 trigger definitions
+already exist. The 2016/2017 DoubleEG and SingleElectron labels in `readDASample`
+are repaired so the existing exclusive PD trigger logic actually applies.
+The provided lists cover UL18 only; pruning is tested for every year code but
+trigger efficiencies/menu completeness still need per-era event validation.
+
+### Year/correction audit: production is not yet physics-ready
+
+The catalog and graph can be resolved offline. **The checked-in Run 2 correction
+payloads are incomplete/partly Run 3 placeholders, so a full Run 2 job still
+needs external calibration work.** In particular, the corrected code requests
+UL `deepJet_incl`, absent from the bundled BTV files; initialization will fail
+until genuine UL BTV payloads are provided. This is preferable to evaluating
+an unrelated Run 3 tagger/SF on the polarized samples. No SF files were changed.
+
+Trivial wiring fixes included with the compatibility change:
+
+- DeepJet selection uses UL tight/medium/loose thresholds:
+  APV 0.6502/0.2598/0.0508; postVFP 0.6377/0.2489/0.0480;
+  2017 0.7476/0.3040/0.0532; 2018 0.7100/0.2783/0.0490.
+  `mysf.h` requests the corresponding `deepJet_comb` / `deepJet_incl` SFs.
+- JER no longer requests a separate `SFUncertainty` correction for Run 2;
+  UL already supplies nominal/up/down inside its `ScaleFactor` correction.
+- 2017 MC's jet-veto map index 0 is initialized (it was a null reference).
+- Run 2 jet-ID evaluation selects CHS, and data id 1000 (UL18 SingleMuon A)
+  is treated as data when choosing JEC, not as MC.
+- 2016 postVFP points to `Summer19UL16_V7_MC`, `Summer20UL16_JRV3_MC`,
+  and `Summer19UL16_RunFGH_V7_DATA`, with only the era's data slots loaded.
+  Its bundled JSON must be replaced; it is byte-identical to the APV one.
+
+Unresolved calibration/normalization questions, with evidence from local files:
+
+- **BTV:** all four `POG/BTV/Run2-*/btagging.json.gz` files are byte-identical
+  to Summer22 preEE (even their DeepJet WP table is 2022). All four
+  `data/histoBtagEffSelEtaPt_201*.root` files are byte-identical to the Summer24
+  files. Replace both SFs and efficiency maps for UL DeepJet before production.
+- **Pileup:** all Run 2 POG LUM JSONs are byte-identical to Summer22 preEE;
+  `mysf.h` consequently names a 2022 correction for all Run 2 eras. The default
+  event weight uses `data/puWeights_UL_<year>.root`, which does exist and differs
+  by year; the alternative JSON PU weight is not a valid Run 2 cross-check.
+  Both the JSON and its key need updating together, not just renaming the key.
+- **TAU:** all Run 2 DeepTau2018v2p5 SF JSONs are Summer22 copies. The default
+  WZ tau veto leaves an empty selected-tau vector, but its v9/v15 veto-efficiency
+  difference still needs a study; these files do not certify a v9 tau SF.
+- **Leptons:** UL electron/photon SF files and muon files are present. The APV
+  and postVFP `electron_mva.json.gz` only contain `2022Re-recoE+PromptFG`, so
+  alternate MVA SF working points are invalid for 2016 (the default corrected
+  WZ weight uses `Medium` from `electron.json.gz`). Non-correction
+  `histoLepSFEtaPt_201*.root` are Summer22 copies. The default `_correction`
+  histograms, fake-rate histograms and trigger SFs exist and differ from Run 3,
+  but their provenance/working-point compatibility is not established here.
+  v9 UL electron momentum calibration must also be checked for double correction
+  because v9 stores `Electron_eCorr` and v15 reprocessing differs.
+- **JME:** postVFP JEC/JER payload replacement is required as above. Jet-ID JSONs
+  are common across eras and their UL validity needs checking. MET XY JSONs
+  are Summer22 copies, but those calls are commented out in the default WZ graph.
+- **Prefiring:** the Run 2 `L1PreFiringWeight_*` branches exist but the WZ event
+  weight does not include them. Adding validated central/variation treatment
+  is necessary for Run 2 yield precision; it is outside a schema fallback.
+- **Luminosity:** `getLumi` already accepts all four codes, returning
+  19.5/16.8/41.5/60.0 fb⁻¹. These rounded legacy numbers are left unchanged;
+  confirm the exact certified luminosity for the chosen JSONs and PD coverage.
+- **CRAB packaging:** `POG_SUBDIR` already maps all four eras, and their golden
+  JSONs exist. No submitter change is needed. Payload size and a complete
+  CMSSW/correctionlib event job were not tested here.
+
+Compatibility checks, from the repository root:
+
+```bash
+python3 rdf/macros/crab/validate_run2_compat.py --inputs ../run2
+# Optional: evaluates adapter expressions using installed ROOT, without data/grid
+python3 rdf/macros/crab/validate_run2_compat.py --inputs ../run2 --root
+python3 -m py_compile rdf/macros/{utilsAna,utilsNanoAOD,utilsSelection,wzAnalysis}.py rdf/macros/crab/validate_run2*.py
+```
+
+The graph audit covers 16 combinations (two schemas × four years × data/MC),
+including systematics and weights; it also verifies v15 preservation and
+idempotence. The ROOT smoke check evaluates the adapter on synthetic vectors,
+including the threshold edge for the DeepTau bit decoder. It is not an
+end-to-end analysis test or a validation of the substituted classifiers.

@@ -131,7 +131,15 @@ MyCorrections::MyCorrections(int the_input_year) {
 
   if(debug > 0) std::cout << "pass lum" << std::endl;
 
-  if(year == 20240 || year == 20250 || year == 20260 || year == 20261) {
+  if(year >= 20160 && year <= 20180) {
+    // Run 2 uses DeepJet for both v9 and v15. Requires real UL BTV payloads:
+    // the historical Run2 directories contain copies of Summer22 corrections.
+    // Do not substitute Run 3 "deepJet_light" for the UL inclusive SF.
+    auto csetBTV = correction::CorrectionSet::from_file(dirName+"BTV/"+subDirName+"btagging.json.gz");
+    btvHFSF_ = csetBTV->at("deepJet_comb");
+    btvLFSF_ = csetBTV->at("deepJet_incl");
+  }
+  else if(year == 20240 || year == 20250 || year == 20260 || year == 20261) {
     std::string fileNameHFBTV = dirName+"BTV/"+subDirName+"btagging.json.gz";
     auto csetHFBTV = correction::CorrectionSet::from_file(fileNameHFBTV);
     btvHFSF_ = csetHFBTV->at("UParTAK4_comb");
@@ -240,20 +248,27 @@ MyCorrections::MyCorrections(int the_input_year) {
 
   if(year == 20160 || year == 20161)  {
     algoName = "AK4PFchs";
-    jecMCName = "Summer19UL16APV_V7_MC"; jerName = "Summer20UL16APV_JRV3_MC";
-    jecDATAName[0] = "Summer19UL16APV_RunBCD_V7_DATA";   jetVetoMapName[0] = "Summer19UL16_V1"; // A
-    jecDATAName[1] = "Summer19UL16APV_RunBCD_V7_DATA";   jetVetoMapName[1] = "Summer19UL16_V1"; // B
-    jecDATAName[2] = "Summer19UL16APV_RunBCD_V7_DATA";   jetVetoMapName[2] = "Summer19UL16_V1"; // C
-    jecDATAName[3] = "Summer19UL16APV_RunBCD_V7_DATA";   jetVetoMapName[3] = "Summer19UL16_V1"; // D
-    jecDATAName[4] = "Summer19UL16APV_RunEF_V7_DATA";    jetVetoMapName[4] = "Summer19UL16_V1"; // E
-    jecDATAName[5] = "Summer19UL16APV_RunEF_V7_DATA";    jetVetoMapName[5] = "Summer19UL16_V1"; // F 20160
-    jecDATAName[6] = "Summer19UL16APV_RunEF_V7_DATA";    jetVetoMapName[6] = "Summer19UL16_V1"; // F 20161
-    jecDATAName[7] = "Summer19UL16APV_RunEF_V7_DATA";    jetVetoMapName[7] = "Summer19UL16_V1"; // G
-    jecDATAName[8] = "Summer19UL16APV_RunEF_V7_DATA";    jetVetoMapName[8] = "Summer19UL16_V1"; // H
+    jecMCName = year == 20160 ? "Summer19UL16APV_V7_MC" : "Summer19UL16_V7_MC";
+    jerName = year == 20160 ? "Summer20UL16APV_JRV3_MC" : "Summer20UL16_JRV3_MC";
+    // Index 0 is also used by the MC jet-veto map, independently of the PD.
+    jetVetoMapName[0] = "Summer19UL16_V1";
+    if(year == 20160) {
+      for(int i=1; i<=5; ++i) {
+        jecDATAName[i] = i <= 3 ? "Summer19UL16APV_RunBCD_V7_DATA" : "Summer19UL16APV_RunEF_V7_DATA";
+        jetVetoMapName[i] = "Summer19UL16_V1";
+      }
+    } else {
+      // TODO supply the UL16 postVFP payload; the bundled file is an APV copy.
+      for(int i=6; i<=8; ++i) {
+        jecDATAName[i] = "Summer19UL16_RunFGH_V7_DATA";
+        jetVetoMapName[i] = "Summer19UL16_V1";
+      }
+    }
   }
   else if(year == 20170)  {
     algoName = "AK4PFchs";
     jecMCName = "Summer19UL17_V5_MC"; jerName = "Summer19UL17_JRV2_MC";
+    jetVetoMapName[0] = "Summer19UL17_V1"; // MC
     jecDATAName[1] = "Summer19UL17_RunB_V5_DATA";   jetVetoMapName[1] = "Summer19UL17_V1"; // B
     jecDATAName[2] = "Summer19UL17_RunC_V5_DATA";   jetVetoMapName[2] = "Summer19UL17_V1"; // C
     jecDATAName[3] = "Summer19UL17_RunD_V5_DATA";   jetVetoMapName[3] = "Summer19UL17_V1"; // D
@@ -447,9 +462,11 @@ MyCorrections::MyCorrections(int the_input_year) {
   //std::cout << tagName << std::endl;
   jerScaleFactor_ = csetJER->at(tagName);
 
-  tagName = jerName + "_" + "SFUncertainty" + "_" + algoName;
-  //std::cout << tagName << std::endl;
-  jerScaleFactorUnc_ = csetJER->at(tagName);
+  // UL JER stores nom/up/down in ScaleFactor itself, not a separate correction.
+  if(year >= 20210) {
+    tagName = jerName + "_" + "SFUncertainty" + "_" + algoName;
+    jerScaleFactorUnc_ = csetJER->at(tagName);
+  }
 
   tagName = jerName + "_" + "PtResolution" + "_" + algoName;
   jerPtResolution__ = csetJER->at(tagName);
@@ -470,8 +487,9 @@ MyCorrections::MyCorrections(int the_input_year) {
   std::string fileNameJetSel = dirName+"JME/"+subDirName+"jetid.json.gz";
   //std::cout << fileNameJetSel << std::endl;
   auto csetJetSel = correction::CorrectionSet::from_file(fileNameJetSel);
-  jetTightSel_           = csetJetSel->at("AK4PUPPI_Tight");
-  jetTightLeptonVetoSel_ = csetJetSel->at("AK4PUPPI_TightLeptonVeto");
+  std::string jetIDAlgo = year < 20210 ? "AK4CHS" : "AK4PUPPI";
+  jetTightSel_           = csetJetSel->at(jetIDAlgo+"_Tight");
+  jetTightLeptonVetoSel_ = csetJetSel->at(jetIDAlgo+"_TightLeptonVeto");
 
   std::string fileNameMetCorr = dirName+"JME/"+subDirName+"met_xyCorrections.json.gz";
   auto csetMetCorr = correction::CorrectionSet::from_file(fileNameMetCorr);
