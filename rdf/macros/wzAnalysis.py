@@ -177,6 +177,8 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
 
     branchList = ROOT.vector('string')()
     for branchName in [
+            "run",
+            "luminosityBlock",
             "eventNum",
             "weight",
             "theCat",

@@ -80,4 +80,6 @@ normalization, so a plain sum is correct.
   Without it `loadJSON` only warns and the lumi filter then rejects every event.
   The submitter refuses such years.
 - Data events that fire several PDs are written once per PD in the ntuple path,
-  so de-duplicate on `(run, luminosityBlock, event)` after merging data tasks.
+  so de-duplicate on `(run, luminosityBlock, eventNum)` after merging data tasks.
+  The WZ ntuples carry `run` and `luminosityBlock` from this version on; outputs from
+  earlier campaigns (v1/v2) do not.
