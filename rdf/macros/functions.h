@@ -237,7 +237,32 @@ Vec_b cleaningJetSelMask(unsigned int sel, Vec_f jet_eta, Vec_f jet_chHEF, Vec_f
   float result = 0.0;
 
   for(unsigned int i=0;i<jet_eta.size();i++) {
-    if(year >= 20240 || year <= 20210) {
+    if(year <= 20180) {
+      // UL AK4 PUPPI Tight / TightLepVeto (PFJetIDSelectionFunctor RUN2UL16PUPPI / RUN2ULPUPPI).
+      // There is no Run 2 NanoAODv15 jetid payload. For 2017/18 both levels use the TightLepVeto
+      // values (NHF < 0.9999 at 2.7-3.0, NEF < 0.90 above 3.0); the functor's TIGHT block lists
+      // 0.99/0.4, which would make Tight stricter than TightLepVeto there.
+      float aeta = fabs(jet_eta[i]);
+      int nConst = jet_chMultiplicity[i] + jet_neMultiplicity[i];
+      bool pass = false, lepVeto = true;
+      if(year <= 20161) {
+        if     (aeta <= 2.4) {pass = jet_neHEF[i] < 0.90 && jet_neEmEF[i] < 0.90 && nConst > 1 && jet_chHEF[i] > 0 && jet_chMultiplicity[i] > 0;
+                              lepVeto = jet_muEF[i] < 0.8 && jet_chEmEF[i] < 0.8;}
+        else if(aeta <= 2.7)  pass = jet_neHEF[i] < 0.98 && jet_neEmEF[i] < 0.99;
+        else if(aeta <= 3.0)  pass = jet_neMultiplicity[i] > 1;
+        else                  pass = jet_neEmEF[i] < 0.90 && jet_neMultiplicity[i] > 2;
+      }
+      else {
+        if     (aeta <= 2.6) {pass = jet_neHEF[i] < 0.90 && jet_neEmEF[i] < 0.90 && nConst > 1 && jet_chHEF[i] > 0 && jet_chMultiplicity[i] > 0;
+                              lepVeto = jet_muEF[i] < 0.8 && jet_chEmEF[i] < 0.8;}
+        else if(aeta <= 2.7) {pass = jet_neHEF[i] < 0.90 && jet_neEmEF[i] < 0.99;
+                              lepVeto = jet_muEF[i] < 0.8 && jet_chEmEF[i] < 0.8;}
+        else if(aeta <= 3.0)  pass = jet_neHEF[i] < 0.9999;
+        else                  pass = jet_neEmEF[i] < 0.90 && jet_neMultiplicity[i] > 2;
+      }
+      result = (pass && (sel == 0 || lepVeto)) ? 1.0 : 0.0;
+    }
+    else if(year >= 20240) {
       result = corrSFs.eval_jetSel(sel, jet_eta[i], jet_chHEF[i], jet_neHEF[i], jet_chEmEF[i], jet_neEmEF[i], jet_muEF[i], jet_chMultiplicity[i], jet_neMultiplicity[i]);
 
       if(debug) {

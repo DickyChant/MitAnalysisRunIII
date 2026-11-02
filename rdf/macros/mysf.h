@@ -113,10 +113,10 @@ MyCorrections::MyCorrections(int the_input_year) {
   std::string fileNameLUM = dirName+"LUM/"+subDirName+"puWeights.json.gz";
 
   std::string corrNameLUM = "";  
-  if     (year == 20160) corrNameLUM = "Collisions2022_355100_357900_eraBCD_GoldenJson";
-  else if(year == 20161) corrNameLUM = "Collisions2022_355100_357900_eraBCD_GoldenJson";
-  else if(year == 20170) corrNameLUM = "Collisions2022_355100_357900_eraBCD_GoldenJson";
-  else if(year == 20180) corrNameLUM = "Collisions2022_355100_357900_eraBCD_GoldenJson";
+  if     (year == 20160) corrNameLUM = "Collisions16_UltraLegacy_goldenJSON";
+  else if(year == 20161) corrNameLUM = "Collisions16_UltraLegacy_goldenJSON";
+  else if(year == 20170) corrNameLUM = "Collisions17_UltraLegacy_goldenJSON";
+  else if(year == 20180) corrNameLUM = "Collisions18_UltraLegacy_goldenJSON";
   else if(year == 20220) corrNameLUM = "Collisions2022_355100_357900_eraBCD_GoldenJson";
   else if(year == 20221) corrNameLUM = "Collisions2022_359022_362760_eraEFG_GoldenJson";
   else if(year == 20230) corrNameLUM = "Collisions2023_366403_369802_eraBC_GoldenJson";
@@ -131,15 +131,8 @@ MyCorrections::MyCorrections(int the_input_year) {
 
   if(debug > 0) std::cout << "pass lum" << std::endl;
 
-  if(year >= 20160 && year <= 20180) {
-    // Run 2 uses DeepJet for both v9 and v15. Requires real UL BTV payloads:
-    // the historical Run2 directories contain copies of Summer22 corrections.
-    // Do not substitute Run 3 "deepJet_light" for the UL inclusive SF.
-    auto csetBTV = correction::CorrectionSet::from_file(dirName+"BTV/"+subDirName+"btagging.json.gz");
-    btvHFSF_ = csetBTV->at("deepJet_comb");
-    btvLFSF_ = csetBTV->at("deepJet_incl");
-  }
-  else if(year == 20240 || year == 20250 || year == 20260 || year == 20261) {
+  // Run 2 NanoAODv15 carries UParTAK4 too; BTV provides its UL fixedWP SFs (CAT Run2-*-UL-NanoAODv15)
+  if(year <= 20180 || year == 20240 || year == 20250 || year == 20260 || year == 20261) {
     std::string fileNameHFBTV = dirName+"BTV/"+subDirName+"btagging.json.gz";
     auto csetHFBTV = correction::CorrectionSet::from_file(fileNameHFBTV);
     btvHFSF_ = csetHFBTV->at("UParTAK4_comb");
@@ -158,6 +151,8 @@ MyCorrections::MyCorrections(int the_input_year) {
 
   if(debug > 0) std::cout << "pass btag" << std::endl;
 
+  // No Run 2 muon_scalesmearing payload exists; compute_MUOPT_Unc only uses it for 2022-2024
+  if(year >= 20220) {
   std::string fileNameScaleMu = dirName+"MUO/"+subDirName+"muon_scalesmearing.json.gz";
   auto csetScaleMu = correction::CorrectionSet::from_file(fileNameScaleMu);
   muonScale_cb_params_   = csetScaleMu->at("cb_params");
@@ -168,6 +163,7 @@ MyCorrections::MyCorrections(int the_input_year) {
   muonScale_k_mc_   = csetScaleMu->at("k_mc");
   muonScale_a_mc_   = csetScaleMu->at("a_mc");
   muonScale_m_mc_   = csetScaleMu->at("m_mc");
+  }
 
   std::string fileNameMu = dirName+"MUO/"+subDirName+"muon_Z.json.gz";
   auto csetMu = correction::CorrectionSet::from_file(fileNameMu);
@@ -205,9 +201,11 @@ MyCorrections::MyCorrections(int the_input_year) {
   if(year >= 20220) electronIDSF_ = csetIDELE->at("Electron-ID-SF");
   else              electronIDSF_ = csetIDELE->at("UL-Electron-ID-SF");
 
+  if(year >= 20220) { // no Run 2 electron_mva payload; the UL MVA WPs are in electron.json.gz
   std::string fileNameMVAELE = dirName+"EGM/"+subDirName+"electron_mva.json.gz";
   auto csetMVAELE = correction::CorrectionSet::from_file(fileNameMVAELE);
   electronMVASF_ = csetMVAELE->at("Electron-ID-SF");
+  }
 
   std::string fileNameEnergyEtDependentELE = dirName+"EGM/"+subDirName+"electronSS_EtDependent.json.gz";
   auto csetEnergyEtDependentELE = correction::CorrectionSet::from_file(fileNameEnergyEtDependentELE);
@@ -226,7 +224,7 @@ MyCorrections::MyCorrections(int the_input_year) {
 
   if(debug > 0) std::cout << "pass egm" << std::endl;
 
-  std::string fileNameTAU = dirName+"TAU/"+subDirName+"tau_DeepTau2018v2p5.json.gz";
+  std::string fileNameTAU = dirName+"TAU/"+subDirName+(year <= 20180 ? "tau.json.gz" : "tau_DeepTau2018v2p5.json.gz");
   auto csetTAU = correction::CorrectionSet::from_file(fileNameTAU);
   tauJETSF_ = csetTAU->at("DeepTau2018v2p5VSjet");
 
@@ -246,42 +244,14 @@ MyCorrections::MyCorrections(int the_input_year) {
   std::string jecDATAName[10]    = {"NULL","NULL","NULL","NULL","NULL","NULL","NULL","NULL","NULL","NULL"};
   std::string jetVetoMapName[10] = {"NULL","NULL","NULL","NULL","NULL","NULL","NULL","NULL","NULL","NULL"};
 
-  if(year == 20160 || year == 20161)  {
-    algoName = "AK4PFchs";
-    jecMCName = year == 20160 ? "Summer19UL16APV_V7_MC" : "Summer19UL16_V7_MC";
-    jerName = year == 20160 ? "Summer20UL16APV_JRV3_MC" : "Summer20UL16_JRV3_MC";
-    // Index 0 is also used by the MC jet-veto map, independently of the PD.
-    jetVetoMapName[0] = "Summer19UL16_V1";
-    if(year == 20160) {
-      for(int i=1; i<=5; ++i) {
-        jecDATAName[i] = i <= 3 ? "Summer19UL16APV_RunBCD_V7_DATA" : "Summer19UL16APV_RunEF_V7_DATA";
-        jetVetoMapName[i] = "Summer19UL16_V1";
-      }
-    } else {
-      // TODO supply the UL16 postVFP payload; the bundled file is an APV copy.
-      for(int i=6; i<=8; ++i) {
-        jecDATAName[i] = "Summer19UL16_RunFGH_V7_DATA";
-        jetVetoMapName[i] = "Summer19UL16_V1";
-      }
-    }
-  }
-  else if(year == 20170)  {
-    algoName = "AK4PFchs";
-    jecMCName = "Summer19UL17_V5_MC"; jerName = "Summer19UL17_JRV2_MC";
-    jetVetoMapName[0] = "Summer19UL17_V1"; // MC
-    jecDATAName[1] = "Summer19UL17_RunB_V5_DATA";   jetVetoMapName[1] = "Summer19UL17_V1"; // B
-    jecDATAName[2] = "Summer19UL17_RunC_V5_DATA";   jetVetoMapName[2] = "Summer19UL17_V1"; // C
-    jecDATAName[3] = "Summer19UL17_RunD_V5_DATA";   jetVetoMapName[3] = "Summer19UL17_V1"; // D
-    jecDATAName[4] = "Summer19UL17_RunE_V5_DATA";   jetVetoMapName[4] = "Summer19UL17_V1"; // E
-    jecDATAName[5] = "Summer19UL17_RunF_V5_DATA";   jetVetoMapName[5] = "Summer19UL17_V1"; // F
-  }
-  else if(year == 20180)  {
-    algoName = "AK4PFchs";
-    jecMCName = "Summer19UL18_V5_MC"; jerName = "Summer19UL18_JRV2_MC";
-    jecDATAName[0] = "Summer19UL18_RunA_V5_DATA";   jetVetoMapName[0] = "Summer19UL18_V1"; // A
-    jecDATAName[1] = "Summer19UL18_RunB_V5_DATA";   jetVetoMapName[1] = "Summer19UL18_V1"; // B
-    jecDATAName[2] = "Summer19UL18_RunC_V5_DATA";   jetVetoMapName[2] = "Summer19UL18_V1"; // C
-    jecDATAName[3] = "Summer19UL18_RunD_V5_DATA";   jetVetoMapName[3] = "Summer19UL18_V1"; // D
+  if(year <= 20180)  {
+    // Run 2 NanoAODv15: AK4 PUPPI jets, one DATA JEC tag per year (run is an input), UL veto maps
+    if     (year == 20160) {jecMCName = "Summer20UL16APVNanoV15_V1_MC"; jerName = "Summer20UL16APV_JRV5_MC"; jetVetoMapName[0] = "Summer19UL16_V1";}
+    else if(year == 20161) {jecMCName = "Summer20UL16NanoV15_V1_MC";    jerName = "Summer20UL16_JRV5_MC";    jetVetoMapName[0] = "Summer19UL16_V1";}
+    else if(year == 20170) {jecMCName = "Summer20UL17NanoV15_V1_MC";    jerName = "Summer19UL17_JRV4_MC";    jetVetoMapName[0] = "Summer19UL17_V1";}
+    else if(year == 20180) {jecMCName = "Summer20UL18NanoV15_V1_MC";    jerName = "Summer19UL18_JRV3_MC";    jetVetoMapName[0] = "Summer19UL18_V1";}
+    std::string jecDATA = jecMCName.substr(0, jecMCName.size()-2) + "DATA";
+    for(int i=0; i<10; i++) {jecDATAName[i] = jecDATA; jetVetoMapName[i] = jetVetoMapName[0];}
   }
   else if(year == 20220)  {
     jecMCName = "Summer22_22Sep2023_V4_MC"; jerName = "Summer22_22Sep2023_JRV2_MC";
@@ -462,11 +432,8 @@ MyCorrections::MyCorrections(int the_input_year) {
   //std::cout << tagName << std::endl;
   jerScaleFactor_ = csetJER->at(tagName);
 
-  // UL JER stores nom/up/down in ScaleFactor itself, not a separate correction.
-  if(year >= 20210) {
-    tagName = jerName + "_" + "SFUncertainty" + "_" + algoName;
-    jerScaleFactorUnc_ = csetJER->at(tagName);
-  }
+  tagName = jerName + "_" + "SFUncertainty" + "_" + algoName;
+  jerScaleFactorUnc_ = csetJER->at(tagName);
 
   tagName = jerName + "_" + "PtResolution" + "_" + algoName;
   jerPtResolution__ = csetJER->at(tagName);
@@ -484,16 +451,19 @@ MyCorrections::MyCorrections(int the_input_year) {
     jetVetoMap_[i] = csetJetVetoMap->at(jetVetoMapName[i]);
   }
 
+  // No Run 2 NanoAODv15 jet ID or MET xy payloads: Run 2 jet ID is the UL PUPPI ID in
+  // functions.h (cleaningJetSelMask), and compute_JSON_MET passes Run 2 MET through.
+  if(year >= 20220) {
   std::string fileNameJetSel = dirName+"JME/"+subDirName+"jetid.json.gz";
   //std::cout << fileNameJetSel << std::endl;
   auto csetJetSel = correction::CorrectionSet::from_file(fileNameJetSel);
-  std::string jetIDAlgo = year < 20210 ? "AK4CHS" : "AK4PUPPI";
-  jetTightSel_           = csetJetSel->at(jetIDAlgo+"_Tight");
-  jetTightLeptonVetoSel_ = csetJetSel->at(jetIDAlgo+"_TightLeptonVeto");
+  jetTightSel_           = csetJetSel->at("AK4PUPPI_Tight");
+  jetTightLeptonVetoSel_ = csetJetSel->at("AK4PUPPI_TightLeptonVeto");
 
   std::string fileNameMetCorr = dirName+"JME/"+subDirName+"met_xyCorrections.json.gz";
   auto csetMetCorr = correction::CorrectionSet::from_file(fileNameMetCorr);
   metCorr_ = csetMetCorr->at("met_xy_corrections");
+  }
 
   if(debug > 0) std::cout << "pass jme" << std::endl;
 
@@ -583,11 +553,11 @@ double MyCorrections::eval_jetCORR(double area, double eta, double phi, double p
   int theRun = run;
   if(year == 20250 && theRun < 392159) theRun = 392159;
   // data
-  if     (type >= 0 && (year == 20220 || year == 20221 || year == 20230)) return JECDATA_[type]->evaluate({area, eta, pt, rho,      (float)theRun});
+  if     (type >= 0 && (year <= 20180 || year == 20220 || year == 20221 || year == 20230)) return JECDATA_[type]->evaluate({area, eta, pt, rho,      (float)theRun});
   else if(type >= 0)                                                      return JECDATA_[type]->evaluate({area, eta, pt, rho, phi, (float)theRun});
 
   // MC
-  if     (type < 0 && (year == 20220 || year == 20221 || year == 20230))  return JECMC_->evaluate({area, eta, pt, rho});
+  if     (type < 0 && (year <= 20180 || year == 20220 || year == 20221 || year == 20230))  return JECMC_->evaluate({area, eta, pt, rho});
   else if(type < 0)                                                       return JECMC_->evaluate({area, eta, pt, rho, phi});
 
   printf("ERROR in eval_jetCORR!\n");
@@ -599,15 +569,9 @@ double MyCorrections::eval_jesUnc(double eta, double pt, int type) {
 };
 
 double MyCorrections::eval_jerScaleFactor(double eta, double pt, int type) {
-  if(year < 20210){
-    if     (type ==  0) return jerScaleFactor_->evaluate({eta,"nom"});
-    else if(type == +1) return jerScaleFactor_->evaluate({eta,"up"});
-    else if(type == -1) return jerScaleFactor_->evaluate({eta,"down"});
-  } else {
-    if     (type ==  0) return (jerScaleFactor_->evaluate({eta,pt}));
-    else if(type == +1) return (jerScaleFactor_->evaluate({eta,pt}) + jerScaleFactorUnc_->evaluate({eta,pt}));
-    else if(type == -1) return (jerScaleFactor_->evaluate({eta,pt}) - jerScaleFactorUnc_->evaluate({eta,pt}));
-  }
+  if     (type ==  0) return (jerScaleFactor_->evaluate({eta,pt}));
+  else if(type == +1) return (jerScaleFactor_->evaluate({eta,pt}) + jerScaleFactorUnc_->evaluate({eta,pt}));
+  else if(type == -1) return (jerScaleFactor_->evaluate({eta,pt}) - jerScaleFactorUnc_->evaluate({eta,pt}));
   std::cout << "0 JER correction!" << std::endl;
   return 0.0;
 };

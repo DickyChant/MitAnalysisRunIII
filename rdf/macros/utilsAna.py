@@ -22,7 +22,8 @@ FILELIST_DIR = os.environ.get("FILELIST_DIR", "direct/filelists")
 
 def getLumi(year):
     #lumi = [19.5, 16.8, 41.5, 60.0, 8.1, 26.9, 18.1, 9.7, 109.6, 107.5, 25.8, 2.1]
-    lumi = [19.5, 16.8, 41.5, 60.0, 8.1, 26.9, 18.1, 9.7, 109.6, 133.3, 25.8, 2.1] # 25+26 together
+    # Run 2: UL golden-JSON luminosities (LUM-17-003/18-002/19-001), 2016 split at the HIPM boundary
+    lumi = [19.52, 16.81, 41.48, 59.83, 8.1, 26.9, 18.1, 9.7, 109.6, 133.3, 25.8, 2.1] # 25+26 together
 
     lumiBit = -999
     if  (year == 20160): lumiBit = 0

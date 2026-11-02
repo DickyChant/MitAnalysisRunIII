@@ -112,9 +112,6 @@ def getBTagCut_PNet(type,year):
 # UnifiedParT
 def getBTagCut(type,year):
 
-    if year in (20160, 20161, 20170, 20180):
-        return getBTagCut_DeepJet(type, year)
-
     if(type < 0 or type > 2): return 100
     value = [0.8482, 0.4319, 0.0849]
     if(year == 20220):
@@ -150,6 +147,15 @@ def getBTagCut(type,year):
        value[1] = 0.1272
        value[2] = 0.0246
 
+    # Run 2 NanoAODv15 UParTAK4 T/M/L (UParTAK4_wp_values, CAT BTV Run2-*-UL-NanoAODv15)
+    elif(year == 20160):
+       value = [0.5467, 0.1847, 0.0387]
+    elif(year == 20161):
+       value = [0.5538, 0.1898, 0.0400]
+    elif(year == 20170):
+       value = [0.5755, 0.1776, 0.0331]
+    elif(year == 20180):
+       value = [0.5405, 0.1610, 0.0308]
 
     return value[type]
 
@@ -296,7 +302,7 @@ def selectionJetMet(df,year,bTagSel,isData,count,jetEtaCut):
     if(isData == "true"): jetTypeCorr = count%10
     print("jetTypeCorr: {0}".format(jetTypeCorr))
 
-    BTAGName = "DeepFlav" if year in (20160, 20161, 20170, 20180) else "UParTAK4"
+    BTAGName = "UParTAK4" # Run 2 NanoAODv15 carries UParTAK4 as well
     if((year // 10) > 2021 and (year // 10) < 2024): BTAGName = "RobustParTAK4"
 
     JMEName0 = "Jet_chMultiplicity"
@@ -1048,6 +1054,8 @@ def selectionDAWeigths(df,year,PDType,whichAna,fakeRateSel):
 
 def selectionMCWeigths(df,year,PDType,weight,type,bTagSel,useBTaggingWeights,nTheoryReplicas,genEventSumLHEScaleRenorm,genEventSumPSRenorm,MUOWP,ELEWP,correctionString,whichAna,fakeRateSel):
 
+    hasPrefire = year <= 20180 and df.HasColumn("L1PreFiringWeight_Nom")
+
     hasTheoryColumnName = [True, True, True]
     theoryColumnName = ["PSWeight", "LHEScaleWeight", "LHEPdfWeight"]
     for x in range(len(theoryColumnName)):
@@ -1131,6 +1139,9 @@ def selectionMCWeigths(df,year,PDType,weight,type,bTagSel,useBTaggingWeights,nTh
 
               .Define("weightEWKCorr", "compute_EWKCorr(0,PDType,mjjGen)")
 
+              # L1 ECAL+muon prefiring (Run 2 MC only); its Up variation fills syst slot 127
+              .Define("weightL1Prefire", "L1PreFiringWeight_Nom" if hasPrefire else "1.0f")
+
               #.Define("weightPTWWCorr", "compute_PTWWCorr(0,PDType,ptww)")
               )
 
@@ -1138,7 +1149,7 @@ def selectionMCWeigths(df,year,PDType,weight,type,bTagSel,useBTaggingWeights,nTh
         if(useBTaggingWeights == 1):
             print("BtagCorr/AddCorr: 1/1")
             dftag = (dftag
-                     .Define("weight","weightMC*weightFake*weightWS*weightEWKCorr*weightBtagSF*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON*weightMuonSF*weightElectronSF")
+                     .Define("weight","weightMC*weightL1Prefire*weightFake*weightWS*weightEWKCorr*weightBtagSF*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON*weightMuonSF*weightElectronSF")
                      .Define("weightMuoCorr","weightMuoSFJSON*weightMuonSF")
                      .Define("weightEleCorr","weightEleSFJSON*weightElectronSF")
                      .Define("weightMuonTightSFUp"  ,"weight/weightMuonSF*compute_MuonSF(fake_Muon_pt,fake_Muon_eta,+1.0)")
@@ -1149,7 +1160,7 @@ def selectionMCWeigths(df,year,PDType,weight,type,bTagSel,useBTaggingWeights,nTh
         else:
             print("BtagCorr/AddCorr: 0/1")
             dftag = (dftag
-                     .Define("weight","weightMC*weightFake*weightWS*weightEWKCorr*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON*weightMuonSF*weightElectronSF")
+                     .Define("weight","weightMC*weightL1Prefire*weightFake*weightWS*weightEWKCorr*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON*weightMuonSF*weightElectronSF")
                      .Define("weightMuoCorr","weightMuoSFJSON*weightMuonSF")
                      .Define("weightEleCorr","weightEleSFJSON*weightElectronSF")
                      .Define("weightMuonTightSFUp"  ,"weight/weightMuonSF*compute_MuonSF(fake_Muon_pt,fake_Muon_eta,+1.0)")
@@ -1162,7 +1173,7 @@ def selectionMCWeigths(df,year,PDType,weight,type,bTagSel,useBTaggingWeights,nTh
         if(useBTaggingWeights == 1):
             print("BtagCorr/AddCorr: 1/0")
             dftag = (dftag
-                     .Define("weight","weightMC*weightFake*weightWS*weightEWKCorr*weightBtagSF*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON")
+                     .Define("weight","weightMC*weightL1Prefire*weightFake*weightWS*weightEWKCorr*weightBtagSF*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON")
                      .Define("weightMuoCorr","weightMuoSFJSON")
                      .Define("weightEleCorr","weightEleSFJSON")
                      .Define("weightMuonTightSFUp"  ,"weight")
@@ -1173,7 +1184,7 @@ def selectionMCWeigths(df,year,PDType,weight,type,bTagSel,useBTaggingWeights,nTh
         else:
             print("BtagCorr/AddCorr: 0/0")
             dftag = (dftag
-                     .Define("weight","weightMC*weightFake*weightWS*weightEWKCorr*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON")
+                     .Define("weight","weightMC*weightL1Prefire*weightFake*weightWS*weightEWKCorr*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON")
                      .Define("weightMuoCorr","weightMuoSFJSON")
                      .Define("weightEleCorr","weightEleSFJSON")
                      .Define("weightMuonTightSFUp"  ,"weight")
@@ -1194,6 +1205,8 @@ def selectionMCWeigths(df,year,PDType,weight,type,bTagSel,useBTaggingWeights,nTh
                  .Define("weightBTag","weight*weightBtagSF")
                  .Define("weightNoBTag","weight")
                 )
+
+    dftag = dftag.Define("weightL1PrefireUp", "weight/weightL1Prefire*L1PreFiringWeight_Up" if hasPrefire else "weight")
 
     dftag =(dftag.Define("weight0","weight/weightBtagSF")
                  .Define("weight1","weight/weightPURecoSF")
@@ -1431,7 +1444,7 @@ def makeFinalVariable(df,var,theCat,start,x,bin,min,max,type):
     elif(type == 124): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weightBtagSFBC_01Up")
     elif(type == 125): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weightBtagSFLF_00Up")
     elif(type == 126): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weightBtagSFLF_01Up")
-    elif(type == 127): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weight")
+    elif(type == 127): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weightL1PrefireUp")
     elif(type == 128): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weight")
     elif(type == 129): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weight")
     elif(type == 130): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weight")
@@ -1475,7 +1488,7 @@ def makeFinalVariableVar(df,var,theCat,start,x,xBins,type):
     elif(type == 124): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weightBtagSFBC_01Up")
     elif(type == 125): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weightBtagSFLF_00Up")
     elif(type == 126): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weightBtagSFLF_01Up")
-    elif(type == 127): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weight")
+    elif(type == 127): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weightL1PrefireUp")
     elif(type == 128): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weight")
     elif(type == 129): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weight")
     elif(type == 130): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weight")
@@ -1519,7 +1532,7 @@ def makeFinalVariable2D(df,varX,varY,theCat,start,x,binX,minX,maxX,binY,minY,max
     elif(type == 124): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weightBtagSFBC_01Up")
     elif(type == 125): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weightBtagSFLF_00Up")
     elif(type == 126): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weightBtagSFLF_01Up")
-    elif(type == 127): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weight")
+    elif(type == 127): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weightL1PrefireUp")
     elif(type == 128): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weight")
     elif(type == 129): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weight")
     elif(type == 130): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weight")
@@ -1563,7 +1576,7 @@ def makeFinalVariable2DVar(df,varX,varY,theCat,start,x,xBins,yBins,type):
     elif(type == 124): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weightBtagSFBC_01Up")
     elif(type == 125): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weightBtagSFLF_00Up")
     elif(type == 126): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weightBtagSFLF_01Up")
-    elif(type == 127): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weight")
+    elif(type == 127): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weightL1PrefireUp")
     elif(type == 128): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weight")
     elif(type == 129): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weight")
     elif(type == 130): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weight")
