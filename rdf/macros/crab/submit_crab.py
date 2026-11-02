@@ -135,7 +135,8 @@ def resolve_tasks(entries, skim_type):
 
 
 def das_files(dataset):
-    out = check_output(["dasgoclient", "-query", "file dataset={0}".format(dataset)]).decode()
+    instance = " instance=prod/phys03" if dataset.endswith("/USER") else ""
+    out = check_output(["dasgoclient", "-query", "file dataset={0}{1}".format(dataset, instance)]).decode()
     return sorted(l.strip() for l in out.splitlines() if l.strip().startswith("/store/"))
 
 

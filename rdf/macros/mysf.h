@@ -169,7 +169,7 @@ MyCorrections::MyCorrections(int the_input_year) {
   auto csetMu = correction::CorrectionSet::from_file(fileNameMu);
   //muonTRKSF_ = csetMu->at("NUM_TrackerMuons_DEN_genTracks");
   muonIDSF_ = csetMu->at("NUM_MediumPromptID_DEN_TrackerMuons");
-  muonISOSF_ = csetMu->at("NUM_LoosePFIso_DEN_MediumPromptID");
+  muonISOSF_ = csetMu->at(year <= 20180 ? "NUM_LooseRelIso_DEN_MediumPromptID" : "NUM_LoosePFIso_DEN_MediumPromptID");
 
   std::string fileNameHighPtRECOMu       = dirName+"MUO/"+subDirName+"muon_HighPt.json.gz";
   if(year == 20240) fileNameHighPtRECOMu = dirName+"MUO/"+subDirName+"ScaleFactors_Muon_highPt_RECO_2024_schemaV2.json.gz";
