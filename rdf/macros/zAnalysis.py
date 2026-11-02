@@ -303,14 +303,14 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
             histo[ltype+30][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+30,x), "histo_{0}_{1}".format(ltype+30,x), 80,-0.5,79.5), "PV_npvsGood","weight")
             histo[ltype+33][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+33,x), "histo_{0}_{1}".format(ltype+33,x), 100, 0, 200), "CaloMET_pt","weight")
             if((year // 10) < 2024):
-                histo[ltype+39][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+39,x), "histo_{0}_{1}".format(ltype+39,x), 100, 0, 200), "MET_pt","weight")
+                histo[ltype+39][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+39,x), "histo_{0}_{1}".format(ltype+39,x), 100, 0, 200), "MET_pt" if year > 20180 else "PuppiMET_pt","weight")
             else:
                 histo[ltype+39][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+39,x), "histo_{0}_{1}".format(ltype+39,x), 100, 0, 200), "PFMET_pt","weight")
             histo[ltype+42][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+42,x), "histo_{0}_{1}".format(ltype+42,x), 100, 0, 200), "PuppiMET_pt{0}".format(altMass),"weight")
             #histo[ltype+45][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+45,x), "histo_{0}_{1}".format(ltype+45,x), 100, 0, 200), "TkMET_pt","weight")
             histo[ltype+48][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+48,x), "histo_{0}_{1}".format(ltype+48,x), 80,-0.5,79.5), "Rho_fixedGridRhoFastjetAll","weight")
             if((year // 10) < 2024):
-                histo[ltype+51][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+51,x), "histo_{0}_{1}".format(ltype+51,x), 100, -3.1416, 3.1416), "MET_phi","weight")
+                histo[ltype+51][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+51,x), "histo_{0}_{1}".format(ltype+51,x), 100, -3.1416, 3.1416), "MET_phi" if year > 20180 else "PuppiMET_phi","weight")
             else:
                 histo[ltype+51][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+51,x), "histo_{0}_{1}".format(ltype+51,x), 100, -3.1416, 3.1416), "PFMET_phi","weight")
             histo[ltype+54][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+54,x), "histo_{0}_{1}".format(ltype+54,x), 100, -3.1416, 3.1416), "PuppiMET_phi{0}".format(altMass),"weight")

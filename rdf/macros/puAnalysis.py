@@ -53,6 +53,7 @@ def selectionWW(df,year,PDType,isData,count):
                   .Filter("Sum(fake_Muon_charge)+Sum(fake_Electron_charge) == 0", "Opposite-sign leptons")
                   )
 
+    dftag = selectionJetMet (dftag,year,bTagSel,isData,count,5.0)
     dftag = selection2LVar  (dftag,year,isData)
     dftag = (dftag.Filter("ptl1 > 25", "ptl1 > 25")
                   .Filter("ptl2 > 20", "ptl2 > 20")
@@ -61,7 +62,6 @@ def selectionWW(df,year,PDType,isData,count):
                   .Filter("mll > 85","mll > 85")
                   )
 
-    dftag = selectionJetMet (dftag,year,bTagSel,isData,count,5.0)
     #dftag = (dftag.Filter("PuppiMET_pt > 20", "PuppiMET_pt > 20")
     #              .Filter("minPMET > 20", "minPMET > 20")
     #              )
