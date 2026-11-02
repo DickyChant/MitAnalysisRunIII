@@ -71,6 +71,11 @@ normalization, so a plain sum is correct.
 
 ## Known limitations
 
+- A file that no site can serve intact (truncated replica, or none reachable) fails every
+  job of its MC task, because each job also reads the whole dataset for the normalization.
+  Resubmit such a task under a new tag with `--exclude-lfns=<list>`: the files are dropped
+  from both the normalization list and the job inputs, so the yield stays consistent.
+
 - Data years need their golden JSON in `jsns/` (the name is in `getDATAlist`).
   Without it `loadJSON` only warns and the lumi filter then rejects every event.
   The submitter refuses such years.

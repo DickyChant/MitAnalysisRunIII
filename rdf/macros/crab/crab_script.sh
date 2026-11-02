@@ -86,6 +86,11 @@ import PSet
 for f in PSet.process.source.fileNames:
     print(f)
 " > crab_lfns.txt || fail 83 "cannot read input files from PSet.py"
+if [ -s crab_norm/exclude.lst ]; then   # submit_crab.py --exclude-lfns: unreadable everywhere
+  grep -v -x -F -f crab_norm/exclude.lst crab_lfns.txt > crab_lfns_kept.txt || true
+  echo "Excluded $(( $(wc -l < crab_lfns.txt) - $(wc -l < crab_lfns_kept.txt) )) input file(s) listed in crab_norm/exclude.lst"
+  mv crab_lfns_kept.txt crab_lfns.txt
+fi
 [ -s crab_lfns.txt ] || fail 83 "no input files in PSet.py"
 firstLFN=$(grep -m1 '^/store/' crab_lfns.txt)
 localPrefix=""

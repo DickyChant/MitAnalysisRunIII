@@ -31,6 +31,8 @@ Options:
     --no-ntuples           histograms only (keep doNtuples as in the code)
     --redirector=<url>     prefix for LFNs on the worker (default root://cms-xrd-global.cern.ch/)
     --work-area=<dir>      CRAB project dir (default crab_projects)
+    --exclude-lfns=<file>  LFNs (one per line) dropped from the MC normalization lists and
+                           from every job's input: for files no site can serve intact
     --dry-run              resolve tasks and build the payload, do not query DAS or submit
 """
 
@@ -137,7 +139,7 @@ def das_files(dataset):
     return sorted(l.strip() for l in out.splitlines() if l.strip().startswith("/store/"))
 
 
-def build_payload(ana, years, mc_norm):
+def build_payload(ana, years, mc_norm, exclude=()):
     """Trimmed sandbox: code, config, corrections for the requested years only."""
     if os.path.isdir(BUILD_DIR):
         shutil.rmtree(BUILD_DIR)
@@ -165,7 +167,10 @@ def build_payload(ana, years, mc_norm):
                 path = os.path.join("jsonpog-integration/POG", pog, sub)
                 if os.path.isdir(path):
                     tar.add(path)
-        for name, files in mc_norm.items():
+        lists = dict(mc_norm)
+        if exclude:
+            lists["exclude.lst"] = sorted(exclude)
+        for name, files in lists.items():
             info = tarfile.TarInfo("crab_norm/" + name)
             data = "".join(f + "\n" for f in files).encode()
             info.size = len(data)
@@ -233,10 +238,10 @@ def main():
     opts = {"tag": None, "site": None, "lfn_base": None, "ana": "wzAnalysis", "cfg": None,
             "years": set(), "processes": set(), "mc_fpj": 5, "data_fpj": 3, "ntuples": True,
             "redirector": "root://cms-xrd-global.cern.ch/", "work_area": "crab_projects",
-            "dry_run": False}
+            "dry_run": False, "exclude_lfns": None}
     valid = ["tag=", "site=", "lfn-base=", "ana=", "cfg=", "years=", "processes=",
              "mc-files-per-job=", "data-files-per-job=", "no-ntuples", "redirector=",
-             "work-area=", "dry-run", "help"]
+             "work-area=", "dry-run", "exclude-lfns=", "help"]
     try:
         parsed, _ = getopt.getopt(sys.argv[1:], "", valid)
     except getopt.GetoptError as ex:
@@ -268,6 +273,12 @@ def main():
     if not opts["cfg"]:
         opts["cfg"] = "{0}_input_condor_jobs.cfg".format(opts["ana"])
     opts["work_area"] = os.path.join(CRAB_DIR, opts["work_area"])
+
+    exclude = set()
+    if opts["exclude_lfns"]:
+        with open(opts["exclude_lfns"]) as f:
+            exclude = {l.strip() for l in f if l.strip().startswith("/store/")}
+        print("Excluding {0} LFNs from inputs and normalization".format(len(exclude)))
 
     entries = read_cfg(opts["cfg"], opts["years"], opts["processes"])
     tasks, private = resolve_tasks(entries, SKIM_TYPE[opts["ana"]])
@@ -301,9 +312,9 @@ def main():
                     sys.exit("ERROR: DAS query failed for {0}: {1}".format(t["dataset"], e))
                 if not files:
                     sys.exit("ERROR: DAS returned no files for {0}".format(t["dataset"]))
-                mc_norm[str(t["process"]) + ".txt"] = [opts["redirector"] + f for f in files]
+                mc_norm[str(t["process"]) + ".txt"] = [opts["redirector"] + f for f in files if f not in exclude]
 
-    payload = build_payload(opts["ana"], {t["year"] for t in tasks}, mc_norm)
+    payload = build_payload(opts["ana"], {t["year"] for t in tasks}, mc_norm, exclude)
     if opts["dry_run"]:
         print("\nDry run: nothing submitted. Output would go to <lfn-base>/{0}".format(opts["tag"]))
         return
