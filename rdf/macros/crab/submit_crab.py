@@ -70,7 +70,7 @@ SANDBOX_LIMIT_MB = 120
 DAS_DIR = re.compile(r"^[^+/]+\+[^+/]+\+(NANOAOD|NANOAODSIM|USER)$")
 
 SKIM_TYPE = {"wzAnalysis": "3l", "fakeAnalysis": "1l", "triggerAnalysis": "2l",
-             "metAnalysis": "met", "puAnalysis": "2l"}
+             "metAnalysis": "met", "puAnalysis": "2l", "zAnalysis": "2l"}
 
 sys.path.insert(0, MACROS_DIR)
 os.chdir(MACROS_DIR)

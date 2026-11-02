@@ -1839,6 +1839,7 @@ def SwitchSample(argument, skimType):
        736: (dirT2+"/WZJJ_EWK_TLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1_private-00000000000000000000000000000000+USER",(0.0033)*1000,plotCategory("kPlotEWKWZ")), # rough helicity estimate at CMS inclusive 0.0163 pb scale; TODO verify xsec with GenXSecAnalyzer
        737: (dirT2+"/WZJJ_EWK_TTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1_private-00000000000000000000000000000000+USER",(0.0081)*1000,plotCategory("kPlotEWKWZ")), # rough helicity estimate at CMS inclusive 0.0163 pb scale; TODO verify xsec with GenXSecAnalyzer
        738: (dirT2+"/WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.01630)*1000,plotCategory("kPlotEWKWZ")), # CMS Open Data cms-72727 GenXSecAnalyzer (13 TeV)
+       739: (dirT2+"/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v2+NANOAODSIM",61526.7*1000,plotCategory("kPlotOther")), # NNLO W->lnu; fake-rate EWK subtraction
 
        820: (dirT2+"/DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",2075.14*3*3.78*1000,plotCategory("kPlotDY")),
        821: (dirT2+"/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",2075.14*3*1000,plotCategory("kPlotDY")),
@@ -1879,6 +1880,7 @@ def SwitchSample(argument, skimType):
        756: (dirT2+"/WZJJ_EWK_TLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1_private-00000000000000000000000000000000+USER",(0.0033)*1000,plotCategory("kPlotEWKWZ")), # rough helicity estimate at CMS inclusive 0.0163 pb scale; TODO verify xsec with GenXSecAnalyzer
        757: (dirT2+"/WZJJ_EWK_TTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1_private-00000000000000000000000000000000+USER",(0.0081)*1000,plotCategory("kPlotEWKWZ")), # rough helicity estimate at CMS inclusive 0.0163 pb scale; TODO verify xsec with GenXSecAnalyzer
        758: (dirT2+"/WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.01630)*1000,plotCategory("kPlotEWKWZ")), # CMS Open Data cms-72727 GenXSecAnalyzer (13 TeV)
+       759: (dirT2+"/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v2+NANOAODSIM",61526.7*1000,plotCategory("kPlotOther")), # NNLO W->lnu; fake-rate EWK subtraction
 
        840: (dirT2+"/DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",2075.14*3*3.78*1000,plotCategory("kPlotDY")),
        841: (dirT2+"/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",2075.14*3*1000,plotCategory("kPlotDY")),
@@ -1919,6 +1921,7 @@ def SwitchSample(argument, skimType):
        776: (dirT2+"/WZJJ_EWK_TLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1_private-00000000000000000000000000000000+USER",(0.0033)*1000,plotCategory("kPlotEWKWZ")), # rough helicity estimate at CMS inclusive 0.0163 pb scale; TODO verify xsec with GenXSecAnalyzer
        777: (dirT2+"/WZJJ_EWK_TTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1_private-00000000000000000000000000000000+USER",(0.0081)*1000,plotCategory("kPlotEWKWZ")), # rough helicity estimate at CMS inclusive 0.0163 pb scale; TODO verify xsec with GenXSecAnalyzer
        778: (dirT2+"/WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.01630)*1000,plotCategory("kPlotEWKWZ")), # CMS Open Data cms-72727 GenXSecAnalyzer (13 TeV)
+       779: (dirT2+"/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v2+NANOAODSIM",61526.7*1000,plotCategory("kPlotOther")), # NNLO W->lnu; fake-rate EWK subtraction
 
        860: (dirT2+"/DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",2075.14*3*3.78*1000,plotCategory("kPlotDY")),
        861: (dirT2+"/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",2075.14*3*1000,plotCategory("kPlotDY")),
@@ -1959,6 +1962,7 @@ def SwitchSample(argument, skimType):
        796: (dirT2+"/WZJJ_EWK_TLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1_private-00000000000000000000000000000000+USER",(0.0033)*1000,plotCategory("kPlotEWKWZ")), # rough helicity estimate at CMS inclusive 0.0163 pb scale; TODO verify xsec with GenXSecAnalyzer
        797: (dirT2+"/WZJJ_EWK_TTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1_private-00000000000000000000000000000000+USER",(0.0081)*1000,plotCategory("kPlotEWKWZ")), # rough helicity estimate at CMS inclusive 0.0163 pb scale; TODO verify xsec with GenXSecAnalyzer
        798: (dirT2+"/WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.01630)*1000,plotCategory("kPlotEWKWZ")), # CMS Open Data cms-72727 GenXSecAnalyzer (13 TeV)
+       799: (dirT2+"/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v2+NANOAODSIM",61526.7*1000,plotCategory("kPlotOther")), # NNLO W->lnu; fake-rate EWK subtraction
 
        900:(dirLocal+"/2018/vbf-hrhogamma-powheg+NANOAOD_01",1.0*1000,plotCategory("kPlotBSM")),
 
