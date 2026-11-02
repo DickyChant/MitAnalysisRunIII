@@ -196,6 +196,14 @@ void makeVVDataCards(int whichAna = 0, int fidAna = 0, TString InputDir = "anaZ"
     BinXF = 1; minXF = -0.5; maxXF = 2.5;
   }
 
+  // take the binning from the input baseline: wzAnalysis makeDataCards=3-6 books 16 (SR) / 4 (CR) bins
+  {
+    TFile *fBin = new TFile(Form("%s/fillhisto_%s_%d_%d.root",InputDir.Data(),anaSel.Data(),year,300+fidAna*200), "read");
+    TH1D *hBin = (TH1D*)fBin->Get("histo0"); assert(hBin);
+    BinXF = hBin->GetNbinsX(); minXF = hBin->GetXaxis()->GetXmin(); maxXF = hBin->GetXaxis()->GetXmax();
+    delete fBin;
+  }
+
   for(int ic=0; ic<nPlotCategories; ic++) {
     histo_Baseline[ic] = new TH1D(Form("histo_%s",plotBaseNames[ic].Data()),Form("histo_%s",plotBaseNames[ic].Data()), BinXF, minXF, maxXF);
     TString plotBaseNamesTemp =  plotBaseNames[ic];
@@ -224,10 +232,11 @@ void makeVVDataCards(int whichAna = 0, int fidAna = 0, TString InputDir = "anaZ"
   delete inputFile;
 
   for(int j=0; j<nSystTotal; j++){
-    inputFile = new TFile(Form("%s/fillhisto_%s_%d_%d.root",InputDir.Data(),anaSel.Data(),year,300+fidAna*jumpValue+1+j), "read");
+    int jFile = j < endTheory+21 ? j : j+1; // skip weightEWKCorrUnc (type 135)
+    inputFile = new TFile(Form("%s/fillhisto_%s_%d_%d.root",InputDir.Data(),anaSel.Data(),year,300+fidAna*jumpValue+1+jFile), "read");
     for(unsigned ic=kPlotData; ic!=nPlotCategories; ic++) {
       histo_Syst[j][ic] = (TH1D*)inputFile->Get(Form("histo%d", ic)); assert(histo_Syst[j][ic]); histo_Syst[j][ic]->SetDirectory(0);
-      histo_Syst[j][ic]->SetNameTitle(Form("histo_%s_%s",plotBaseNames[ic].Data(),nameSyst[j].Data()),Form("histo_%s_%s",plotBaseNames[ic].Data(),nameSyst[j].Data()));
+      histo_Syst[j][ic]->SetNameTitle(Form("histo_%s_syst%d",plotBaseNames[ic].Data(),j),Form("histo_%s_syst%d",plotBaseNames[ic].Data(),j));
     }
     delete inputFile;
   }
