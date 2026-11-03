@@ -152,10 +152,10 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,puWeights):
                        .Define("weightFakeSel2", "compute_weights({0},genWeight,PDType,fake_Muon_genPartFlav,fake_Electron_genPartFlav,{1})*compute_lumiFakeRate(fake_Muon_pt,fake_Electron_pt,2,{2})*weightPURecoSF".format(weight,useFR,year))
                        )
 
-    FILTERMU0 = "(Sum(fake_mu) == 1 && ptl <  20 && HLT_Mu8_TrkIsoVVL)"
-    FILTERMU1 = "(Sum(fake_mu) == 1 && ptl >= 20 && HLT_Mu17_TrkIsoVVL)"
-    FILTEREL0 = "(Sum(fake_el) == 1 && ptl <  15 && HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30)"
-    FILTEREL1 = "(Sum(fake_el) == 1 && ptl >= 15 && HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30)"
+    FILTERMU0 = pruneWZTrigger(df, "(Sum(fake_mu) == 1 && ptl <  20 && HLT_Mu8_TrkIsoVVL)")
+    FILTERMU1 = pruneWZTrigger(df, "(Sum(fake_mu) == 1 && ptl >= 20 && HLT_Mu17_TrkIsoVVL)")
+    FILTEREL0 = pruneWZTrigger(df, "(Sum(fake_el) == 1 && ptl <  15 && HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30)")
+    FILTEREL1 = pruneWZTrigger(df, "(Sum(fake_el) == 1 && ptl >= 15 && HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30)")
     FILTERLEP = "({0}||{1}||{2}||{3})".format(FILTERMU0,FILTERMU1,FILTEREL0,FILTEREL1)
     FILTERLEP0 = "({0}||{1})".format(FILTERMU0,FILTEREL0)
     FILTERLEP1 = "({0}||{1})".format(FILTERMU1,FILTEREL1)
