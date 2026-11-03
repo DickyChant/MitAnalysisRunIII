@@ -568,7 +568,7 @@ def getDATAlist(type, year, skimType):
     elif(year == 2018 and type == 1022):
         filesL = findDIR("{0}/MuonEG+Run2018C-UL2018_NanoAODv15-v2+NANOAOD".format(dirT2))
     elif(year == 2018 and type == 1023):
-        filesL = findDIR("{0}/MuonEG+Run2018D-UL2018_NanoAODv15-v2+NANOAOD".format(dirT2))
+        filesL = findDIR("{0}/MuonEG+Run2018D-UL2018_NanoAODv15-v1+NANOAOD".format(dirT2))
 
     elif(year == 2018 and type == 1030):
         filesL = findDIR("{0}/EGamma+Run2018A-UL2018_NanoAODv15-v2+NANOAOD".format(dirT2))
