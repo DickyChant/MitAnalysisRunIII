@@ -172,7 +172,7 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,histo_wwpt,puW
                       )
 
     BTAGName = "UParTAK4"
-    if((year // 10) < 2024): BTAGName = "RobustParTAK4"
+    if(20220 <= year < 20240): BTAGName = "RobustParTAK4"
 
     overallLeptonSel = jsonObject['leptonSel']
     FAKE_MU   = getLeptomSelFromJson(overallLeptonSel, "FAKE_MU",   year)
