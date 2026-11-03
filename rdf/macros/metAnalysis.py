@@ -4,6 +4,7 @@ from array import array
 
 ROOT.ROOT.EnableImplicitMT(10)
 from utilsCategory import plotCategory
+from utilsNanoAOD import pruneWZTrigger
 from utilsAna import getMClist, getMCnormList, getDATAlist, getLumi
 from utilsAna import SwitchSample, groupFiles, getTriggerFromJson, getLeptomSelFromJson
 from utilsSelection import selection2LVar, selectionElMu, selectionJetMet
@@ -30,13 +31,13 @@ elSelChoice = 0
 def selectionLL(df,count,year,PDType,isData):
 
     overallTriggers = jsonObject['triggers']
-    TRIGGERMET = getTriggerFromJson(overallTriggers, "TRIGGERMET", year)
+    TRIGGERMET = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERMET", year))
 
-    TRIGGERMUEG = getTriggerFromJson(overallTriggers, "TRIGGERMUEG", year)
-    TRIGGERDMU  = getTriggerFromJson(overallTriggers, "TRIGGERDMU", year)
-    TRIGGERSMU  = getTriggerFromJson(overallTriggers, "TRIGGERSMU", year)
-    TRIGGERDEL  = getTriggerFromJson(overallTriggers, "TRIGGERDEL", year)
-    TRIGGERSEL  = getTriggerFromJson(overallTriggers, "TRIGGERSEL", year)
+    TRIGGERMUEG = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERMUEG", year))
+    TRIGGERDMU  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERDMU", year))
+    TRIGGERSMU  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERSMU", year))
+    TRIGGERDEL  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERDEL", year))
+    TRIGGERSEL  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERSEL", year))
 
     TRIGGERLEP = "{0} or {1} or {2} or {3} or {4}".format(TRIGGERSEL,TRIGGERDEL,TRIGGERSMU,TRIGGERDMU,TRIGGERMUEG)
 

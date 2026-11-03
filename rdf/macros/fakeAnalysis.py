@@ -4,6 +4,7 @@ from array import array
 
 ROOT.ROOT.EnableImplicitMT(10)
 from utilsCategory import plotCategory
+from utilsNanoAOD import pruneWZTrigger
 from utilsAna import getMClist, getMCnormList, getDATAlist
 from utilsAna import SwitchSample, groupFiles, getTriggerFromJson, getLeptomSelFromJson, getLumi
 from utilsSelection import selectionJetMet, selectionElMu, selectionTrigger1L
@@ -111,8 +112,8 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,puWeights):
     ROOT.initJSONSFs(year)
 
     overallTriggers = jsonObject['triggers']
-    TRIGGERFAKEMU = getTriggerFromJson(overallTriggers, "TRIGGERFAKEMU", year)
-    TRIGGERFAKEEL = getTriggerFromJson(overallTriggers, "TRIGGERFAKEEL", year)
+    TRIGGERFAKEMU = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERFAKEMU", year))
+    TRIGGERFAKEEL = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERFAKEEL", year))
 
     list_TRIGGERFAKEMU = TRIGGERFAKEMU.split('(')[1].split(')')[0].split('||')
     list_TRIGGERFAKEEL = TRIGGERFAKEEL.split('(')[1].split(')')[0].split('||')
