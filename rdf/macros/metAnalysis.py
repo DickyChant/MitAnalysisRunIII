@@ -4,7 +4,7 @@ from array import array
 
 ROOT.ROOT.EnableImplicitMT(10)
 from utilsCategory import plotCategory
-from utilsNanoAOD import pruneWZTrigger
+from utilsNanoAOD import pruneWZTrigger, setTriggerFiles
 from utilsAna import getMClist, getMCnormList, getDATAlist, getLumi
 from utilsAna import SwitchSample, groupFiles, getTriggerFromJson, getLeptomSelFromJson
 from utilsSelection import selection2LVar, selectionElMu, selectionJetMet
@@ -205,6 +205,7 @@ def readMCSample(sampleNOW, year, skimType, whichJob, group):
             return 0
         print("Used files: {0}".format(len(files)))
 
+    setTriggerFiles(files)
     df = ROOT.RDataFrame("Events", files)
     nevents = df.Count().GetValue()
 
@@ -236,6 +237,7 @@ def readDASample(sampleNOW, year, skimType, whichJob, group):
             return 0
         print("Used files: {0}".format(len(files)))
 
+    setTriggerFiles(files)
     df = ROOT.RDataFrame("Events", files)
 
     weight=1.

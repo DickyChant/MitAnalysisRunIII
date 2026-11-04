@@ -54,7 +54,24 @@ def prepareWZNanoAOD(df, year):
     return df
 
 
+_triggerPaths = None
+
+
+def setTriggerFiles(files):
+    """Record the HLT paths stored in every input file; the menu can change between files of one job."""
+    import ROOT
+    global _triggerPaths
+    _triggerPaths = None
+    for name in files:
+        f = ROOT.TFile.Open(str(name))
+        paths = {b.GetName() for b in f.Get("Events").GetListOfBranches() if b.GetName().startswith("HLT_")}
+        f.Close()
+        _triggerPaths = paths if _triggerPaths is None else _triggerPaths & paths
+
+
 def pruneWZTrigger(df, expression):
-    """Unavailable HLT paths are false, including an entirely absent trigger group."""
+    """Unavailable HLT paths are false, including an entirely absent trigger group
+    and paths missing from any input file recorded by setTriggerFiles."""
     import re
-    return re.sub(r'\bHLT_\w+\b', lambda m: m[0] if df.HasColumn(m[0]) else 'false', expression)
+    return re.sub(r'\bHLT_\w+\b', lambda m: m[0] if df.HasColumn(m[0]) and
+                  (_triggerPaths is None or m[0] in _triggerPaths) else 'false', expression)
