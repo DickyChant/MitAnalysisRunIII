@@ -4,6 +4,7 @@ from array import array
 
 ROOT.ROOT.EnableImplicitMT(10)
 from utilsCategory import plotCategory
+from utilsNanoAOD import pruneWZTrigger, setTriggerFiles
 from utilsAna import getMClist, getMCnormList, getDATAlist, getLumi
 from utilsAna import SwitchSample, groupFiles, getTriggerFromJson, getLeptomSelFromJson
 from utilsSelection import selection2LVar, selectionElMu, selectionJetMet
@@ -30,13 +31,13 @@ elSelChoice = 0
 def selectionLL(df,count,year,PDType,isData):
 
     overallTriggers = jsonObject['triggers']
-    TRIGGERMET = getTriggerFromJson(overallTriggers, "TRIGGERMET", year)
+    TRIGGERMET = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERMET", year))
 
-    TRIGGERMUEG = getTriggerFromJson(overallTriggers, "TRIGGERMUEG", year)
-    TRIGGERDMU  = getTriggerFromJson(overallTriggers, "TRIGGERDMU", year)
-    TRIGGERSMU  = getTriggerFromJson(overallTriggers, "TRIGGERSMU", year)
-    TRIGGERDEL  = getTriggerFromJson(overallTriggers, "TRIGGERDEL", year)
-    TRIGGERSEL  = getTriggerFromJson(overallTriggers, "TRIGGERSEL", year)
+    TRIGGERMUEG = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERMUEG", year))
+    TRIGGERDMU  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERDMU", year))
+    TRIGGERSMU  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERSMU", year))
+    TRIGGERDEL  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERDEL", year))
+    TRIGGERSEL  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERSEL", year))
 
     TRIGGERLEP = "{0} or {1} or {2} or {3} or {4}".format(TRIGGERSEL,TRIGGERDEL,TRIGGERSMU,TRIGGERDMU,TRIGGERMUEG)
 
@@ -204,6 +205,7 @@ def readMCSample(sampleNOW, year, skimType, whichJob, group):
             return 0
         print("Used files: {0}".format(len(files)))
 
+    setTriggerFiles(files)
     df = ROOT.RDataFrame("Events", files)
     nevents = df.Count().GetValue()
 
@@ -220,8 +222,8 @@ def readDASample(sampleNOW, year, skimType, whichJob, group):
     if  (sampleNOW >= 1000 and sampleNOW <= 1009): PDType = "SingleMuon"
     elif(sampleNOW >= 1010 and sampleNOW <= 1019): PDType = "DoubleMuon"
     elif(sampleNOW >= 1020 and sampleNOW <= 1029): PDType = "MuonEG"
-    elif(sampleNOW >= 1030 and sampleNOW <= 1039): PDType = "EGamma"
-    elif(sampleNOW >= 1040 and sampleNOW <= 1049): PDType = "Muon"
+    elif(sampleNOW >= 1030 and sampleNOW <= 1039): PDType = "DoubleEG" if year // 10 in (2016, 2017) else "EGamma"
+    elif(sampleNOW >= 1040 and sampleNOW <= 1049): PDType = "SingleElectron" if year // 10 in (2016, 2017) else "Muon"
     elif(sampleNOW >= 1050 and sampleNOW <= 1059): PDType = "MET"
 
     files = getDATAlist(sampleNOW, year, skimType)
@@ -235,6 +237,7 @@ def readDASample(sampleNOW, year, skimType, whichJob, group):
             return 0
         print("Used files: {0}".format(len(files)))
 
+    setTriggerFiles(files)
     df = ROOT.RDataFrame("Events", files)
 
     weight=1.

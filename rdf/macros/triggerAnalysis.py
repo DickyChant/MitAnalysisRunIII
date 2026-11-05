@@ -4,6 +4,7 @@ from array import array
 
 ROOT.ROOT.EnableImplicitMT(10)
 from utilsCategory import plotCategory
+from utilsNanoAOD import pruneWZTrigger, setTriggerFiles
 from utilsAna import getMClist, getMCnormList, getDATAlist
 from utilsAna import SwitchSample, groupFiles, getTriggerFromJson, getLeptomSelFromJson, getLumi
 from utilsSelection import selectionTauVeto, selectionPhoton, selectionJetMet, selection2LVar, selectionTrigger1L, selectionTrigger2L, selectionElMu, selectionWeigths, selectionGenLepJet
@@ -225,11 +226,11 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
     ROOT.initJSONSFs(year)
 
     overallTriggers = jsonObject['triggers']
-    TRIGGERMUEG = getTriggerFromJson(overallTriggers, "TRIGGERMUEG", year)
-    TRIGGERDMU  = getTriggerFromJson(overallTriggers, "TRIGGERDMU", year)
-    TRIGGERSMU  = getTriggerFromJson(overallTriggers, "TRIGGERSMU", year)
-    TRIGGERDEL  = getTriggerFromJson(overallTriggers, "TRIGGERDEL", year)
-    TRIGGERSEL  = getTriggerFromJson(overallTriggers, "TRIGGERSEL", year)
+    TRIGGERMUEG = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERMUEG", year))
+    TRIGGERDMU  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERDMU", year))
+    TRIGGERSMU  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERSMU", year))
+    TRIGGERDEL  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERDEL", year))
+    TRIGGERSEL  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERSEL", year))
 
     list_TRIGGERMUEG = TRIGGERMUEG.split('(')[1].split(')')[0].split('||')
     list_TRIGGERDMU  = TRIGGERDMU .split('(')[1].split(')')[0].split('||')
@@ -256,8 +257,8 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
 
     dfbase = selectionWeigths(dfbase,isData,year,PDType,weight,0,bTagSel,useBTaggingWeights,nTheoryReplicas,genEventSumLHEScaleRenorm,genEventSumPSRenorm,MUOWP,ELEWP,"",0)
 
-    TRIGGERFAKEMU = getTriggerFromJson(overallTriggers, "TRIGGERFAKEMU", year)
-    TRIGGERFAKEEL = getTriggerFromJson(overallTriggers, "TRIGGERFAKEEL", year)
+    TRIGGERFAKEMU = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERFAKEMU", year))
+    TRIGGERFAKEEL = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERFAKEEL", year))
 
     list_TRIGGERFAKEMU = TRIGGERFAKEMU.split('(')[1].split(')')[0].split('||')
     list_TRIGGERFAKEEL = TRIGGERFAKEEL.split('(')[1].split(')')[0].split('||')
@@ -583,6 +584,7 @@ def readMCSample(sampleNOW,year,skimType,whichJob,group,wsWeights,puWeights,hist
             return 0
         print("Used files: {0}".format(len(files)))
 
+    setTriggerFiles(files)
     df = ROOT.RDataFrame("Events", files)
     nevents = df.Count().GetValue()
 
@@ -599,8 +601,8 @@ def readDASample(sampleNOW,year,skimType,whichJob,group,wsWeights,puWeights,hist
     if  (sampleNOW >= 1000 and sampleNOW <= 1009): PDType = "SingleMuon"
     elif(sampleNOW >= 1010 and sampleNOW <= 1019): PDType = "DoubleMuon"
     elif(sampleNOW >= 1020 and sampleNOW <= 1029): PDType = "MuonEG"
-    elif(sampleNOW >= 1030 and sampleNOW <= 1039): PDType = "EGamma"
-    elif(sampleNOW >= 1040 and sampleNOW <= 1049): PDType = "Muon"
+    elif(sampleNOW >= 1030 and sampleNOW <= 1039): PDType = "DoubleEG" if year // 10 in (2016, 2017) else "EGamma"
+    elif(sampleNOW >= 1040 and sampleNOW <= 1049): PDType = "SingleElectron" if year // 10 in (2016, 2017) else "Muon"
     elif(sampleNOW >= 1050 and sampleNOW <= 1059): PDType = "MET"
 
     files = getDATAlist(sampleNOW, year, skimType)
@@ -614,6 +616,7 @@ def readDASample(sampleNOW,year,skimType,whichJob,group,wsWeights,puWeights,hist
             return 0
         print("Used files: {0}".format(len(files)))
 
+    setTriggerFiles(files)
     df = ROOT.RDataFrame("Events", files)
 
     genEventSumLHEScaleRenorm = [1, 1, 1, 1, 1, 1]

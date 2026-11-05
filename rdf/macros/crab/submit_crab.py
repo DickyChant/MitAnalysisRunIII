@@ -70,7 +70,7 @@ SANDBOX_LIMIT_MB = 120
 DAS_DIR = re.compile(r"^[^+/]+\+[^+/]+\+(NANOAOD|NANOAODSIM|USER)$")
 
 SKIM_TYPE = {"wzAnalysis": "3l", "fakeAnalysis": "1l", "triggerAnalysis": "2l",
-             "metAnalysis": "met", "puAnalysis": "2l"}
+             "metAnalysis": "met", "puAnalysis": "2l", "zAnalysis": "2l"}
 
 sys.path.insert(0, MACROS_DIR)
 os.chdir(MACROS_DIR)
@@ -135,7 +135,8 @@ def resolve_tasks(entries, skim_type):
 
 
 def das_files(dataset):
-    out = check_output(["dasgoclient", "-query", "file dataset={0}".format(dataset)]).decode()
+    instance = " instance=prod/phys03" if dataset.endswith("/USER") else ""
+    out = check_output(["dasgoclient", "-query", "file dataset={0}{1}".format(dataset, instance)]).decode()
     return sorted(l.strip() for l in out.splitlines() if l.strip().startswith("/store/"))
 
 

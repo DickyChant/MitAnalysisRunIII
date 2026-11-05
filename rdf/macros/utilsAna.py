@@ -22,7 +22,8 @@ FILELIST_DIR = os.environ.get("FILELIST_DIR", "direct/filelists")
 
 def getLumi(year):
     #lumi = [19.5, 16.8, 41.5, 60.0, 8.1, 26.9, 18.1, 9.7, 109.6, 107.5, 25.8, 2.1]
-    lumi = [19.5, 16.8, 41.5, 60.0, 8.1, 26.9, 18.1, 9.7, 109.6, 133.3, 25.8, 2.1] # 25+26 together
+    # Run 2: UL golden-JSON luminosities (LUM-17-003/18-002/19-001), 2016 split at the HIPM boundary
+    lumi = [19.52, 16.81, 41.48, 59.83, 8.1, 26.9, 18.1, 9.7, 109.6, 133.3, 25.8, 2.1] # 25+26 together
 
     lumiBit = -999
     if  (year == 20160): lumiBit = 0
@@ -100,11 +101,11 @@ def getPrunedTriggers(df,TRIGGERXXX):
             TRIGGERPRUNED += ")"
     return TRIGGERPRUNED
 
-def getLeptomSelFromJson(overall, type, year, debug = 0):
+def getLeptomSelFromJson(overall, type, year, debug = 0, version = None):
 
     if(year > 10000): year = year // 10
-    version = 12
-    if(year >= 2024 or year <= 2021): version = 15
+    if version is None:
+        version = 15 if (year >= 2024 or year <= 2021) else 12
 
     for leptonSel in overall:
         if(leptonSel['name'] == type and leptonSel['version'] == version):
@@ -431,7 +432,7 @@ def getDATAlist(type, year, skimType):
         filesL = findDIR("{0}/DoubleEG+Run2016F-UL2016_NanoAODv15-v1+NANOAOD".format(dirT2))
     elif(year == 2016 and type == 1037):
         filesL = findDIR("{0}/DoubleEG+Run2016G-UL2016_NanoAODv15-v1+NANOAOD".format(dirT2))
-    elif(year == 2016 and type == 10388):
+    elif(year == 2016 and type == 1038):
         filesL = findDIR("{0}/DoubleEG+Run2016H-UL2016_NanoAODv15-v1+NANOAOD".format(dirT2))
 
     elif(year == 2016 and type == 1041):
@@ -567,7 +568,7 @@ def getDATAlist(type, year, skimType):
     elif(year == 2018 and type == 1022):
         filesL = findDIR("{0}/MuonEG+Run2018C-UL2018_NanoAODv15-v2+NANOAOD".format(dirT2))
     elif(year == 2018 and type == 1023):
-        filesL = findDIR("{0}/MuonEG+Run2018D-UL2018_NanoAODv15-v2+NANOAOD".format(dirT2))
+        filesL = findDIR("{0}/MuonEG+Run2018D-UL2018_NanoAODv15-v1+NANOAOD".format(dirT2))
 
     elif(year == 2018 and type == 1030):
         filesL = findDIR("{0}/EGamma+Run2018A-UL2018_NanoAODv15-v2+NANOAOD".format(dirT2))
@@ -1786,21 +1787,182 @@ def SwitchSample(argument, skimType):
        611: (dirT2+"/DYto2Tau-2Jets_Bin-2J-MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8+RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2+NANOAODSIM",351.28*1000/3.,plotCategory("kPlotDY")),
        612: (dirT2+"/TTto2L2Nu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8+RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2+NANOAODSIM",0.950*923.6*0.1086*0.1086*9*1000,plotCategory("kPlotTT")),
 
+       # Run 2 WZ layout (all MC ids < 1000; xsec = pb * 1000 = fb):
+       # era/year       primary block   overflow block   preserved DY/DY/TT
+       # 2016APV/20160   800-819         720-739          800/801/808
+       # 2016/20161      820-839         740-759          820/821/828
+       # 2017/20170      840-859         760-779          840/841/848
+       # 2018/20180      860-879         780-799          860/861/868
+       # Primary offsets 0,1,8 stay unchanged. Fill other primary slots, then
+       # overflow offsets 0-18 in the same process order for every era; +19 free.
+       # 600-643 and 700-719 are reserved downstream; existing 9xx tests untouched.
+       # Exact nominal DAS versions from run2_survey.out; no ext duplication.
+       # Polarized LL/LT/TL/TT use official v9; every other new entry uses v15.
+       # Cross-section sources/caveats and full manifest: crab/run2_samples.csv,
+       # crab/README.md. TODO values are provisional, not generator measurements.
        800: (dirT2+"/DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v2+NANOAODSIM",2075.14*3*3.78*1000,plotCategory("kPlotDY")),
        801: (dirT2+"/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",2075.14*3*1000,plotCategory("kPlotDY")),
        808: (dirT2+"/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v2+NANOAODSIM",831.76*0.1086*0.1086*9*1000,plotCategory("kPlotTT")),
+       802: (dirT2+"/WLLJJ_WToLNu_EWK_TuneCP5_13TeV_madgraph-madspin-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.0356)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer (UL18 MiniAOD, 3 files)
+       803: (dirT2+"/WZTo3LNu_mllmin4p0_TuneCP5_13TeV-powheg-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(4.43)*1000,plotCategory("kPlotWZ")), # CMS Run 2 WZ POWHEG convention; TODO verify xsec for mllmin4p0
+       804: (dirT2+"/ZZJJTo4L_EWKnotop_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.000992)*1000,plotCategory("kPlotZZ")), # GenXSecAnalyzer (UL18 MiniAOD, 3 files); Run 3 ZZJJto4L-EWK is 0.00114 at 13.6 TeV
+       805: (dirT2+"/ZZTo4L_TuneCP5_13TeV_powheg_pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(1.256)*1000,plotCategory("kPlotZZ")), # CMS Run 2 POWHEG ZZ convention; TODO verify xsec
+       806: (dirT2+"/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.2086)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       807: (dirT2+"/WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.1651)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       809: (dirT2+"/WZZ_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.05565)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       810: (dirT2+"/ZZZ_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.01398)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       811: (dirT2+"/WZG_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.0788)*1000,plotCategory("kPlotVVV")), # GenXSecAnalyzer (UL18 MiniAOD, 3 files); Run 3 WZGtoLNuZG is 0.0843 at 13.6 TeV
+       812: (dirT2+"/TTWW_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.0070)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttVV LO convention; TODO verify xsec
+       813: (dirT2+"/TTWZ_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.00245)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttVV LO convention; TODO verify xsec
+       814: (dirT2+"/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(48.58*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV ggH x BR(H->ZZ->4l), l=e/mu/tau
+       815: (dirT2+"/VBF_HToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(3.782*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV VBF x BR(H->ZZ->4l), l=e/mu/tau
+       816: (dirT2+"/TTZToLL_M-1to10_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.0532)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttZ low-mass convention; TODO verify xsec
+       817: (dirT2+"/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.2432)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttZ NLO convention; TODO verify xsec
+       818: (dirT2+"/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(55.48)*1000,plotCategory("kPlotVG")), # CMS Run 2 Zgamma NLO convention; TODO verify xsec
+       819: (dirT2+"/ZGToLLG_01J_5f_lowMLL_lowGPt_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(172.4)*1000,plotCategory("kPlotVG")), # CMS Run 2 lowMLL/lowGPt estimate; TODO verify xsec and overlap (not x39 equivalent)
+       720: (dirT2+"/ZGamma2JToGamma2L2J_EWK_MLL-50_MJJ-120_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.1097)*1000,plotCategory("kPlotVG")), # CMS Run 2 EWK Zgamma LO convention; TODO verify xsec
+       721: (dirT2+"/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.2043)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttW NLO convention, W->lnu; TODO verify xsec
+       722: (dirT2+"/tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.0758)*1000,plotCategory("kPlotTVX")), # CMS Run 2 tZq NLO convention, Z->ll; TODO verify xsec
+       723: (dirT2+"/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.5071*(1-0.5824))*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV ttH x (1-BR(H->bb))
+       724: (dirT2+"/GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.00159)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       725: (dirT2+"/GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.00159)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       726: (dirT2+"/GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v2+NANOAODSIM",(0.00159)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       727: (dirT2+"/GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.00319)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       728: (dirT2+"/GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.00319)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       729: (dirT2+"/GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.00319)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       730: (dirT2+"/ZH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2-minlo-HZJ_JHUGenV7011_pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.000668)*1000,plotCategory("kPlotHiggs")), # CMS Run 2 HZZ 4LFilter convention; TODO verify xsec incl. filter efficiency
+       731: (dirT2+"/WplusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.8400*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV W+H x BR(H->ZZ->4l)
+       732: (dirT2+"/WminusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.5328*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV W-H x BR(H->ZZ->4l)
+       733: (dirT2+"/HZJ_HToWWTo2L2Nu_ZTo2L_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.7612*0.215*(3*0.1086)**2*0.10099)*1000,plotCategory("kPlotHiggs")), # YR4 qqZH x BR(H->WW->2l2nu) x BR(Z->2l); TODO verify xsec/filter
+       734: (dirT2+"/WZJJ_EWK_LLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1_private-00000000000000000000000000000000+USER",(0.001375)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       735: (dirT2+"/WZJJ_EWK_LTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1_private-00000000000000000000000000000000+USER",(0.00283)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       736: (dirT2+"/WZJJ_EWK_TLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1_private-00000000000000000000000000000000+USER",(0.00318)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       737: (dirT2+"/WZJJ_EWK_TTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1_private-00000000000000000000000000000000+USER",(0.00885)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       738: (dirT2+"/WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1+NANOAODSIM",(0.01630)*1000,plotCategory("kPlotEWKWZ")), # CMS Open Data cms-72727 GenXSecAnalyzer (13 TeV)
+       739: (dirT2+"/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8+RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v2+NANOAODSIM",61526.7*1000,plotCategory("kPlotOther")), # NNLO W->lnu; fake-rate EWK subtraction
 
        820: (dirT2+"/DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",2075.14*3*3.78*1000,plotCategory("kPlotDY")),
        821: (dirT2+"/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",2075.14*3*1000,plotCategory("kPlotDY")),
        828: (dirT2+"/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v2+NANOAODSIM",831.76*0.1086*0.1086*9*1000,plotCategory("kPlotTT")),
+       822: (dirT2+"/WLLJJ_WToLNu_EWK_TuneCP5_13TeV_madgraph-madspin-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.0356)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer (UL18 MiniAOD, 3 files)
+       823: (dirT2+"/WZTo3LNu_mllmin4p0_TuneCP5_13TeV-powheg-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(4.43)*1000,plotCategory("kPlotWZ")), # CMS Run 2 WZ POWHEG convention; TODO verify xsec for mllmin4p0
+       824: (dirT2+"/ZZJJTo4L_EWKnotop_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.000992)*1000,plotCategory("kPlotZZ")), # GenXSecAnalyzer (UL18 MiniAOD, 3 files); Run 3 ZZJJto4L-EWK is 0.00114 at 13.6 TeV
+       825: (dirT2+"/ZZTo4L_TuneCP5_13TeV_powheg_pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v2+NANOAODSIM",(1.256)*1000,plotCategory("kPlotZZ")), # CMS Run 2 POWHEG ZZ convention; TODO verify xsec
+       826: (dirT2+"/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.2086)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       827: (dirT2+"/WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.1651)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       829: (dirT2+"/WZZ_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.05565)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       830: (dirT2+"/ZZZ_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.01398)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       831: (dirT2+"/WZG_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.0788)*1000,plotCategory("kPlotVVV")), # GenXSecAnalyzer (UL18 MiniAOD, 3 files); Run 3 WZGtoLNuZG is 0.0843 at 13.6 TeV
+       832: (dirT2+"/TTWW_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.0070)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttVV LO convention; TODO verify xsec
+       833: (dirT2+"/TTWZ_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.00245)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttVV LO convention; TODO verify xsec
+       834: (dirT2+"/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(48.58*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV ggH x BR(H->ZZ->4l), l=e/mu/tau
+       835: (dirT2+"/VBF_HToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(3.782*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV VBF x BR(H->ZZ->4l), l=e/mu/tau
+       836: (dirT2+"/TTZToLL_M-1to10_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.0532)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttZ low-mass convention; TODO verify xsec
+       837: (dirT2+"/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.2432)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttZ NLO convention; TODO verify xsec
+       838: (dirT2+"/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(55.48)*1000,plotCategory("kPlotVG")), # CMS Run 2 Zgamma NLO convention; TODO verify xsec
+       839: (dirT2+"/ZGToLLG_01J_5f_lowMLL_lowGPt_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(172.4)*1000,plotCategory("kPlotVG")), # CMS Run 2 lowMLL/lowGPt estimate; TODO verify xsec and overlap (not x39 equivalent)
+       740: (dirT2+"/ZGamma2JToGamma2L2J_EWK_MLL-50_MJJ-120_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.1097)*1000,plotCategory("kPlotVG")), # CMS Run 2 EWK Zgamma LO convention; TODO verify xsec
+       741: (dirT2+"/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.2043)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttW NLO convention, W->lnu; TODO verify xsec
+       742: (dirT2+"/tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.0758)*1000,plotCategory("kPlotTVX")), # CMS Run 2 tZq NLO convention, Z->ll; TODO verify xsec
+       743: (dirT2+"/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.5071*(1-0.5824))*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV ttH x (1-BR(H->bb))
+       744: (dirT2+"/GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.00159)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       745: (dirT2+"/GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.00159)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       746: (dirT2+"/GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.00159)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       747: (dirT2+"/GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.00319)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       748: (dirT2+"/GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.00319)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       749: (dirT2+"/GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.00319)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       750: (dirT2+"/ZH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2-minlo-HZJ_JHUGenV7011_pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.000668)*1000,plotCategory("kPlotHiggs")), # CMS Run 2 HZZ 4LFilter convention; TODO verify xsec incl. filter efficiency
+       751: (dirT2+"/WplusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.8400*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV W+H x BR(H->ZZ->4l)
+       752: (dirT2+"/WminusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.5328*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV W-H x BR(H->ZZ->4l)
+       753: (dirT2+"/HZJ_HToWWTo2L2Nu_ZTo2L_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.7612*0.215*(3*0.1086)**2*0.10099)*1000,plotCategory("kPlotHiggs")), # YR4 qqZH x BR(H->WW->2l2nu) x BR(Z->2l); TODO verify xsec/filter
+       754: (dirT2+"/WZJJ_EWK_LLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1_private-00000000000000000000000000000000+USER",(0.001375)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       755: (dirT2+"/WZJJ_EWK_LTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1_private-00000000000000000000000000000000+USER",(0.00283)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       756: (dirT2+"/WZJJ_EWK_TLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1_private-00000000000000000000000000000000+USER",(0.00318)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       757: (dirT2+"/WZJJ_EWK_TTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1_private-00000000000000000000000000000000+USER",(0.00885)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       758: (dirT2+"/WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1+NANOAODSIM",(0.01630)*1000,plotCategory("kPlotEWKWZ")), # CMS Open Data cms-72727 GenXSecAnalyzer (13 TeV)
+       759: (dirT2+"/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8+RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v2+NANOAODSIM",61526.7*1000,plotCategory("kPlotOther")), # NNLO W->lnu; fake-rate EWK subtraction
 
        840: (dirT2+"/DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",2075.14*3*3.78*1000,plotCategory("kPlotDY")),
        841: (dirT2+"/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",2075.14*3*1000,plotCategory("kPlotDY")),
        848: (dirT2+"/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v2+NANOAODSIM",831.76*0.1086*0.1086*9*1000,plotCategory("kPlotTT")),
+       842: (dirT2+"/WLLJJ_WToLNu_EWK_TuneCP5_13TeV_madgraph-madspin-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.0356)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer (UL18 MiniAOD, 3 files)
+       843: (dirT2+"/WZTo3LNu_mllmin4p0_TuneCP5_13TeV-powheg-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(4.43)*1000,plotCategory("kPlotWZ")), # CMS Run 2 WZ POWHEG convention; TODO verify xsec for mllmin4p0
+       844: (dirT2+"/ZZJJTo4L_EWKnotop_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.000992)*1000,plotCategory("kPlotZZ")), # GenXSecAnalyzer (UL18 MiniAOD, 3 files); Run 3 ZZJJto4L-EWK is 0.00114 at 13.6 TeV
+       845: (dirT2+"/ZZTo4L_TuneCP5_13TeV_powheg_pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(1.256)*1000,plotCategory("kPlotZZ")), # CMS Run 2 POWHEG ZZ convention; TODO verify xsec
+       846: (dirT2+"/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.2086)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       847: (dirT2+"/WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.1651)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       849: (dirT2+"/WZZ_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.05565)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       850: (dirT2+"/ZZZ_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.01398)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       851: (dirT2+"/WZG_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.0788)*1000,plotCategory("kPlotVVV")), # GenXSecAnalyzer (UL18 MiniAOD, 3 files); Run 3 WZGtoLNuZG is 0.0843 at 13.6 TeV
+       852: (dirT2+"/TTWW_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.0070)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttVV LO convention; TODO verify xsec
+       853: (dirT2+"/TTWZ_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.00245)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttVV LO convention; TODO verify xsec
+       854: (dirT2+"/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(48.58*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV ggH x BR(H->ZZ->4l), l=e/mu/tau
+       855: (dirT2+"/VBF_HToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(3.782*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV VBF x BR(H->ZZ->4l), l=e/mu/tau
+       856: (dirT2+"/TTZToLL_M-1to10_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.0532)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttZ low-mass convention; TODO verify xsec
+       857: (dirT2+"/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.2432)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttZ NLO convention; TODO verify xsec
+       858: (dirT2+"/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(55.48)*1000,plotCategory("kPlotVG")), # CMS Run 2 Zgamma NLO convention; TODO verify xsec
+       859: (dirT2+"/ZGToLLG_01J_5f_lowMLL_lowGPt_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(172.4)*1000,plotCategory("kPlotVG")), # CMS Run 2 lowMLL/lowGPt estimate; TODO verify xsec and overlap (not x39 equivalent)
+       760: (dirT2+"/ZGamma2JToGamma2L2J_EWK_MLL-50_MJJ-120_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.1097)*1000,plotCategory("kPlotVG")), # CMS Run 2 EWK Zgamma LO convention; TODO verify xsec
+       761: (dirT2+"/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.2043)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttW NLO convention, W->lnu; TODO verify xsec
+       762: (dirT2+"/tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.0758)*1000,plotCategory("kPlotTVX")), # CMS Run 2 tZq NLO convention, Z->ll; TODO verify xsec
+       763: (dirT2+"/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.5071*(1-0.5824))*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV ttH x (1-BR(H->bb))
+       764: (dirT2+"/GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.00159)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       765: (dirT2+"/GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.00159)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       766: (dirT2+"/GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.00159)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       767: (dirT2+"/GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.00319)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       768: (dirT2+"/GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.00319)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       769: (dirT2+"/GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.00319)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       770: (dirT2+"/ZH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2-minlo-HZJ_JHUGenV7011_pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.000668)*1000,plotCategory("kPlotHiggs")), # CMS Run 2 HZZ 4LFilter convention; TODO verify xsec incl. filter efficiency
+       771: (dirT2+"/WplusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.8400*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV W+H x BR(H->ZZ->4l)
+       772: (dirT2+"/WminusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.5328*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV W-H x BR(H->ZZ->4l)
+       773: (dirT2+"/HZJ_HToWWTo2L2Nu_ZTo2L_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.7612*0.215*(3*0.1086)**2*0.10099)*1000,plotCategory("kPlotHiggs")), # YR4 qqZH x BR(H->WW->2l2nu) x BR(Z->2l); TODO verify xsec/filter
+       774: (dirT2+"/WZJJ_EWK_LLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1_private-00000000000000000000000000000000+USER",(0.001375)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       775: (dirT2+"/WZJJ_EWK_LTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1_private-00000000000000000000000000000000+USER",(0.00283)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       776: (dirT2+"/WZJJ_EWK_TLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1_private-00000000000000000000000000000000+USER",(0.00318)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       777: (dirT2+"/WZJJ_EWK_TTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1_private-00000000000000000000000000000000+USER",(0.00885)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       778: (dirT2+"/WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1+NANOAODSIM",(0.01630)*1000,plotCategory("kPlotEWKWZ")), # CMS Open Data cms-72727 GenXSecAnalyzer (13 TeV)
+       779: (dirT2+"/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8+RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v2+NANOAODSIM",61526.7*1000,plotCategory("kPlotOther")), # NNLO W->lnu; fake-rate EWK subtraction
 
        860: (dirT2+"/DYJetsToLL_M-10to50_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",2075.14*3*3.78*1000,plotCategory("kPlotDY")),
        861: (dirT2+"/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",2075.14*3*1000,plotCategory("kPlotDY")),
        868: (dirT2+"/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v2+NANOAODSIM",831.76*0.1086*0.1086*9*1000,plotCategory("kPlotTT")),
+       862: (dirT2+"/WLLJJ_WToLNu_EWK_TuneCP5_13TeV_madgraph-madspin-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.0356)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer (UL18 MiniAOD, 3 files)
+       863: (dirT2+"/WZTo3LNu_mllmin4p0_TuneCP5_13TeV-powheg-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(4.43)*1000,plotCategory("kPlotWZ")), # CMS Run 2 WZ POWHEG convention; TODO verify xsec for mllmin4p0
+       864: (dirT2+"/ZZJJTo4L_EWKnotop_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.000992)*1000,plotCategory("kPlotZZ")), # GenXSecAnalyzer (UL18 MiniAOD, 3 files); Run 3 ZZJJto4L-EWK is 0.00114 at 13.6 TeV
+       865: (dirT2+"/ZZTo4L_TuneCP5_13TeV_powheg_pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(1.256)*1000,plotCategory("kPlotZZ")), # CMS Run 2 POWHEG ZZ convention; TODO verify xsec
+       866: (dirT2+"/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.2086)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       867: (dirT2+"/WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.1651)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       869: (dirT2+"/WZZ_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.05565)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       870: (dirT2+"/ZZZ_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.01398)*1000,plotCategory("kPlotVVV")), # CMS Run 2 triboson NLO (Guiang 2023 sample table)
+       871: (dirT2+"/WZG_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.0788)*1000,plotCategory("kPlotVVV")), # GenXSecAnalyzer (UL18 MiniAOD, 3 files); Run 3 WZGtoLNuZG is 0.0843 at 13.6 TeV
+       872: (dirT2+"/TTWW_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.0070)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttVV LO convention; TODO verify xsec
+       873: (dirT2+"/TTWZ_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.00245)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttVV LO convention; TODO verify xsec
+       874: (dirT2+"/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(48.58*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV ggH x BR(H->ZZ->4l), l=e/mu/tau
+       875: (dirT2+"/VBF_HToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(3.782*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV VBF x BR(H->ZZ->4l), l=e/mu/tau
+       876: (dirT2+"/TTZToLL_M-1to10_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.0532)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttZ low-mass convention; TODO verify xsec
+       877: (dirT2+"/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.2432)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttZ NLO convention; TODO verify xsec
+       878: (dirT2+"/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(55.48)*1000,plotCategory("kPlotVG")), # CMS Run 2 Zgamma NLO convention; TODO verify xsec
+       879: (dirT2+"/ZGToLLG_01J_5f_lowMLL_lowGPt_TuneCP5_13TeV-amcatnloFXFX-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(172.4)*1000,plotCategory("kPlotVG")), # CMS Run 2 lowMLL/lowGPt estimate; TODO verify xsec and overlap (not x39 equivalent)
+       780: (dirT2+"/ZGamma2JToGamma2L2J_EWK_MLL-50_MJJ-120_TuneCP5_13TeV-madgraph-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.1097)*1000,plotCategory("kPlotVG")), # CMS Run 2 EWK Zgamma LO convention; TODO verify xsec
+       781: (dirT2+"/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.2043)*1000,plotCategory("kPlotTVX")), # CMS Run 2 ttW NLO convention, W->lnu; TODO verify xsec
+       782: (dirT2+"/tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.0758)*1000,plotCategory("kPlotTVX")), # CMS Run 2 tZq NLO convention, Z->ll; TODO verify xsec
+       783: (dirT2+"/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.5071*(1-0.5824))*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV ttH x (1-BR(H->bb))
+       784: (dirT2+"/GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.00159)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       785: (dirT2+"/GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.00159)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       786: (dirT2+"/GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.00159)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       787: (dirT2+"/GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.00319)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       788: (dirT2+"/GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.00319)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       789: (dirT2+"/GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.00319)*1000,plotCategory("kPlotZZ")), # CMS Run 2 MCFM701 LO; TODO verify xsec (no additional K factor)
+       790: (dirT2+"/ZH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2-minlo-HZJ_JHUGenV7011_pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.000668)*1000,plotCategory("kPlotHiggs")), # CMS Run 2 HZZ 4LFilter convention; TODO verify xsec incl. filter efficiency
+       791: (dirT2+"/WplusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.8400*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV W+H x BR(H->ZZ->4l)
+       792: (dirT2+"/WminusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.5328*0.0002745)*1000,plotCategory("kPlotHiggs")), # YR4 13 TeV W-H x BR(H->ZZ->4l)
+       793: (dirT2+"/HZJ_HToWWTo2L2Nu_ZTo2L_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.7612*0.215*(3*0.1086)**2*0.10099)*1000,plotCategory("kPlotHiggs")), # YR4 qqZH x BR(H->WW->2l2nu) x BR(Z->2l); TODO verify xsec/filter
+       794: (dirT2+"/WZJJ_EWK_LLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1_private-00000000000000000000000000000000+USER",(0.001375)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       795: (dirT2+"/WZJJ_EWK_LTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1_private-00000000000000000000000000000000+USER",(0.00283)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       796: (dirT2+"/WZJJ_EWK_TLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1_private-00000000000000000000000000000000+USER",(0.00318)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       797: (dirT2+"/WZJJ_EWK_TTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+sqian-RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1_private-00000000000000000000000000000000+USER",(0.00885)*1000,plotCategory("kPlotEWKWZ")), # GenXSecAnalyzer, mean of the four UL eras (spread < 1.5%)
+       798: (dirT2+"/WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1+NANOAODSIM",(0.01630)*1000,plotCategory("kPlotEWKWZ")), # CMS Open Data cms-72727 GenXSecAnalyzer (13 TeV)
+       799: (dirT2+"/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8+RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v2+NANOAODSIM",61526.7*1000,plotCategory("kPlotOther")), # NNLO W->lnu; fake-rate EWK subtraction
 
        900:(dirLocal+"/2018/vbf-hrhogamma-powheg+NANOAOD_01",1.0*1000,plotCategory("kPlotBSM")),
 

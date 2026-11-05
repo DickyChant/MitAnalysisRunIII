@@ -4,6 +4,7 @@ from array import array
 
 ROOT.ROOT.EnableImplicitMT(10)
 from utilsCategory import plotCategory
+from utilsNanoAOD import pruneWZTrigger, setTriggerFiles
 from utilsAna import getMClist, getMCnormList, getDATAlist
 from utilsAna import SwitchSample, groupFiles, getTriggerFromJson, getLeptomSelFromJson, getLumi
 from utilsSelection import selectionJetMet, selectionElMu, selectionTrigger1L
@@ -111,8 +112,8 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,puWeights):
     ROOT.initJSONSFs(year)
 
     overallTriggers = jsonObject['triggers']
-    TRIGGERFAKEMU = getTriggerFromJson(overallTriggers, "TRIGGERFAKEMU", year)
-    TRIGGERFAKEEL = getTriggerFromJson(overallTriggers, "TRIGGERFAKEEL", year)
+    TRIGGERFAKEMU = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERFAKEMU", year))
+    TRIGGERFAKEEL = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERFAKEEL", year))
 
     list_TRIGGERFAKEMU = TRIGGERFAKEMU.split('(')[1].split(')')[0].split('||')
     list_TRIGGERFAKEEL = TRIGGERFAKEEL.split('(')[1].split(')')[0].split('||')
@@ -151,10 +152,10 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,puWeights):
                        .Define("weightFakeSel2", "compute_weights({0},genWeight,PDType,fake_Muon_genPartFlav,fake_Electron_genPartFlav,{1})*compute_lumiFakeRate(fake_Muon_pt,fake_Electron_pt,2,{2})*weightPURecoSF".format(weight,useFR,year))
                        )
 
-    FILTERMU0 = "(Sum(fake_mu) == 1 && ptl <  20 && HLT_Mu8_TrkIsoVVL)"
-    FILTERMU1 = "(Sum(fake_mu) == 1 && ptl >= 20 && HLT_Mu17_TrkIsoVVL)"
-    FILTEREL0 = "(Sum(fake_el) == 1 && ptl <  15 && HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30)"
-    FILTEREL1 = "(Sum(fake_el) == 1 && ptl >= 15 && HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30)"
+    FILTERMU0 = pruneWZTrigger(df, "(Sum(fake_mu) == 1 && ptl <  20 && HLT_Mu8_TrkIsoVVL)")
+    FILTERMU1 = pruneWZTrigger(df, "(Sum(fake_mu) == 1 && ptl >= 20 && HLT_Mu17_TrkIsoVVL)")
+    FILTEREL0 = pruneWZTrigger(df, "(Sum(fake_el) == 1 && ptl <  15 && HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30)")
+    FILTEREL1 = pruneWZTrigger(df, "(Sum(fake_el) == 1 && ptl >= 15 && HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30)")
     FILTERLEP = "({0}||{1}||{2}||{3})".format(FILTERMU0,FILTERMU1,FILTEREL0,FILTEREL1)
     FILTERLEP0 = "({0}||{1})".format(FILTERMU0,FILTEREL0)
     FILTERLEP1 = "({0}||{1})".format(FILTERMU1,FILTEREL1)
@@ -340,6 +341,7 @@ def readMCSample(sampleNOW, year, skimType, whichJob, group, puWeights):
             return 0
         print("Used files: {0}".format(len(files)))
 
+    setTriggerFiles(files)
     df = ROOT.RDataFrame("Events", files)
     nevents = df.Count().GetValue()
 
@@ -356,8 +358,8 @@ def readDASample(sampleNOW, year, skimType, whichJob, group, puWeights):
     if  (sampleNOW >= 1000 and sampleNOW <= 1009): PDType = "SingleMuon"
     elif(sampleNOW >= 1010 and sampleNOW <= 1019): PDType = "DoubleMuon"
     elif(sampleNOW >= 1020 and sampleNOW <= 1029): PDType = "MuonEG"
-    elif(sampleNOW >= 1030 and sampleNOW <= 1039): PDType = "EGamma"
-    elif(sampleNOW >= 1040 and sampleNOW <= 1049): PDType = "Muon"
+    elif(sampleNOW >= 1030 and sampleNOW <= 1039): PDType = "DoubleEG" if year // 10 in (2016, 2017) else "EGamma"
+    elif(sampleNOW >= 1040 and sampleNOW <= 1049): PDType = "SingleElectron" if year // 10 in (2016, 2017) else "Muon"
     elif(sampleNOW >= 1050 and sampleNOW <= 1059): PDType = "MET"
 
     files = getDATAlist(sampleNOW, year, skimType)
@@ -371,6 +373,7 @@ def readDASample(sampleNOW, year, skimType, whichJob, group, puWeights):
             return 0
         print("Used files: {0}".format(len(files)))
 
+    setTriggerFiles(files)
     df = ROOT.RDataFrame("Events", files)
 
     weight=1.
