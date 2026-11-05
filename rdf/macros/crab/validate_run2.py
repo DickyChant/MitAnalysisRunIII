@@ -70,8 +70,7 @@ def validate(survey_path):
         assert dataset == row['dataset'] and dataset in survey, (sid, dataset)
         assert math.isclose(fb, 1000 * float(row['xsec_pb']), rel_tol=1e-9), sid
         assert category == row['plot_category'] == scope['SwitchSample'](int(row['run3_equivalent']), '3l')[2]
-        polarized = re.search(r'_(LL|LT|TL|TT)Polarization_', dataset)
-        assert ('v9-106X' if polarized else 'v15-150X') in dataset, sid
+        assert 'v15-150X' in dataset, sid  # the polarized samples are private v15 productions
 
     entries = []
     data_datasets = []

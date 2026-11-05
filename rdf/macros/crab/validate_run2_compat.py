@@ -87,7 +87,7 @@ def audit(inputs):
                         df = scope['selectionGenLepJet'](df, 15, 30, 5.0)
                     df.Define('mjjGen', '0.f')
                     df = scope['selectionWeigths'](df, data, year, 'WZJJ', 1., 1, 0, 1, [103,9,4], [1]*6, [1]*4, 'Medium', 'wp80iso', '_correction', 2)
-                assert 'Jet_btagDeepFlavB' in df.expressions['clean_Jet_btagUnifiedParTB']
+                assert 'Jet_btagUParTAK4B' in df.expressions['clean_Jet_btagUnifiedParTB']
                 if version == 9:
                     assert df.expressions['jet_SelMask0'] == '(Jet_jetId & 2) != 0'
                     assert '> 0.0' in df.expressions['tight_el']
