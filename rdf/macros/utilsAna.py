@@ -105,7 +105,9 @@ def getLeptomSelFromJson(overall, type, year, debug = 0, version = None):
 
     if(year > 10000): year = year // 10
     if version is None:
-        version = 15 if (year >= 2024 or year <= 2021) else 12
+        # Run 2 UL NanoAODv15 (year <= 2021): own set 152 = v15 definitions with the analysis tight WP
+        # (TIGHT_MU8/EL8) moved to the Run 3 prompt efficiency: promptMVA mu > 0.0, el > 0.05 (issue #9)
+        version = 152 if year <= 2021 else (15 if year >= 2024 else 12)
 
     for leptonSel in overall:
         if(leptonSel['name'] == type and leptonSel['version'] == version):
