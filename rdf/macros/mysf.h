@@ -541,6 +541,9 @@ double MyCorrections::eval_btvSF(const char *valType, char *workingPoint, double
   if(eta <= -2.5 || eta >= 2.5) return 0.0;
   eta = std::min(std::abs(eta),2.399);
   pt = std::min(pt,999.999);
+  // Run 2 UL v15 UParTAK4_comb (b/c) covers 30 <= pT < 300 GeV only; outside it correctionlib returns a
+  // flat fallback (2018 M: 0.99 +- 0.042). Use the edge bins instead, as HiggsDNA does.
+  if(year <= 20180 && flavor != 0) pt = std::min(std::max(pt,30.0),299.999);
   if(flavor != 0) {
     return btvHFSF_->evaluate({valType, workingPoint, flavor, eta, pt});
   }
