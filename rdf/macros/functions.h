@@ -922,7 +922,9 @@ float compute_EWKCorr(const int type, const TString theCat, const float mjjGen){
     }
   }
   else if(theCat.Contains("WZto3LNu-2Jets_EW")
-       || theCat.Contains("WZJJto3LNu-EWK")) {
+       || theCat.Contains("WZJJto3LNu-EWK")
+       || theCat.Contains("WLLJJ_WToLNu_EWK")    // Run 2 UL EW WZjj
+       || theCat.Contains("WZJJ_EWK_")) {        // Run 2 UL polarized EW WZjj (MadSpin, WZ-CM)
     if(!theCat.Contains("sherpa")){ // no sherpa correction
       if(type == 0) {
         const TH1D& hcorr = hVV_KF_EWK[1];
