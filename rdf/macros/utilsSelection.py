@@ -40,22 +40,15 @@ def getBTagCut_DeepJet(type,year):
        value[1] = 0.2435
        value[2] = 0.0480
 
+    # UL DeepJet T/M/L working points (BTV recommendations).
     elif(year == 20160):
-       value[0] = 0.6563
-       value[1] = 0.2435
-       value[2] = 0.0480
+       value = [0.6502, 0.2598, 0.0508]
     elif(year == 20161):
-       value[0] = 0.6563
-       value[1] = 0.2435
-       value[2] = 0.0480
+       value = [0.6377, 0.2489, 0.0480]
     elif(year == 20170):
-       value[0] = 0.6563
-       value[1] = 0.2435
-       value[2] = 0.0480
+       value = [0.7476, 0.3040, 0.0532]
     elif(year == 20180):
-       value[0] = 0.6563
-       value[1] = 0.2435
-       value[2] = 0.0480
+       value = [0.7100, 0.2783, 0.0490]
 
     return value[type]
 
@@ -154,22 +147,15 @@ def getBTagCut(type,year):
        value[1] = 0.1272
        value[2] = 0.0246
 
+    # Run 2 NanoAODv15 UParTAK4 T/M/L (UParTAK4_wp_values, CAT BTV Run2-*-UL-NanoAODv15)
     elif(year == 20160):
-       value[0] = 0.4648
-       value[1] = 0.1272
-       value[2] = 0.0246
+       value = [0.5467, 0.1847, 0.0387]
     elif(year == 20161):
-       value[0] = 0.4648
-       value[1] = 0.1272
-       value[2] = 0.0246
+       value = [0.5538, 0.1898, 0.0400]
     elif(year == 20170):
-       value[0] = 0.4648
-       value[1] = 0.1272
-       value[2] = 0.0246
+       value = [0.5755, 0.1776, 0.0331]
     elif(year == 20180):
-       value[0] = 0.4648
-       value[1] = 0.1272
-       value[2] = 0.0246
+       value = [0.5405, 0.1610, 0.0308]
 
     return value[type]
 
@@ -287,6 +273,11 @@ def makeJES(df,year,postFix,bTagSel,jetEtaCut,jetTypeCorr):
               .Define("vbs_etaj2{0}".format(postFix), "compute_jet_var(vbs_Jet_pt{0}, vbs_Jet_eta, vbs_Jet_phi, vbs_Jet_mass, 7)".format(postFix))
               .Define("vbs_phij1{0}".format(postFix), "compute_jet_var(vbs_Jet_pt{0}, vbs_Jet_eta, vbs_Jet_phi, vbs_Jet_mass, 8)".format(postFix))
               .Define("vbs_phij2{0}".format(postFix), "compute_jet_var(vbs_Jet_pt{0}, vbs_Jet_eta, vbs_Jet_phi, vbs_Jet_mass, 9)".format(postFix))
+              .Define("vbs_massj1{0}".format(postFix),"compute_jet_var(vbs_Jet_pt{0}, vbs_Jet_eta, vbs_Jet_phi, vbs_Jet_mass,10)".format(postFix))
+              .Define("vbs_massj2{0}".format(postFix),"compute_jet_var(vbs_Jet_pt{0}, vbs_Jet_eta, vbs_Jet_phi, vbs_Jet_mass,11)".format(postFix))
+              .Define("vbs_Jet_btagUnifiedParTB{0}".format(postFix), "clean_Jet_btagUnifiedParTB[vbs_jet{0}]".format(postFix))
+              .Define("vbs_btagj1{0}".format(postFix),"(int)vbs_Jet_btagUnifiedParTB{0}.size() > 0 ? vbs_Jet_btagUnifiedParTB{0}[0] : -1.f".format(postFix))
+              .Define("vbs_btagj2{0}".format(postFix),"(int)vbs_Jet_btagUnifiedParTB{0}.size() > 1 ? vbs_Jet_btagUnifiedParTB{0}[1] : -1.f".format(postFix))
 
               .Define("PuppiMET_pt{0}".format(postFitDef), "compute_JSON_MET_Unc(PuppiMET_pt,PuppiMET_phi,RawPuppiMET_pt,RawPuppiMET_phi,clean_Jet_chEmEF,clean_Jet_neEmEF,clean_Jet_muonSubtrFactor,clean_Jet_rawFactor,clean_Jet_pt{0},clean_Jet_pt{1},clean_Jet_eta,clean_Jet_phi,clean_Jet_mass,1)".format(postFitMet,postFitDef))
               .Define("PuppiMET_phi{0}".format(postFitDef),"compute_JSON_MET_Unc(PuppiMET_pt,PuppiMET_phi,RawPuppiMET_pt,RawPuppiMET_phi,clean_Jet_chEmEF,clean_Jet_neEmEF,clean_Jet_muonSubtrFactor,clean_Jet_rawFactor,clean_Jet_pt{0},clean_Jet_pt{1},clean_Jet_eta,clean_Jet_phi,clean_Jet_mass,2)".format(postFitMet,postFitDef))
@@ -308,10 +299,10 @@ def makeJES(df,year,postFix,bTagSel,jetEtaCut,jetTypeCorr):
 def selectionJetMet(df,year,bTagSel,isData,count,jetEtaCut):
 
     jetTypeCorr = -1
-    if(count > 1000): jetTypeCorr = count%10
+    if(isData == "true"): jetTypeCorr = count%10
     print("jetTypeCorr: {0}".format(jetTypeCorr))
 
-    BTAGName = "UParTAK4"
+    BTAGName = "UParTAK4" # Run 2 NanoAODv15 carries UParTAK4 as well
     if((year // 10) > 2021 and (year // 10) < 2024): BTAGName = "RobustParTAK4"
 
     JMEName0 = "Jet_chMultiplicity"
@@ -322,11 +313,20 @@ def selectionJetMet(df,year,bTagSel,isData,count,jetEtaCut):
         JMEName1 = "Jet_nElectrons" # dummy
         JMEName2 = "Jet_jetId"
 
+    # v9 lacks jet multiplicities. Use its stored UL tight/tight-lepton-veto
+    # bits instead of fabricating multiplicities for the v15 jet-ID evaluator.
+    if not df.HasColumn(JMEName0) or not df.HasColumn(JMEName1):
+        if not df.HasColumn("Jet_jetId"):
+            raise ValueError("WZ jets require multiplicities or legacy Jet_jetId")
+        df = (df.Define("jet_SelMask0", "(Jet_jetId & 2) != 0")
+                .Define("jet_SelMask1", "(Jet_jetId & 4) != 0"))
+    else:
+        df = (df.Define("jet_SelMask0", "cleaningJetSelMask(0,Jet_eta,Jet_chHEF,Jet_neHEF,Jet_chEmEF,Jet_neEmEF,Jet_muEF,{0},{1},{2},{3})".format(JMEName0,JMEName1,JMEName2,year))
+                .Define("jet_SelMask1", "cleaningJetSelMask(1,Jet_eta,Jet_chHEF,Jet_neHEF,Jet_chEmEF,Jet_neEmEF,Jet_muEF,{0},{1},{2},{3})".format(JMEName0,JMEName1,JMEName2,year)))
+
     dftag =(df.Define("jet_mask1", "cleaningMask(Muon_jetIdx[fake_mu],nJet)")
               .Define("jet_mask2", "cleaningMask(Electron_jetIdx[fake_el],nJet)")
               .Define("jet_VetoMapMask", "cleaningJetVetoMapMask(Jet_eta,Jet_phi,{0},{1})".format(jetTypeCorr,year))
-              .Define("jet_SelMask0", "cleaningJetSelMask(0,Jet_eta,Jet_chHEF,Jet_neHEF,Jet_chEmEF,Jet_neEmEF,Jet_muEF,{0},{1},{2},{3})".format(JMEName0,JMEName1,JMEName2,year))
-              .Define("jet_SelMask1", "cleaningJetSelMask(1,Jet_eta,Jet_chHEF,Jet_neHEF,Jet_chEmEF,Jet_neEmEF,Jet_muEF,{0},{1},{2},{3})".format(JMEName0,JMEName1,JMEName2,year))
               #.Define("clean_jet", "Jet_pt > 10 && jet_mask1 && jet_mask2 && jet_VetoMapMask > 0 && jet_SelMask0 && jet_SelMask1")
               .Define("clean_jet", "Jet_pt > 10 && jet_mask1 && jet_mask2 && jet_VetoMapMask > 0 && jet_SelMask0") # No Tight lepton veto
               .Define("clean_Jet_pt", "Jet_pt[clean_jet]")
@@ -617,7 +617,19 @@ def make3LVar(df,postFixMu,postFixEl):
               .Define("ptl2Z{0}".format(postFix),    "compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,13)".format(postFixMu,postFixEl))
               .Define("ptlW{0}".format(postFix),     "compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,14)".format(postFixMu,postFixEl))
               .Define("etalW{0}".format(postFix),"abs(compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,15))".format(postFixMu,postFixEl))
+              .Define("etalW_signed{0}".format(postFix),"compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,15)".format(postFixMu,postFixEl))
               .Define("mtW{0}".format(postFix),      "compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,16)".format(postFixMu,postFixEl))
+              .Define("etal1Z{0}".format(postFix),   "compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,17)".format(postFixMu,postFixEl))
+              .Define("etal2Z{0}".format(postFix),   "compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,18)".format(postFixMu,postFixEl))
+              .Define("phil1Z{0}".format(postFix),   "compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,19)".format(postFixMu,postFixEl))
+              .Define("phil2Z{0}".format(postFix),   "compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,20)".format(postFixMu,postFixEl))
+              .Define("massl1Z{0}".format(postFix),  "compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,21)".format(postFixMu,postFixEl))
+              .Define("massl2Z{0}".format(postFix),  "compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,22)".format(postFixMu,postFixEl))
+              .Define("philW{0}".format(postFix),    "compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,23)".format(postFixMu,postFixEl))
+              .Define("masslW{0}".format(postFix),   "compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,24)".format(postFixMu,postFixEl))
+              .Define("flavorl1Z{0}".format(postFix),"compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,25)".format(postFixMu,postFixEl))
+              .Define("flavorl2Z{0}".format(postFix),"compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,26)".format(postFixMu,postFixEl))
+              .Define("flavorlW{0}".format(postFix), "compute_3l_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,27)".format(postFixMu,postFixEl))
               .Define("mllZ{0}".format(postFix),     "abs(mll{0}-91.1876)".format(postFix))
               .Define("mllSSZ{0}".format(postFix),   "abs(mllSS{0}-91.1876)".format(postFix))
               .Define("ltype{0}".format(postFix),    "compute_nl_var(fake_Muon_pt{0}, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Muon_charge, fake_Electron_pt{1}, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, fake_Electron_charge, PuppiMET_ptDef, PuppiMET_phiDef,2)".format(postFixMu,postFixEl))
@@ -1050,6 +1062,8 @@ def selectionDAWeigths(df,year,PDType,whichAna,fakeRateSel):
 
 def selectionMCWeigths(df,year,PDType,weight,type,bTagSel,useBTaggingWeights,nTheoryReplicas,genEventSumLHEScaleRenorm,genEventSumPSRenorm,MUOWP,ELEWP,correctionString,whichAna,fakeRateSel):
 
+    hasPrefire = year <= 20180 and df.HasColumn("L1PreFiringWeight_Nom")
+
     hasTheoryColumnName = [True, True, True]
     theoryColumnName = ["PSWeight", "LHEScaleWeight", "LHEPdfWeight"]
     for x in range(len(theoryColumnName)):
@@ -1133,6 +1147,9 @@ def selectionMCWeigths(df,year,PDType,weight,type,bTagSel,useBTaggingWeights,nTh
 
               .Define("weightEWKCorr", "compute_EWKCorr(0,PDType,mjjGen)")
 
+              # L1 ECAL+muon prefiring (Run 2 MC only); its Up variation fills syst slot 127
+              .Define("weightL1Prefire", "L1PreFiringWeight_Nom" if hasPrefire else "1.0f")
+
               #.Define("weightPTWWCorr", "compute_PTWWCorr(0,PDType,ptww)")
               )
 
@@ -1140,7 +1157,7 @@ def selectionMCWeigths(df,year,PDType,weight,type,bTagSel,useBTaggingWeights,nTh
         if(useBTaggingWeights == 1):
             print("BtagCorr/AddCorr: 1/1")
             dftag = (dftag
-                     .Define("weight","weightMC*weightFake*weightWS*weightEWKCorr*weightBtagSF*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON*weightMuonSF*weightElectronSF")
+                     .Define("weight","weightMC*weightL1Prefire*weightFake*weightWS*weightEWKCorr*weightBtagSF*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON*weightMuonSF*weightElectronSF")
                      .Define("weightMuoCorr","weightMuoSFJSON*weightMuonSF")
                      .Define("weightEleCorr","weightEleSFJSON*weightElectronSF")
                      .Define("weightMuonTightSFUp"  ,"weight/weightMuonSF*compute_MuonSF(fake_Muon_pt,fake_Muon_eta,+1.0)")
@@ -1151,7 +1168,7 @@ def selectionMCWeigths(df,year,PDType,weight,type,bTagSel,useBTaggingWeights,nTh
         else:
             print("BtagCorr/AddCorr: 0/1")
             dftag = (dftag
-                     .Define("weight","weightMC*weightFake*weightWS*weightEWKCorr*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON*weightMuonSF*weightElectronSF")
+                     .Define("weight","weightMC*weightL1Prefire*weightFake*weightWS*weightEWKCorr*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON*weightMuonSF*weightElectronSF")
                      .Define("weightMuoCorr","weightMuoSFJSON*weightMuonSF")
                      .Define("weightEleCorr","weightEleSFJSON*weightElectronSF")
                      .Define("weightMuonTightSFUp"  ,"weight/weightMuonSF*compute_MuonSF(fake_Muon_pt,fake_Muon_eta,+1.0)")
@@ -1164,7 +1181,7 @@ def selectionMCWeigths(df,year,PDType,weight,type,bTagSel,useBTaggingWeights,nTh
         if(useBTaggingWeights == 1):
             print("BtagCorr/AddCorr: 1/0")
             dftag = (dftag
-                     .Define("weight","weightMC*weightFake*weightWS*weightEWKCorr*weightBtagSF*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON")
+                     .Define("weight","weightMC*weightL1Prefire*weightFake*weightWS*weightEWKCorr*weightBtagSF*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON")
                      .Define("weightMuoCorr","weightMuoSFJSON")
                      .Define("weightEleCorr","weightEleSFJSON")
                      .Define("weightMuonTightSFUp"  ,"weight")
@@ -1175,7 +1192,7 @@ def selectionMCWeigths(df,year,PDType,weight,type,bTagSel,useBTaggingWeights,nTh
         else:
             print("BtagCorr/AddCorr: 0/0")
             dftag = (dftag
-                     .Define("weight","weightMC*weightFake*weightWS*weightEWKCorr*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON")
+                     .Define("weight","weightMC*weightL1Prefire*weightFake*weightWS*weightEWKCorr*weightPURecoSF*weightTriggerSF*weightMuoSFJSON*weightEleSFJSON")
                      .Define("weightMuoCorr","weightMuoSFJSON")
                      .Define("weightEleCorr","weightEleSFJSON")
                      .Define("weightMuonTightSFUp"  ,"weight")
@@ -1186,16 +1203,18 @@ def selectionMCWeigths(df,year,PDType,weight,type,bTagSel,useBTaggingWeights,nTh
 
     if(useBTaggingWeights == 1):
         dftag = (dftag
-                 .Define("weightNoLepSF","weightMC*weightFake*weightWS*weightEWKCorr*weightBtagSF*weightPURecoSF*weightTriggerSF")
+                 .Define("weightNoLepSF","weightMC*weightL1Prefire*weightFake*weightWS*weightEWKCorr*weightBtagSF*weightPURecoSF*weightTriggerSF")
                  .Define("weightBTag","weight")
                  .Define("weightNoBTag","weight/weightBtagSF")
                 )
     else:
         dftag = (dftag
-                 .Define("weightNoLepSF","weightMC*weightFake*weightWS*weightEWKCorr*weightPURecoSF*weightTriggerSF")
+                 .Define("weightNoLepSF","weightMC*weightL1Prefire*weightFake*weightWS*weightEWKCorr*weightPURecoSF*weightTriggerSF")
                  .Define("weightBTag","weight*weightBtagSF")
                  .Define("weightNoBTag","weight")
                 )
+
+    dftag = dftag.Define("weightL1PrefireUp", "weight/weightL1Prefire*L1PreFiringWeight_Up" if hasPrefire else "weight")
 
     dftag =(dftag.Define("weight0","weight/weightBtagSF")
                  .Define("weight1","weight/weightPURecoSF")
@@ -1433,7 +1452,7 @@ def makeFinalVariable(df,var,theCat,start,x,bin,min,max,type):
     elif(type == 124): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weightBtagSFBC_01Up")
     elif(type == 125): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weightBtagSFLF_00Up")
     elif(type == 126): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weightBtagSFLF_01Up")
-    elif(type == 127): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weight")
+    elif(type == 127): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weightL1PrefireUp")
     elif(type == 128): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weight")
     elif(type == 129): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weight")
     elif(type == 130): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),bin,min,max), "{0}".format(var),"weight")
@@ -1477,7 +1496,7 @@ def makeFinalVariableVar(df,var,theCat,start,x,xBins,type):
     elif(type == 124): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weightBtagSFBC_01Up")
     elif(type == 125): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weightBtagSFLF_00Up")
     elif(type == 126): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weightBtagSFLF_01Up")
-    elif(type == 127): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weight")
+    elif(type == 127): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weightL1PrefireUp")
     elif(type == 128): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weight")
     elif(type == 129): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weight")
     elif(type == 130): return df.Histo1D(("histo_{0}_{1}".format(histoNumber,x), "histo_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins), "{0}".format(var),"weight")
@@ -1521,7 +1540,7 @@ def makeFinalVariable2D(df,varX,varY,theCat,start,x,binX,minX,maxX,binY,minY,max
     elif(type == 124): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weightBtagSFBC_01Up")
     elif(type == 125): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weightBtagSFLF_00Up")
     elif(type == 126): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weightBtagSFLF_01Up")
-    elif(type == 127): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weight")
+    elif(type == 127): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weightL1PrefireUp")
     elif(type == 128): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weight")
     elif(type == 129): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weight")
     elif(type == 130): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),binX,minX,maxX,binY,minY,maxY), "{0}".format(varX), "{0}".format(varY),"weight")
@@ -1565,7 +1584,7 @@ def makeFinalVariable2DVar(df,varX,varY,theCat,start,x,xBins,yBins,type):
     elif(type == 124): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weightBtagSFBC_01Up")
     elif(type == 125): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weightBtagSFLF_00Up")
     elif(type == 126): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weightBtagSFLF_01Up")
-    elif(type == 127): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weight")
+    elif(type == 127): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weightL1PrefireUp")
     elif(type == 128): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weight")
     elif(type == 129): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weight")
     elif(type == 130): return df.Histo2D(("histo2d_{0}_{1}".format(histoNumber,x), "histo2d_{0}_{1}".format(histoNumber,x),len(xBins)-1,xBins,len(yBins)-1,yBins), "{0}".format(varX), "{0}".format(varY),"weight")

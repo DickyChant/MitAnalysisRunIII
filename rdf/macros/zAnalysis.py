@@ -4,8 +4,9 @@ from array import array
 
 ROOT.ROOT.EnableImplicitMT(10)
 from utilsCategory import plotCategory
+from utilsNanoAOD import pruneWZTrigger, setTriggerFiles
 from utilsAna import getMClist, getDATAlist
-from utilsAna import SwitchSample, groupFiles, getTriggerFromJson, getPrunedTriggers, getLeptomSelFromJson, getLumi
+from utilsAna import SwitchSample, groupFiles, getTriggerFromJson, getLeptomSelFromJson, getLumi
 from utilsSelection import selectionTauVeto, selectionPhoton, selectionJetMet, selection2LVar, selectionTrigger2L, selectionElMu, selectionWeigths, selectionGenLepJet
 #from utilsAna import loadCorrectionSet
 
@@ -20,9 +21,7 @@ useFR = 0
 
 altMass = "Def"
 
-jetEtaCut = 4.7
-
-doNtuples = False
+jetEtaCut = 4.9
 
 selectionJsonPath = "config/selection.json"
 
@@ -144,18 +143,6 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
 
     xPtTrgbins = array('d', [25,30,35,40,45,50,55,60,65,70,75,80,90,105,120,150,200])
 
-    x1Bins01 = array('d', [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5])
-    x1Bins02 = array('d', [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5])
-    x1Bins03 = array('d', [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5])
-    x1Bins04 = array('d', [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5])
-    x1Bins05 = array('d', [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5])
-    x1Bins09 = array('d', [-0.5,0.5,1.5,2.5,3.5])
-    x1Bins20 = array('d', [500,700,900,1100,1300,1650,2000,2450,2900])
-    x1Bins21 = array('d', [20,50,80,110,140,180,220,280,340])
-    x1Bins22 = array('d', [1.5,2.5,3.5,4.5])
-    x1Bins23 = array('d', [2.5,3.0,3.6,4.0,4.5,5.0,5.5,6.0,7.0])
-    x1Bins24 = array('d', [0.0,0.9,1.8,2.1,2.5,2.7,2.9,3.0,3.1416])
-
     theCat = category
     if(theCat > 100): theCat = plotCategory("kPlotData")
 
@@ -214,58 +201,12 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
 
     ROOT.initJSONSFs(year)
 
-    branchList = ROOT.vector('string')()
-    for branchName in [
-            "eventNum",
-            "weight",
-            "theCat",
-            "ngood_jets",
-            "vbs_mjj",
-            "vbs_ptjj",
-            "vbs_detajj",
-            "vbs_dphijj",
-            "vbs_ptj1",
-            "vbs_ptj2",
-            "vbs_etaj1",
-            "vbs_etaj2",
-            "vbs_zepvv",
-            "vbs_zepmax",
-            "vbs_sumHT",
-            "vbs_ptvv",
-            "vbs_pttot",
-            "vbs_detavvj1",
-            "vbs_detavvj2",
-            "vbs_ptbalance",
-            "vbs_dphijjll",
-            "vbs_rpt",
-            "mll{0}".format(altMass),
-	    "ptll{0}".format(altMass),
-	    "drll{0}".format(altMass),
-	    "dphill{0}".format(altMass),
-	    "ptl1{0}".format(altMass),
-	    "ptl2{0}".format(altMass),
-	    "dPhilMETMin{0}".format(altMass),
-	    "minPMET{0}".format(altMass),
-	    "ptww{0}".format(altMass),
-	    "mcoll{0}".format(altMass),
-	    "mtwmax{0}".format(altMass),
-	    "mtwmin{0}".format(altMass),
-            "PuppiMET_ptDef"
-    ]:
-        branchList.push_back(branchName)
-
     overallTriggers = jsonObject['triggers']
-    TRIGGERMUEG = getTriggerFromJson(overallTriggers, "TRIGGERMUEG", year)
-    TRIGGERDMU  = getTriggerFromJson(overallTriggers, "TRIGGERDMU", year)
-    TRIGGERSMU  = getTriggerFromJson(overallTriggers, "TRIGGERSMU", year)
-    TRIGGERDEL  = getTriggerFromJson(overallTriggers, "TRIGGERDEL", year)
-    TRIGGERSEL  = getTriggerFromJson(overallTriggers, "TRIGGERSEL", year)
-
-    TRIGGERMUEG  = getPrunedTriggers(df,TRIGGERMUEG  )
-    TRIGGERDMU   = getPrunedTriggers(df,TRIGGERDMU   )
-    TRIGGERSMU   = getPrunedTriggers(df,TRIGGERSMU   )
-    TRIGGERDEL   = getPrunedTriggers(df,TRIGGERDEL   )
-    TRIGGERSEL   = getPrunedTriggers(df,TRIGGERSEL   )
+    TRIGGERMUEG = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERMUEG", year))
+    TRIGGERDMU  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERDMU", year))
+    TRIGGERSMU  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERSMU", year))
+    TRIGGERDEL  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERDEL", year))
+    TRIGGERSEL  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERSEL", year))
 
     list_TRIGGERMUEG = TRIGGERMUEG.split('(')[1].split(')')[0].split('||')
     list_TRIGGERDMU  = TRIGGERDMU .split('(')[1].split(')')[0].split('||')
@@ -300,8 +241,9 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
     xMllBins = array('d', [20,50,80,110,140,180,220,280,340])
     xNjetsBins = array('d', [1.5,2.5,3.5,4.5])
     xDetajjBins = array('d', [2.5,3.0,3.6,4.0,4.5,5.0,5.5,6.0,7.0])
-    VBSSELECTION = "(Sum(fake_Muon_charge)+Sum(fake_Electron_charge) == 0 && mll{0} > 20 && ptl1{0} > 25 && ptl2{0} > 20 && (DiLepton_flavor == 1 || abs(mll{0}-85.1876) > 20) && nbtag_goodbtag_Jet_bjet == 0 && nvbs_jets >= 2 && vbs_mjj > 500 && vbs_detajj > 2.5 && vbs_zepvv < 1.0 && PuppiMET_pt{0} > {1})".format(altMass,30)
-    XSELSELECTION = "(Sum(fake_Muon_charge)+Sum(fake_Electron_charge) == 0 && mll{0} > 15 && mll{0} < 70 && ptl1{0} > 25 && ptl2{0} > 18 && nbtag_good_Jet_bjet > 0 && ngood_jets >= 2)".format(altMass)
+    VBSSELECTION0 = "(DiLepton_flavor != 0 && Sum(fake_Muon_charge)+Sum(fake_Electron_charge) == 0 && mll{0} > 20 && ptl1{0} > 25 && ptl2{0} > 20 && (DiLepton_flavor != 2 || abs(mll{0}-85.1876) > 20) && nbtag_goodbtag_Jet_bjet == 0 && nvbs_jets >= 2 && vbs_mjj > 500 && vbs_detajj > 2.5 && vbs_zepvv < 1.0 && PuppiMET_pt{0} > {1})".format(altMass,30)
+    VBSSELECTION1 = "(DiLepton_flavor == 0 && Sum(fake_Muon_charge)+Sum(fake_Electron_charge) == 0 && mll{0} > 15 && ptl1{0} > 25 && ptl2{0} > 18 && nbtag_good_Jet_bjet != 0 && ngood_jets >= 2 && ngood_cen_jets >= 1 && mll{0} < 50)".format(altMass)
+    VBSSELECTION = "{0} || {1}".format(VBSSELECTION0,VBSSELECTION1)
 
     xMllMin = [91.1876-15, 91.1876-15, 91.1876-15]
     xMllMax = [91.1876+15, 91.1876+15, 91.1876+15]
@@ -309,7 +251,6 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
     dfzllcat = []
     dfjetcat = []
     dfvbscat = []
-    dfxselcat = []
     dfzgcat = []
     dfzemcat = []
     dfzmecat = []
@@ -324,13 +265,7 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
                                .Filter("{0} != kPlotEWKWZ || nGenJet_bParton == 0".format(theCat), "EWKWZ requirement")
                                .Define("theCat{0}".format(x), "compute_category({0},kPlotNonPrompt,kPlotWS,nFake,nTight,0)".format(theCat))
                                .Filter("theCat{0}=={1}".format(x,x), "correct category ({0})".format(x))
-                               .Define("theCat","theCat{0}".format(x))
                                )
-
-            dfxselcat.append(dfcat[3*x+ltype].Filter("{0}".format(XSELSELECTION),"XSEL selection")
-                                             .Define("ptOvermll" , "ptll{0}/mll{0}".format(altMass))
-                                             .Define("dphiJJLL", "compute_jet_lepton_var(good_Jet_pt, good_Jet_eta, good_Jet_phi, good_Jet_mass, fake_Muon_pt, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Electron_pt, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, PuppiMET_pt, PuppiMET_phi, 8)")
-	                    )
 
             dfvbscat.append(dfcat[3*x+ltype].Filter("{0}".format(VBSSELECTION),"VBS selection")
                                             .Define("weightWSEff0", "weight*compute_WSEfficiency(0,fake_Electron_pt,fake_Electron_eta)")
@@ -364,20 +299,19 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
                  histo[17][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(17,x), "histo_{0}_{1}".format(17,x), 20,  25, 125), "fake_Electron_pt","weight")
                  histo[18][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(18,x), "histo_{0}_{1}".format(18,x), 50, -2.5,2.5), "fake_Electron_eta","weight")
                  histo[19][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(19,x), "histo_{0}_{1}".format(19,x), 20, -2.5,2.5), "fake_Electron_eta","weight")
-            histo[ltype+20][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+20,x), "histo_{0}_{1}".format(ltype+20,x), 80,-0.5,79.5), "PV_npvsGood","weightPUSF_JSON")
             histo[ltype+24][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+24,x), "histo_{0}_{1}".format(ltype+24,x), 6,-0.5,5.5), "ngood_jets","weight")
             histo[ltype+27][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+27,x), "histo_{0}_{1}".format(ltype+27,x), 5,-0.5,4.5), "nbtag_goodbtag_Jet_bjet","weightBTag")
             histo[ltype+30][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+30,x), "histo_{0}_{1}".format(ltype+30,x), 80,-0.5,79.5), "PV_npvsGood","weight")
             histo[ltype+33][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+33,x), "histo_{0}_{1}".format(ltype+33,x), 100, 0, 200), "CaloMET_pt","weight")
-            if((year // 10) < 2024 and (year // 10) > 2021):
-                histo[ltype+39][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+39,x), "histo_{0}_{1}".format(ltype+39,x), 100, 0, 200), "MET_pt","weight")
+            if((year // 10) < 2024):
+                histo[ltype+39][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+39,x), "histo_{0}_{1}".format(ltype+39,x), 100, 0, 200), "MET_pt" if year > 20180 else "PuppiMET_pt","weight")
             else:
                 histo[ltype+39][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+39,x), "histo_{0}_{1}".format(ltype+39,x), 100, 0, 200), "PFMET_pt","weight")
             histo[ltype+42][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+42,x), "histo_{0}_{1}".format(ltype+42,x), 100, 0, 200), "PuppiMET_pt{0}".format(altMass),"weight")
             #histo[ltype+45][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+45,x), "histo_{0}_{1}".format(ltype+45,x), 100, 0, 200), "TkMET_pt","weight")
             histo[ltype+48][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+48,x), "histo_{0}_{1}".format(ltype+48,x), 80,-0.5,79.5), "Rho_fixedGridRhoFastjetAll","weight")
-            if((year // 10) < 2024 and (year // 10) > 2021):
-                histo[ltype+51][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+51,x), "histo_{0}_{1}".format(ltype+51,x), 100, -3.1416, 3.1416), "MET_phi","weight")
+            if((year // 10) < 2024):
+                histo[ltype+51][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+51,x), "histo_{0}_{1}".format(ltype+51,x), 100, -3.1416, 3.1416), "MET_phi" if year > 20180 else "PuppiMET_phi","weight")
             else:
                 histo[ltype+51][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+51,x), "histo_{0}_{1}".format(ltype+51,x), 100, -3.1416, 3.1416), "PFMET_phi","weight")
             histo[ltype+54][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+54,x), "histo_{0}_{1}".format(ltype+54,x), 100, -3.1416, 3.1416), "PuppiMET_phi{0}".format(altMass),"weight")
@@ -485,29 +419,37 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
                                                       .Define("finalVar22", "compute_jet_lepton_final_var(vbs_mjj,vbs_detajj,vbs_dphijj,0.0,0.0,mll{0},ngood_jets,{1})".format(altMass,22))
                                                       .Define("finalVar23", "compute_jet_lepton_final_var(vbs_mjj,vbs_detajj,vbs_dphijj,0.0,0.0,mll{0},ngood_jets,{1})".format(altMass,23))
                                                       .Define("finalVar24", "compute_jet_lepton_final_var(vbs_mjj,vbs_detajj,vbs_dphijj,0.0,0.0,mll{0},ngood_jets,{1})".format(altMass,24))
+                                                      .Define("ptOvermll" , "ptll{0}/mll{0}".format(altMass))
+                                                      .Define("dphiJJLL", "compute_jet_lepton_var(good_Jet_pt, good_Jet_eta, good_Jet_phi, good_Jet_mass, fake_Muon_pt, fake_Muon_eta, fake_Muon_phi, fake_Muon_mass, fake_Electron_pt, fake_Electron_eta, fake_Electron_phi, fake_Electron_mass, PuppiMET_pt, PuppiMET_phi, 8)")
                                                      )
 
-            if(doNtuples == True and x == theCat):
-                outputFile = "ntupleZAna_sample{0}_ltype{1}_year{2}_job{3}.root".format(count,ltype,year,whichJob)
-                dfvbscat[3*x+ltype] = dfvbscat[3*x+ltype].Define("eventNum", "event")
-                dfvbscat[3*x+ltype].Snapshot("events", outputFile, branchList)
-
+            x1Bins01 = array('d', [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5])
+            x1Bins02 = array('d', [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5])
+            x1Bins03 = array('d', [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5])
+            x1Bins04 = array('d', [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5])
+            x1Bins05 = array('d', [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5])
+            x1Bins09 = array('d', [-0.5,0.5,1.5,2.5,3.5])
+            x1Bins20 = array('d', [500,700,900,1100,1300,1650,2000,2450,2900])
+            x1Bins21 = array('d', [20,50,80,110,140,180,220,280,340])
+            x1Bins22 = array('d', [1.5,2.5,3.5,4.5])
+            x1Bins23 = array('d', [2.5,3.0,3.6,4.0,4.5,5.0,5.5,6.0,7.0])
+            x1Bins24 = array('d', [0.0,0.9,1.8,2.1,2.5,2.7,2.9,3.0,3.1416])
             if(ltype == 0):
-                histo[163][x] = dfxselcat[3*x+ltype]                                                                        .Histo1D(("histo_{0}_{1}".format(163,x), "histo_{0}_{1}".format(163,x), 40, 0.0, 4.0), "ptOvermll","weight")
-                histo[164][x] = dfxselcat[3*x+ltype]                                                                        .Histo1D(("histo_{0}_{1}".format(164,x), "histo_{0}_{1}".format(164,x), 55, 15, 70), "mll{0}".format(altMass),"weight")
-                histo[165][x] = dfxselcat[3*x+ltype].Filter("                                              ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(165,x), "histo_{0}_{1}".format(165,x), 55, 15, 70), "mll{0}".format(altMass),"weight")
-                histo[166][x] = dfxselcat[3*x+ltype].Filter("ngood_cen_jets == 1 && ngood_fwd_jets >= 1")                   .Histo1D(("histo_{0}_{1}".format(166,x), "histo_{0}_{1}".format(166,x), 55, 15, 70), "mll{0}".format(altMass),"weight")
-                histo[167][x] = dfxselcat[3*x+ltype].Filter("ngood_cen_jets == 2 && ngood_fwd_jets == 0")                   .Histo1D(("histo_{0}_{1}".format(167,x), "histo_{0}_{1}".format(167,x), 55, 15, 70), "mll{0}".format(altMass),"weight")
-                histo[168][x] = dfxselcat[3*x+ltype].Filter("ngood_cen_jets == 2 && ngood_fwd_jets >= 1")                   .Histo1D(("histo_{0}_{1}".format(168,x), "histo_{0}_{1}".format(168,x), 55, 15, 70), "mll{0}".format(altMass),"weight")
-                histo[169][x] = dfxselcat[3*x+ltype].Filter("ngood_cen_jets == 1 && ngood_fwd_jets >= 1 && ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(169,x), "histo_{0}_{1}".format(169,x), 55, 15, 70), "mll{0}".format(altMass),"weight")
-                histo[170][x] = dfxselcat[3*x+ltype].Filter("ngood_cen_jets == 2 && ngood_fwd_jets == 0 && ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(170,x), "histo_{0}_{1}".format(170,x), 55, 15, 70), "mll{0}".format(altMass),"weight")
-                histo[171][x] = dfxselcat[3*x+ltype].Filter("ngood_cen_jets == 2 && ngood_fwd_jets >= 1 && ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(171,x), "histo_{0}_{1}".format(171,x), 55, 15, 70), "mll{0}".format(altMass),"weight")
-                histo[172][x] = dfxselcat[3*x+ltype].Filter("ngood_cen_jets == 2 && ngood_fwd_jets == 0 && ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(172,x), "histo_{0}_{1}".format(172,x), 16, 0, 3.2), "dphiJJLL".format(altMass),"weight")
-                histo[173][x] = dfxselcat[3*x+ltype].Filter("                                              ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(173,x), "histo_{0}_{1}".format(173,x), 3, 1.5, 4.5), "ngood_jets".format(altMass),"weight")
-                histo[174][x] = dfxselcat[3*x+ltype].Filter("                                              ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(174,x), "histo_{0}_{1}".format(174,x), 3, 0.5, 3.5), "ngood_cen_jets".format(altMass),"weight")
-                histo[175][x] = dfxselcat[3*x+ltype].Filter("                                              ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(175,x), "histo_{0}_{1}".format(175,x), 3, -0.5, 2.5), "ngood_fwd_jets".format(altMass),"weight")
-                histo[176][x] = dfxselcat[3*x+ltype].Filter("                                              ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(176,x), "histo_{0}_{1}".format(176,x), 3, 0.5, 3.5), "nbtag_good_Jet_bjet".format(altMass),"weight")
-                histo[177][x] = dfxselcat[3*x+ltype].Filter("ngood_cen_jets == 2 && ngood_fwd_jets == 0 && ptOvermll > 1.7 && dphiJJLL < 1.0").Histo1D(("histo_{0}_{1}".format(177,x), "histo_{0}_{1}".format(177,x), 55, 15, 70), "mll{0}".format(altMass),"weight")
+                histo[163][x] = dfvbscat[3*x+ltype]                                                                        .Histo1D(("histo_{0}_{1}".format(163,x), "histo_{0}_{1}".format(163,x), 40, 0.0, 4.0), "ptOvermll","weight")
+                histo[164][x] = dfvbscat[3*x+ltype]                                                                        .Histo1D(("histo_{0}_{1}".format(164,x), "histo_{0}_{1}".format(164,x), 35, 15, 50), "mll{0}".format(altMass),"weight")
+                histo[165][x] = dfvbscat[3*x+ltype].Filter("                                              ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(165,x), "histo_{0}_{1}".format(165,x), 35, 15, 50), "mll{0}".format(altMass),"weight")
+                histo[166][x] = dfvbscat[3*x+ltype].Filter("ngood_cen_jets == 1 && ngood_fwd_jets >= 1")                   .Histo1D(("histo_{0}_{1}".format(166,x), "histo_{0}_{1}".format(166,x), 35, 15, 50), "mll{0}".format(altMass),"weight")
+                histo[167][x] = dfvbscat[3*x+ltype].Filter("ngood_cen_jets == 2 && ngood_fwd_jets == 0")                   .Histo1D(("histo_{0}_{1}".format(167,x), "histo_{0}_{1}".format(167,x), 35, 15, 50), "mll{0}".format(altMass),"weight")
+                histo[168][x] = dfvbscat[3*x+ltype].Filter("ngood_cen_jets == 2 && ngood_fwd_jets >= 1")                   .Histo1D(("histo_{0}_{1}".format(168,x), "histo_{0}_{1}".format(168,x), 35, 15, 50), "mll{0}".format(altMass),"weight")
+                histo[169][x] = dfvbscat[3*x+ltype].Filter("ngood_cen_jets == 1 && ngood_fwd_jets >= 1 && ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(169,x), "histo_{0}_{1}".format(169,x), 35, 15, 50), "mll{0}".format(altMass),"weight")
+                histo[170][x] = dfvbscat[3*x+ltype].Filter("ngood_cen_jets == 2 && ngood_fwd_jets == 0 && ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(170,x), "histo_{0}_{1}".format(170,x), 35, 15, 50), "mll{0}".format(altMass),"weight")
+                histo[171][x] = dfvbscat[3*x+ltype].Filter("ngood_cen_jets == 2 && ngood_fwd_jets >= 1 && ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(171,x), "histo_{0}_{1}".format(171,x), 35, 15, 50), "mll{0}".format(altMass),"weight")
+                histo[172][x] = dfvbscat[3*x+ltype].Filter("ngood_cen_jets == 2 && ngood_fwd_jets == 0 && ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(172,x), "histo_{0}_{1}".format(172,x), 16, 0, 3.2), "dphiJJLL".format(altMass),"weight")
+                histo[173][x] = dfvbscat[3*x+ltype].Filter("                                              ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(173,x), "histo_{0}_{1}".format(173,x), 3, 1.5, 4.5), "ngood_jets".format(altMass),"weight")
+                histo[174][x] = dfvbscat[3*x+ltype].Filter("                                              ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(174,x), "histo_{0}_{1}".format(174,x), 3, 0.5, 3.5), "ngood_cen_jets".format(altMass),"weight")
+                histo[175][x] = dfvbscat[3*x+ltype].Filter("                                              ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(175,x), "histo_{0}_{1}".format(175,x), 3, -0.5, 2.5), "ngood_fwd_jets".format(altMass),"weight")
+                histo[176][x] = dfvbscat[3*x+ltype].Filter("                                              ptOvermll > 1.7").Histo1D(("histo_{0}_{1}".format(176,x), "histo_{0}_{1}".format(176,x), 3, 0.5, 3.5), "nbtag_good_Jet_bjet".format(altMass),"weight")
+                histo[177][x] = dfvbscat[3*x+ltype].Filter("ngood_cen_jets == 2 && ngood_fwd_jets == 0 && ptOvermll > 1.7 && dphiJJLL < 1.0").Histo1D(("histo_{0}_{1}".format(177,x), "histo_{0}_{1}".format(177,x), 35, 15, 50), "mll{0}".format(altMass),"weight")
             elif(ltype == 1 or ltype == 2):
                 # eta
                 histo[178+ltype-1][x] = dfvbscat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(178+ltype-1,x), "histo_{0}_{1}".format(178+ltype-1,x), len(x1Bins01)-1, x1Bins01), "finalVar01","weightWSEff0")
@@ -723,6 +665,11 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
                 histo2D[38][x] = dfzllcat[3*x+ltype].Filter("tight_el7[1] == true").Histo2D(("histo2d_{0}_{1}".format(38, x), "histo2d_{0}_{1}".format(38, x), len(xEtaBins)-1, xEtaBins, len(xPtBins)-1, xPtBins), "etae2", "pte2","weight")
                 histo2D[39][x] = dfzllcat[3*x+ltype].Filter("tight_el8[1] == true").Histo2D(("histo2d_{0}_{1}".format(39, x), "histo2d_{0}_{1}".format(39, x), len(xEtaBins)-1, xEtaBins, len(xPtBins)-1, xPtBins), "etae2", "pte2","weight")
 
+            dfzllcat[3*x+ltype] = dfzllcat[3*x+ltype].Filter("ptl1 > 25 && ptl2 > 25")
+            histo[ltype+300][x] = dfzllcat[3*x+ltype].Histo1D(("histo_{0}_{1}".format(ltype+300,x), "histo_{0}_{1}".format(ltype+300,x), 20, 25, 125), "ptl2","weight")
+            for nTrg in range(len(list_TRIGGER)):
+                histo[3*nTrg+ltype+303][x] = dfzllcat[3*x+ltype].Filter("{0} > 0".format(list_TRIGGER[nTrg])).Histo1D(("histo_{0}_{1}".format(3*nTrg+ltype+303,x), "histo_{0}_{1}".format(3*nTrg+ltype+303,x), 20, 25, 125), "ptl2","weight")
+
     report = []
     for x in range(nCat):
         for ltype in range(3):
@@ -846,6 +793,7 @@ def readMCSample(sampleNOW,year,skimType,whichJob,group,wsWeights,puWeights,hist
             return 0
         print("Used files: {0}".format(len(files)))
 
+    setTriggerFiles(files)
     df = ROOT.RDataFrame("Events", files)
     nevents = df.Count().GetValue()
 
@@ -862,8 +810,8 @@ def readDASample(sampleNOW,year,skimType,whichJob,group,wsWeights,puWeights,hist
     if  (sampleNOW >= 1000 and sampleNOW <= 1009): PDType = "SingleMuon"
     elif(sampleNOW >= 1010 and sampleNOW <= 1019): PDType = "DoubleMuon"
     elif(sampleNOW >= 1020 and sampleNOW <= 1029): PDType = "MuonEG"
-    elif(sampleNOW >= 1030 and sampleNOW <= 1039): PDType = "EGamma"
-    elif(sampleNOW >= 1040 and sampleNOW <= 1049): PDType = "Muon"
+    elif(sampleNOW >= 1030 and sampleNOW <= 1039): PDType = "DoubleEG" if year // 10 in (2016, 2017) else "EGamma"
+    elif(sampleNOW >= 1040 and sampleNOW <= 1049): PDType = "SingleElectron" if year // 10 in (2016, 2017) else "Muon"
     elif(sampleNOW >= 1050 and sampleNOW <= 1059): PDType = "MET"
 
     files = getDATAlist(sampleNOW, year, skimType)
@@ -877,6 +825,7 @@ def readDASample(sampleNOW,year,skimType,whichJob,group,wsWeights,puWeights,hist
             return 0
         print("Used files: {0}".format(len(files)))
 
+    setTriggerFiles(files)
     df = ROOT.RDataFrame("Events", files)
 
     genEventSumLHEScaleRenorm = [1, 1, 1, 1, 1, 1]

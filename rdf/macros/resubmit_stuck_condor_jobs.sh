@@ -1,9 +1,21 @@
 #!/bin/sh
 
-rm -f ceballos.txt;
-wget --no-check-certificate https://submit.mit.edu/condormon/jobs/ceballos.txt;
+# Re-run stuck/failed jobs interactively
+# Usage: Inspect condor_q output, then re-run failed jobs manually
+#
+# To find failed jobs:
+#   grep FAILED logs/*.error
+#   grep -L DONE logs/*.out
+#
+# To re-run a specific job interactively:
+#   python3 wzAnalysis.py --process=179 --year=20220 --whichJob=0
 
-grep Running ceballos.txt|awk '{print"nohup ./analysis_slurm.sh "$6" "$7" "$8" "$9" "$10" >& log_"NR"&"}' > lll;
-chmod a+x lll;./lll;rm -f lll;
-
-rm -f ceballos.txt;
+echo "Check for failed jobs with:"
+echo "  grep FAILED logs/*.out"
+echo "  grep -L DONE logs/*.out"
+echo ""
+echo "Re-run failed jobs interactively with:"
+echo "  python3 <analysis>.py --process=<sample> --year=<year> --whichJob=<job>"
+echo ""
+echo "Or resubmit via condor:"
+echo "  ./submit_condor.sh <anaCode> [condorJob] [group]"

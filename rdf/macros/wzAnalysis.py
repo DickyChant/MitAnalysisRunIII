@@ -1,13 +1,21 @@
+"""Run WZ analysis from rdf/macros/ with ROOT and correctionlib:
+
+python3 wzAnalysis.py --process=802 --year=20160 --whichJob=-1
+
+For direct NanoAOD input set USE_DIRECT_NANOAOD=1 and FILELIST_DIR first;
+see crab/README.md for Run 2 datasets, v9 compatibility and calibration caveats.
+"""
 import ROOT
 import os, sys, getopt, json
 from array import array
 
 ROOT.ROOT.EnableImplicitMT(4)
 from utilsCategory import plotCategory
-from utilsAna import getMClist, getDATAlist
+from utilsAna import getMClist, getMCnormList, getDATAlist, readRunsSums
 from utilsAna import SwitchSample, groupFiles, getTriggerFromJson, getLeptomSelFromJson, getLumi
 from utilsSelection import selectionTauVeto, selectionPhoton, selectionJetMet, selection3LVar, selectionLGVar, selectionTrigger2L, selectionElMu, selectionWeigths, selectionGenLepJet, makeFinalVariableVar, makeFinalVariable2DVar
 from utilsMVA import redefineVBSIncMVAVariables
+from utilsNanoAOD import prepareWZNanoAOD, hasLegacyLeptonMVA, pruneWZTrigger, setTriggerFiles
 import tmva_helper_xml
 
 makeDataCards = 4 # 1 (njets), 2-1006 (lepton flavor), 3-1002 (3D), 4-1001 (BDT 2D), 5-1003 (BDT 1D), 6-1004 (mjj), 7-1005 (mjj diff)
@@ -73,21 +81,26 @@ elif(elSelChoice == 9):
 
 def selectionLL(df,year,PDType,isData,count):
 
+    # Legacy mvaTTH scores need their existing version-12 selection thresholds.
+    # Do not apply v15 promptMVA thresholds to a differently trained classifier.
+    leptonVersion = 12 if year < 20200 and hasLegacyLeptonMVA(df) else None
+    df = prepareWZNanoAOD(df, year)
+
     overallTriggers = jsonObject['triggers']
-    TRIGGERMUEG = getTriggerFromJson(overallTriggers, "TRIGGERMUEG", year)
-    TRIGGERDMU  = getTriggerFromJson(overallTriggers, "TRIGGERDMU", year)
-    TRIGGERSMU  = getTriggerFromJson(overallTriggers, "TRIGGERSMU", year)
-    TRIGGERDEL  = getTriggerFromJson(overallTriggers, "TRIGGERDEL", year)
-    TRIGGERSEL  = getTriggerFromJson(overallTriggers, "TRIGGERSEL", year)
+    TRIGGERMUEG = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERMUEG", year))
+    TRIGGERDMU  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERDMU", year))
+    TRIGGERSMU  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERSMU", year))
+    TRIGGERDEL  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERDEL", year))
+    TRIGGERSEL  = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERSEL", year))
 
     dftag = selectionTrigger2L(df,year,PDType,JSON,isData,TRIGGERSEL,TRIGGERDEL,TRIGGERSMU,TRIGGERDMU,TRIGGERMUEG)
 
     overallLeptonSel = jsonObject['leptonSel']
-    FAKE_MU   = getLeptomSelFromJson(overallLeptonSel, "FAKE_MU",   year)
-    TIGHT_MU  = getLeptomSelFromJson(overallLeptonSel, "TIGHT_MU{0}".format(muSelChoice),  year, 1)
+    FAKE_MU   = getLeptomSelFromJson(overallLeptonSel, "FAKE_MU",   year, version=leptonVersion)
+    TIGHT_MU  = getLeptomSelFromJson(overallLeptonSel, "TIGHT_MU{0}".format(muSelChoice),  year, 1, version=leptonVersion)
 
-    FAKE_EL   = getLeptomSelFromJson(overallLeptonSel, "FAKE_EL",   year)
-    TIGHT_EL  = getLeptomSelFromJson(overallLeptonSel, "TIGHT_EL{0}".format(elSelChoice),  year, 1)
+    FAKE_EL   = getLeptomSelFromJson(overallLeptonSel, "FAKE_EL",   year, version=leptonVersion)
+    TIGHT_EL  = getLeptomSelFromJson(overallLeptonSel, "TIGHT_EL{0}".format(elSelChoice),  year, 1, version=leptonVersion)
 
     dftag = selectionElMu(dftag,year,FAKE_MU,TIGHT_MU,FAKE_EL,TIGHT_EL)
 
@@ -178,10 +191,13 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
 
     branchList = ROOT.vector('string')()
     for branchName in [
+            "run",
+            "luminosityBlock",
             "eventNum",
             "weight",
             "theCat",
             "ngood_jets",
+            # VBS kinematic variables
             "vbs_mjj",
             "vbs_ptjj",
             "vbs_detajj",
@@ -190,6 +206,12 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
             "vbs_ptj2",
             "vbs_etaj1",
             "vbs_etaj2",
+            "vbs_phij1",
+            "vbs_phij2",
+            "vbs_massj1",
+            "vbs_massj2",
+            "vbs_btagj1",
+            "vbs_btagj2",
             "vbs_zepvv",
             "vbs_zepmax",
             "vbs_sumHT",
@@ -198,24 +220,46 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
             "vbs_detavvj1",
             "vbs_detavvj2",
             "vbs_ptbalance",
+            # Z lepton p4 and flavor (0=mu, 1=el)
+            "ptl1Z",
+            "etal1Z",
+            "phil1Z",
+            "massl1Z",
+            "flavorl1Z",
+            "ptl2Z",
+            "etal2Z",
+            "phil2Z",
+            "massl2Z",
+            "flavorl2Z",
+            # W lepton p4 and flavor
+            "ptlW",
+            "etalW_signed",
+            "philW",
+            "masslW",
+            "flavorlW",
+            # MET
+            "PuppiMET_ptDef",
+            "PuppiMET_phiDef",
+            # Additional lepton/mass variables
+            "mll",
+            "m3l",
+            "mtW",
+            "TriLepton_flavor",
             "vbs_dphijjll",
-            "vbs_rpt"
+            "vbs_rpt",
     ]:
         branchList.push_back(branchName)
-
-    #ROOT.gInterpreter.ProcessLine('''
-    #TMVA::Experimental::RReader model("weights_mva/bdt_BDTG_vbfinc_v0.weights.xml");
-    #computeModel = TMVA::Experimental::Compute<15, float>(model);
-    #''')
-    #variables = ROOT.model.GetVariableNames()
-    #print(variables)
 
     MVAweights = "weights_mva/bdt_BDTG_vbfinc_pcut50_nsel0_v0.weights.xml"
     #MVAweights = "weights_mva/bdt_BDTG_vbfinc_pcut50_nsel1_v0.weights.xml"
     #MVAweights = "weights_mva/bdt_BDTG_vbfinc_pcut30_nsel0_v0.weights.xml"
     #MVAweights = "weights_mva/bdt_BDTG_vbfinc_pcut30_nsel1_v0.weights.xml"
-    tmva_helper = tmva_helper_xml.TMVAHelperXML(MVAweights)
-    print(tmva_helper.variables)
+    tmva_helper = None
+    if(os.path.exists(MVAweights) and doNtuples == False):
+        tmva_helper = tmva_helper_xml.TMVAHelperXML(MVAweights)
+        print(tmva_helper.variables)
+    else:
+        print("MVA weights not found or doNtuples mode - skipping BDT inference")
 
     dftag = selectionLL(df,year,PDType,isData,count)
 
@@ -236,7 +280,10 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
                     .Define("theCat","compute_category({0},kPlotNonPrompt,kPlotWS,nFake,nTight,0)".format(theCat))
                     )
 
-    dfbase = tmva_helper.run_inference(dfbase,"bdt_vbfinc",0)
+    if(tmva_helper is not None):
+        dfbase = tmva_helper.run_inference(dfbase,"bdt_vbfinc",0)
+    else:
+        dfbase = dfbase.Define("bdt_vbfinc", "ROOT::VecOps::RVec<float>{0.0f}")
 
     dfwzcatMuonMomUp        = []
     dfwzcatElectronMomUp    = []
@@ -1404,40 +1451,8 @@ def readMCSample(sampleNOW,year,skimType,whichJob,group,ewkCorrWeights,wsWeights
     genEventSumLHEScaleWeight = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     genEventSumPSWeight = [0, 0, 0, 0, 0]
 
-    dfRuns = ROOT.RDataFrame("Runs", files)
-    genEventSumWeight = dfRuns.Sum("genEventSumw").GetValue()
-    genEventSumNoWeight = dfRuns.Sum("genEventCount").GetValue()
-    try:
-        if(dfRuns.Min("nLHEPdfSumw").GetValue() < nTheoryReplicas[0]):
-            nTheoryReplicas[0] = int(dfRuns.Min("nLHEPdfSumw").GetValue())
-    except Exception as e:
-        nTheoryReplicas[0] = 0
-    for n in range(9):
-        try:
-            if(dfRuns.Min("nLHEScaleSumw").GetValue() > n):
-                dfRuns = dfRuns.Define("genEventSumLHEScaleWeight{0}".format(n),"LHEScaleSumw[{0}]".format(n))
-                genEventSumLHEScaleWeight[n] = dfRuns.Sum("genEventSumLHEScaleWeight{0}".format(n)).GetValue()
-            else:
-                genEventSumLHEScaleWeight[n] = dfRuns.Count().GetValue()
-                nTheoryReplicas[1] = int(dfRuns.Min("nLHEScaleSumw").GetValue())
-        except Exception as e:
-            genEventSumLHEScaleWeight[n] = dfRuns.Count().GetValue()
-            nTheoryReplicas[1] = n
-            print("Problem with LHEScaleWeights {0}".format(e))
-    for n in range(4):
-        try:
-            if(dfRuns.Min("nPSSumw").GetValue() > n):
-                dfRuns = dfRuns.Define("genEventSumPSWeight{0}".format(n),"PSSumw[{0}]".format(n))
-                genEventSumPSWeight[n] = dfRuns.Sum("genEventSumPSWeight{0}".format(n)).GetValue()
-            else:
-                genEventSumPSWeight[n] = dfRuns.Count().GetValue()
-                nTheoryReplicas[2] = int(dfRuns.Min("nPSSumw").GetValue())
-        except Exception as e:
-            genEventSumPSWeight[n] = dfRuns.Count().GetValue()
-            nTheoryReplicas[2] = n
-            print("Problem with PSWeights {0}".format(e))
-    genEventSumPSWeight[4] = dfRuns.Count().GetValue()
-    runGetEntries = dfRuns.Count().GetValue()
+    genEventSumWeight, genEventSumNoWeight, genEventSumLHEScaleWeight, genEventSumPSWeight, runGetEntries = \
+        readRunsSums(getMCnormList(files), nTheoryReplicas)
 
     print("Number of Theory replicas: {0} / {1} / {2}".format(nTheoryReplicas[0],nTheoryReplicas[1],nTheoryReplicas[2]))
 
@@ -1468,6 +1483,7 @@ def readMCSample(sampleNOW,year,skimType,whichJob,group,ewkCorrWeights,wsWeights
             return 0
         print("Used files: {0}".format(len(files)))
 
+    setTriggerFiles(files)
     df = ROOT.RDataFrame("Events", files)
     nevents = df.Count().GetValue()
 
@@ -1484,8 +1500,8 @@ def readDASample(sampleNOW,year,skimType,whichJob,group,ewkCorrWeights,wsWeights
     if  (sampleNOW >= 1000 and sampleNOW <= 1009): PDType = "SingleMuon"
     elif(sampleNOW >= 1010 and sampleNOW <= 1019): PDType = "DoubleMuon"
     elif(sampleNOW >= 1020 and sampleNOW <= 1029): PDType = "MuonEG"
-    elif(sampleNOW >= 1030 and sampleNOW <= 1039): PDType = "EGamma"
-    elif(sampleNOW >= 1040 and sampleNOW <= 1049): PDType = "Muon"
+    elif(sampleNOW >= 1030 and sampleNOW <= 1039): PDType = "DoubleEG" if year // 10 in (2016, 2017) else "EGamma"
+    elif(sampleNOW >= 1040 and sampleNOW <= 1049): PDType = "SingleElectron" if year // 10 in (2016, 2017) else "Muon"
     elif(sampleNOW >= 1050 and sampleNOW <= 1059): PDType = "MET"
 
     files = getDATAlist(sampleNOW, year, skimType)
@@ -1499,6 +1515,7 @@ def readDASample(sampleNOW,year,skimType,whichJob,group,ewkCorrWeights,wsWeights
             return 0
         print("Used files: {0}".format(len(files)))
 
+    setTriggerFiles(files)
     df = ROOT.RDataFrame("Events", files)
 
     genEventSumLHEScaleRenorm = [1, 1, 1, 1, 1, 1]

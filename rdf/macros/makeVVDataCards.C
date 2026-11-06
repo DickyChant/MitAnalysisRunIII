@@ -27,7 +27,16 @@ void makeVVDataCards(int whichAna = 0, int fidAna = 0, TString InputDir = "anaZ"
   TString theTagYear = "NULL";
   double triggerEffUnc = 1.000;
   double lumiU[4] = {1.000, 1.000, 1.000, 1.000};
-  if     (year == 20220) {triggerEffUnc = 1.005; lumiU[0] = 1.0138; lumiU[1] = 1.0000; lumiU[2] = 1.0000; lumiU[3] = 1.0000; theYear = 2022; theTagYear = "2022";}
+  // Run 3: lumi_13p6TeV_<n>. Run 2 (UL, LUM-17-003/18-002/19-001): uncorrelated per year,
+  // correlated 2016-2018 and correlated 2017-2018 components.
+  TString lumiNames[4] = {"lumi_13p6TeV_0", "lumi_13p6TeV_1", "lumi_13p6TeV_2", "lumi_13p6TeV_3"};
+  if     (year == 20160 || year == 20161) {triggerEffUnc = 1.005; lumiU[0] = 1.010; lumiU[1] = 1.006; lumiU[2] = 1.000; theYear = 2016; theTagYear = year == 20160 ? "2016preVFP" : "2016postVFP";
+                                           lumiNames[0] = "lumi_13TeV_2016"; lumiNames[1] = "lumi_13TeV_correlated";}
+  else if(year == 20170) {triggerEffUnc = 1.005; lumiU[0] = 1.020; lumiU[1] = 1.009; lumiU[2] = 1.006; theYear = 2017; theTagYear = "2017";
+                          lumiNames[0] = "lumi_13TeV_2017"; lumiNames[1] = "lumi_13TeV_correlated"; lumiNames[2] = "lumi_13TeV_1718";}
+  else if(year == 20180) {triggerEffUnc = 1.005; lumiU[0] = 1.015; lumiU[1] = 1.020; lumiU[2] = 1.002; theYear = 2018; theTagYear = "2018";
+                          lumiNames[0] = "lumi_13TeV_2018"; lumiNames[1] = "lumi_13TeV_correlated"; lumiNames[2] = "lumi_13TeV_1718";}
+  else if(year == 20220) {triggerEffUnc = 1.005; lumiU[0] = 1.0138; lumiU[1] = 1.0000; lumiU[2] = 1.0000; lumiU[3] = 1.0000; theYear = 2022; theTagYear = "2022";}
   else if(year == 20221) {triggerEffUnc = 1.005; lumiU[0] = 1.0138; lumiU[1] = 1.0000; lumiU[2] = 1.0000; lumiU[3] = 1.0000; theYear = 2022; theTagYear = "2022EE";}
   else if(year ==  2022) {triggerEffUnc = 1.005; lumiU[0] = 1.0138; lumiU[1] = 1.0000; lumiU[2] = 1.0000; lumiU[3] = 1.0000; theYear = 2022; theTagYear = "2022";}
   else if(year == 20230) {triggerEffUnc = 1.005; lumiU[0] = 1.0017; lumiU[1] = 1.0127; lumiU[2] = 1.0000; lumiU[3] = 1.0000; theYear = 2023; theTagYear = "2023";}
@@ -102,8 +111,8 @@ void makeVVDataCards(int whichAna = 0, int fidAna = 0, TString InputDir = "anaZ"
   nameSyst[23 ] = Form("%sDown",BtagSFNames[ 2].Data());
   nameSyst[24 ] = Form("%sUp"  ,BtagSFNames[ 3].Data());
   nameSyst[25 ] = Form("%sDown",BtagSFNames[ 3].Data());
-  nameSyst[26 ] = "dummy";
-  nameSyst[27 ] = "dummy";
+  nameSyst[26 ] = theYear <= 2018 ? Form("CMS_l1_prefiring_%sUp",theTagYear.Data())   : "dummy";
+  nameSyst[27 ] = theYear <= 2018 ? Form("CMS_l1_prefiring_%sDown",theTagYear.Data()) : "dummy";
   nameSyst[28 ] = "dummy";
   nameSyst[29 ] = "dummy";
   nameSyst[30 ] = "dummy";
@@ -196,6 +205,14 @@ void makeVVDataCards(int whichAna = 0, int fidAna = 0, TString InputDir = "anaZ"
     BinXF = 1; minXF = -0.5; maxXF = 2.5;
   }
 
+  // take the binning from the input baseline: wzAnalysis makeDataCards=3-6 books 16 (SR) / 4 (CR) bins
+  {
+    TFile *fBin = new TFile(Form("%s/fillhisto_%s_%d_%d.root",InputDir.Data(),anaSel.Data(),year,300+fidAna*200), "read");
+    TH1D *hBin = (TH1D*)fBin->Get("histo0"); assert(hBin);
+    BinXF = hBin->GetNbinsX(); minXF = hBin->GetXaxis()->GetXmin(); maxXF = hBin->GetXaxis()->GetXmax();
+    delete fBin;
+  }
+
   for(int ic=0; ic<nPlotCategories; ic++) {
     histo_Baseline[ic] = new TH1D(Form("histo_%s",plotBaseNames[ic].Data()),Form("histo_%s",plotBaseNames[ic].Data()), BinXF, minXF, maxXF);
     TString plotBaseNamesTemp =  plotBaseNames[ic];
@@ -224,10 +241,11 @@ void makeVVDataCards(int whichAna = 0, int fidAna = 0, TString InputDir = "anaZ"
   delete inputFile;
 
   for(int j=0; j<nSystTotal; j++){
-    inputFile = new TFile(Form("%s/fillhisto_%s_%d_%d.root",InputDir.Data(),anaSel.Data(),year,300+fidAna*jumpValue+1+j), "read");
+    int jFile = j < endTheory+21 ? j : j+1; // skip weightEWKCorrUnc (type 135)
+    inputFile = new TFile(Form("%s/fillhisto_%s_%d_%d.root",InputDir.Data(),anaSel.Data(),year,300+fidAna*jumpValue+1+jFile), "read");
     for(unsigned ic=kPlotData; ic!=nPlotCategories; ic++) {
       histo_Syst[j][ic] = (TH1D*)inputFile->Get(Form("histo%d", ic)); assert(histo_Syst[j][ic]); histo_Syst[j][ic]->SetDirectory(0);
-      histo_Syst[j][ic]->SetNameTitle(Form("histo_%s_%s",plotBaseNames[ic].Data(),nameSyst[j].Data()),Form("histo_%s_%s",plotBaseNames[ic].Data(),nameSyst[j].Data()));
+      histo_Syst[j][ic]->SetNameTitle(Form("histo_%s_syst%d",plotBaseNames[ic].Data(),j),Form("histo_%s_syst%d",plotBaseNames[ic].Data(),j));
     }
     delete inputFile;
   }
@@ -547,7 +565,7 @@ void makeVVDataCards(int whichAna = 0, int fidAna = 0, TString InputDir = "anaZ"
 
   for(int nl=0; nl<4; nl++){
     if(lumiU[nl] == 1) continue;
-    newcardShape << Form("lumi_13p6TeV_%d lnN ", nl);
+    newcardShape << Form("%s lnN ", lumiNames[nl].Data());
     for (int ic=0; ic<nPlotCategories; ic++){
       if(!histo_Baseline[ic]) continue;
       if(ic == kPlotData || histo_Baseline[ic]->GetSumOfWeights() <= 0) continue;
@@ -569,6 +587,17 @@ void makeVVDataCards(int whichAna = 0, int fidAna = 0, TString InputDir = "anaZ"
   // BTagging uncertainties
   for(int n_unc=0; n_unc<numberBTagSyst; n_unc++){
     newcardShape << Form("%s shape ",BtagSFNames[n_unc].Data());
+    for (int ic=0; ic<nPlotCategories; ic++){
+      if(!histo_Baseline[ic]) continue;
+      if(ic == kPlotData || histo_Baseline[ic]->GetSumOfWeights() <= 0) continue;
+      if(ic == kPlotNonPrompt) newcardShape << Form("- ");
+      else                     newcardShape << Form("1.0 ");
+    }
+    newcardShape << Form("\n");
+  }
+
+  if(theYear <= 2018) {
+    newcardShape << Form("CMS_l1_prefiring_%s shape ",theTagYear.Data());
     for (int ic=0; ic<nPlotCategories; ic++){
       if(!histo_Baseline[ic]) continue;
       if(ic == kPlotData || histo_Baseline[ic]->GetSumOfWeights() <= 0) continue;
