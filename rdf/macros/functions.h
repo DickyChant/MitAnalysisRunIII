@@ -2519,6 +2519,7 @@ int compute_vbs_gen_category(const int nSel, const int ngood_GenJets, const Vec_
 
   float detajjGen = fabs(good_GenJet_eta[0]-good_GenJet_eta[1]);
   float dphijjGen = deltaPhi(good_GenJet_phi[0],good_GenJet_phi[1]);
+  int totalCharge = 0;
  
   if(applyTightSel >= 1 && applyTightSel <= 10) {
     if(GenDressedLepton_pt[1] > GenDressedLepton_pt[0]) {printf("PROBLEM, ptl2 > ptl1 at gen level\n");}
@@ -2533,6 +2534,7 @@ int compute_vbs_gen_category(const int nSel, const int ngood_GenJets, const Vec_
     if(applyTightSel >= 4) passTightGenSel = passTightGenSel && good_GenJet_pt[0] > 50 && good_GenJet_pt[1] > 50;
     if(applyTightSel >= 5) passTightGenSel = passTightGenSel && GenDressedLepton_hasTauAnc[0] == 0 && GenDressedLepton_hasTauAnc[1] == 0;
     if(passTightGenSel == false) return 0;
+    if(ngood_GenDressedLeptons >= 2) totalCharge = GenDressedLepton_pdgId[0] + GenDressedLepton_pdgId[1];
   }
   else if(applyTightSel >= 11 && applyTightSel <= 20) {
     bool passTightGenSel = mjjGen > 500 && detajjGen > 2.5;
@@ -2546,6 +2548,7 @@ int compute_vbs_gen_category(const int nSel, const int ngood_GenJets, const Vec_
     if(applyTightSel >= 14) passTightGenSel = passTightGenSel && good_GenJet_pt[0] > 50 && good_GenJet_pt[1] > 50;
     if(applyTightSel >= 15) passTightGenSel = passTightGenSel && GenDressedLepton_hasTauAnc[0] == 0 && GenDressedLepton_hasTauAnc[1] == 0 && GenDressedLepton_hasTauAnc[2] == 0;
     if(passTightGenSel == false) return 0;
+    if(ngood_GenDressedLeptons >= 3) totalCharge = GenDressedLepton_pdgId[0] + GenDressedLepton_pdgId[1] + GenDressedLepton_pdgId[2];
   }
 
   if     (nSel == 1){
@@ -2575,6 +2578,10 @@ int compute_vbs_gen_category(const int nSel, const int ngood_GenJets, const Vec_
     else if(dphijjGen < 2.5) return 2;
     else if(dphijjGen < 2.9) return 3;
     else                     return 4;
+  }
+  else if(nSel == 6){
+    if   (totalCharge > 0) return 1;
+    else                   return 2;
   }
   
   return 0;

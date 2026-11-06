@@ -20,7 +20,7 @@ void producingYields_ssww(int category = -1, TString mlfitResult = "/home/submit
 
   TFile *mlfit = TFile::Open(mlfitResult); assert(mlfit);
 
-  int chanAux = 5;
+  int chanAux = 6;
 
   const int chan = chanAux;
   TString channelName[chan];
@@ -30,6 +30,7 @@ void producingYields_ssww(int category = -1, TString mlfitResult = "/home/submit
     channelName[2] = Form("ww0b_20230");
     channelName[3] = Form("ww0b_20231");
     channelName[4] = Form("ww0b_20240");
+    channelName[5] = Form("ww0b_20250");
   }
   else if(category == 1) { // WWb CR
     channelName[0] = Form("ww1b_20220");
@@ -37,6 +38,7 @@ void producingYields_ssww(int category = -1, TString mlfitResult = "/home/submit
     channelName[2] = Form("ww1b_20230");
     channelName[3] = Form("ww1b_20231");
     channelName[4] = Form("ww1b_20240");
+    channelName[5] = Form("ww1b_20250");
   }
   else if(category == 2) { // WZ SR
     channelName[0] = Form("wz0b_20220");
@@ -44,6 +46,7 @@ void producingYields_ssww(int category = -1, TString mlfitResult = "/home/submit
     channelName[2] = Form("wz0b_20230");
     channelName[3] = Form("wz0b_20231");
     channelName[4] = Form("wz0b_20240");
+    channelName[5] = Form("wz0b_20250");
   }
   else if(category == 3) { // WZb CR
     channelName[0] = Form("wz1b_20220");
@@ -51,6 +54,7 @@ void producingYields_ssww(int category = -1, TString mlfitResult = "/home/submit
     channelName[2] = Form("wz1b_20230");
     channelName[3] = Form("wz1b_20231");
     channelName[4] = Form("wz1b_20240");
+    channelName[5] = Form("wz1b_20250");
   }
 
   double yields[nPlotCategories], yieldsE[nPlotCategories];

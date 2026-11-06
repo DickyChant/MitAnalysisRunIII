@@ -949,7 +949,7 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
             elif(makeDataCards == 4):
                 x1Bins = array('d', [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5])
             elif(makeDataCards == 6):
-                x1Bins = array('d', [500,700,900,1100,1300,1650,2000,2450,2900])
+                x1Bins = array('d', [500,700,900,1100,1300,1550,2000,2500,3000])
             elif(makeDataCards == 7):
                 x1Bins = array('d', [20,50,80,110,140,180,220,280,340])
             elif(makeDataCards == 8):

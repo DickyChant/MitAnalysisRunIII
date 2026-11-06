@@ -24,6 +24,7 @@ void computeGenVBSVVXS(TString input = "", int selectType = 0, bool doPDFRMS = f
   const Float_t xbinsWWNJET      [nBin2+1] = {1.5, 2.5, 3.5};
   const Float_t xbinsWWDELTAETAJJ[nBin4+1] = {2.5,3.6,4.5,5.5,8.0};
   const Float_t xbinsWWDELTAPHIJJ[nBin4+1] = {0.0, 1.8, 2.5, 2.9, TMath::Pi()};
+  const Float_t xbinsQ           [nBin2+1] = {-0.5, 0.5, 1.5};
 
   const int number_unc_PS       = 4;
   const int number_unc_QCDScale = 6;
@@ -37,6 +38,8 @@ void computeGenVBSVVXS(TString input = "", int selectType = 0, bool doPDFRMS = f
   else if(selectType == 4) {startFX=890;  nameH = "hDEWKWWDELTAETAJJ";}
   else if(selectType == 5) {startFX=1010; nameH = "hDEWKWWDELTAPHIJJ";}
   else if(selectType == 6) {startFX=386;  nameH = "hDQCDWZMJJ";}
+  else if(selectType == 7) {startFX=1130; nameH = "hDEWKWWQ";}
+  else if(selectType == 8) {startFX=120;  nameH = "hDEWKWZQ"; startFY = 3;}
 
   TH1D *histo_Aux[1+number_unc_PS+number_unc_QCDScale+number_unc_PDF];
   TH1D *histo_Baseline;
@@ -54,6 +57,8 @@ void computeGenVBSVVXS(TString input = "", int selectType = 0, bool doPDFRMS = f
   else if(selectType == 4) {histo_Baseline = new TH1D(Form("%s",nameH.Data()), Form("%s",nameH.Data()), nBin4, xbinsWWDELTAETAJJ);}
   else if(selectType == 5) {histo_Baseline = new TH1D(Form("%s",nameH.Data()), Form("%s",nameH.Data()), nBin4, xbinsWWDELTAPHIJJ);}
   else if(selectType == 6) {histo_Baseline = new TH1D(Form("%s",nameH.Data()), Form("%s",nameH.Data()), nBin4, xbinsWZMJJ       );}
+  else if(selectType == 7) {histo_Baseline = new TH1D(Form("%s",nameH.Data()), Form("%s",nameH.Data()), nBin2, xbinsQ           );}
+  else if(selectType == 8) {histo_Baseline = new TH1D(Form("%s",nameH.Data()), Form("%s",nameH.Data()), nBin2, xbinsQ           );}
 
   for(int i=0; i<number_unc_PS; i++)       histo_PS[i]       = (TH1D*)histo_Baseline->Clone();
   for(int i=0; i<number_unc_QCDScale; i++) histo_QCDScale[i] = (TH1D*)histo_Baseline->Clone();

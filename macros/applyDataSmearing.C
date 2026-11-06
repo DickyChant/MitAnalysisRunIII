@@ -66,24 +66,36 @@ void applyDataSmearing(int nsel = -1, int condorJob = 1001){
     infileName_.push_back(Form("%sfillhisto_zAnalysis%d_2027_394",inputFolder.Data(),condorJob));
     infileName_.push_back(Form("%sfillhisto_zAnalysis%d_2027_395",inputFolder.Data(),condorJob));
   }
+  else if(nsel == 1){
+    factor = 2.5;
+    infileName_.push_back(Form("%sfillhisto_wzAnalysis%d_2028_110",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_wzAnalysis%d_2028_111",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_wzAnalysis%d_2028_112",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_wzAnalysis%d_2028_113",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_wzAnalysis%d_2028_114",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_wzAnalysis%d_2028_115",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_wzAnalysis%d_2028_116",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_wzAnalysis%d_2028_117",inputFolder.Data(),condorJob));
+  }
   else if(nsel == 3){
-    factor = 1.45;
-    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_20240_33",inputFolder.Data(),condorJob));
-    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_20240_35",inputFolder.Data(),condorJob));
-    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_20240_37",inputFolder.Data(),condorJob));
-    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_20240_39",inputFolder.Data(),condorJob));
-    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_20240_111",inputFolder.Data(),condorJob));
-    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_20240_18",inputFolder.Data(),condorJob));
-    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_20240_19",inputFolder.Data(),condorJob));
- 
-    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2027_33",inputFolder.Data(),condorJob));
-    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2027_35",inputFolder.Data(),condorJob));
-    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2027_37",inputFolder.Data(),condorJob));
-    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2027_39",inputFolder.Data(),condorJob));
-    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2027_111",inputFolder.Data(),condorJob));
-    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2027_18",inputFolder.Data(),condorJob));
-    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2027_19",inputFolder.Data(),condorJob));
+    factor = 2.5;
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_32",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_33",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_34",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_35",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_36",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_37",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_38",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_39",inputFolder.Data(),condorJob));
 
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_46",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_47",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_48",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_49",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_50",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_51",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_52",inputFolder.Data(),condorJob));
+    infileName_.push_back(Form("%sfillhisto_sswwAnalysis%d_2028_53",inputFolder.Data(),condorJob));
   }
   else {
     return;

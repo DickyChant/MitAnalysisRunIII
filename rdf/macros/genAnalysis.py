@@ -18,7 +18,7 @@ def analysis(df,count,category,weight,year,PDType,nSel,isRun3Sel,isData,histo_ww
     theCat = category
     if(theCat > 100): theCat = plotCategory("kPlotData")
 
-    nCat, nHisto = plotCategory("kPlotCategories"), 1200
+    nCat, nHisto = plotCategory("kPlotCategories"), 1300
     histo   = [[0 for x in range(nCat)] for y in range(nHisto)]
     histo2D = [[0 for y in range(nCat)] for x in range(nHisto)]
 
@@ -278,6 +278,7 @@ def analysis(df,count,category,weight,year,PDType,nSel,isRun3Sel,isData,histo_ww
                             .Define("theGenCat3" , "compute_vbs_gen_category(3,ngood_GenJets,good_GenJet_pt,good_GenJet_eta,good_GenJet_phi,good_GenJet_mass,ngood_GenDressedLeptons,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass,5)-1")
                             .Define("theGenCat4" , "compute_vbs_gen_category(4,ngood_GenJets,good_GenJet_pt,good_GenJet_eta,good_GenJet_phi,good_GenJet_mass,ngood_GenDressedLeptons,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass,5)-1")
                             .Define("theGenCat5" , "compute_vbs_gen_category(5,ngood_GenJets,good_GenJet_pt,good_GenJet_eta,good_GenJet_phi,good_GenJet_mass,ngood_GenDressedLeptons,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass,5)-1")
+                            .Define("theGenCat6" , "compute_vbs_gen_category(6,ngood_GenJets,good_GenJet_pt,good_GenJet_eta,good_GenJet_phi,good_GenJet_mass,ngood_GenDressedLeptons,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass,5)-1")
                             )
     dfvbswzgen = (dfvbswzgen.Define("theSelCat1", "compute_vbs_gen_category(1,ngood_GenJets,good_GenJet_pt,good_GenJet_eta,good_GenJet_phi,good_GenJet_mass,ngood_GenDressedLeptons,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass,11)")
                             .Filter("theSelCat1 > 0", "theSelCat1 > 0")
@@ -289,7 +290,8 @@ def analysis(df,count,category,weight,year,PDType,nSel,isRun3Sel,isData,histo_ww
                             .Filter("theSelCat4 > 0", "theSelCat4 > 0")
                             .Define("theSelCat5", "compute_vbs_gen_category(1,ngood_GenJets,good_GenJet_pt,good_GenJet_eta,good_GenJet_phi,good_GenJet_mass,ngood_GenDressedLeptons,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass,15)")
                             .Filter("theSelCat5 > 0", "theSelCat5 > 0")
-                            .Define("theGenCat",  "compute_vbs_gen_category(1,ngood_GenJets,good_GenJet_pt,good_GenJet_eta,good_GenJet_phi,good_GenJet_mass,ngood_GenDressedLeptons,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass,15)-1")
+                            .Define("theGenCat1",  "compute_vbs_gen_category(1,ngood_GenJets,good_GenJet_pt,good_GenJet_eta,good_GenJet_phi,good_GenJet_mass,ngood_GenDressedLeptons,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass,15)-1")
+                            .Define("theGenCat6",  "compute_vbs_gen_category(6,ngood_GenJets,good_GenJet_pt,good_GenJet_eta,good_GenJet_phi,good_GenJet_mass,ngood_GenDressedLeptons,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass,15)-1")
                             .Define("mll",   "compute_mll_gen_category(0,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass)")
                             .Define("mllSS", "compute_mll_gen_category(1,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass)")
                             .Define("mllZ",  "compute_mll_gen_category(2,good_GenDressedLepton_pdgId,good_GenDressedLepton_hasTauAnc,good_GenDressedLepton_pt,good_GenDressedLepton_eta,good_GenDressedLepton_phi,good_GenDressedLepton_mass)")
@@ -303,7 +305,7 @@ def analysis(df,count,category,weight,year,PDType,nSel,isRun3Sel,isData,histo_ww
 
     dfvbswzgen = dfvbswzgen.Filter("mllZ < 15", "mllZ < 15")
 
-    histo[527][x] = dfvbswzgen.Histo1D(("histo_{0}_{1}".format(527,x), "histo_{0}_{1}".format(527,x),4,-0.5, 3.5),"theGenCat","weightNoEWKCorr")
+    histo[527][x] = dfvbswzgen.Histo1D(("histo_{0}_{1}".format(527,x), "histo_{0}_{1}".format(527,x),4,-0.5, 3.5),"theGenCat1","weightNoEWKCorr")
 
     BinXF = 4
     minXF = -0.5
@@ -311,7 +313,14 @@ def analysis(df,count,category,weight,year,PDType,nSel,isRun3Sel,isData,histo_ww
     # mZ + 3l requirements
     startF = 0
     for nv in range(0,114):
-        histo[startF+nv][3] = makeFinalVariable(dfvbswzgen,"theGenCat",theCat,startF,3,BinXF,minXF,maxXF,nv)
+        histo[startF+nv][3] = makeFinalVariable(dfvbswzgen,"theGenCat1",theCat,startF,3,BinXF,minXF,maxXF,nv)
+
+    BinXF = 2
+    minXF = -0.5
+    maxXF = 1.5
+    startF = 120
+    for nv in range(0,114):
+        histo[startF+nv][3] = makeFinalVariable(dfvbswzgen,"theGenCat6",theCat,startF,3,BinXF,minXF,maxXF,nv)
 
     BinXF = 4
     minXF = -0.5
@@ -347,6 +356,13 @@ def analysis(df,count,category,weight,year,PDType,nSel,isRun3Sel,isData,histo_ww
     startF = 1010
     for nv in range(0,114):
         histo[startF+nv][x] = makeFinalVariable(dfvbswwgen,"theGenCat5",theCat,startF,x,BinXF,minXF,maxXF,nv)
+
+    BinXF = 2
+    minXF = -0.5
+    maxXF = 1.5
+    startF = 1130
+    for nv in range(0,114):
+        histo[startF+nv][x] = makeFinalVariable(dfvbswwgen,"theGenCat6",theCat,startF,x,BinXF,minXF,maxXF,nv)
 
     report0 = dfzllgen.Report()
     report1 = dfwwxgen.Report()
