@@ -2012,6 +2012,11 @@ def SwitchSample(argument, skimType):
        978:(dirScratch+"/test_samples/WpWpJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8",0.5*0.0295464*1000,plotCategory("kPlotEWKSSWW")),
        979:(dirScratch+"/test_samples/WmWmJJ-EWK_TuneCP5_13p6TeV-powheg-pythia8",0.5*0.0295464*1000,plotCategory("kPlotEWKSSWW")),
 
+       # private Summer24 NanoAODv15, WZ rest frame, 4FS no-top gridpacks (wz_polarisation_notop), 500k events each
+       650: ("/eos/cms/store/user/sqian/run3_polprod/VBS_WZ_LL_WZrf_notop",0.001511*1000,plotCategory("kPlotEWKWZ")),
+       651: ("/eos/cms/store/user/sqian/run3_polprod/VBS_WZ_LT_WZrf_notop",0.003062*1000,plotCategory("kPlotEWKWZ")),
+       652: ("/eos/cms/store/user/sqian/run3_polprod/VBS_WZ_TL_WZrf_notop",0.003474*1000,plotCategory("kPlotEWKWZ")),
+       653: ("/eos/cms/store/user/sqian/run3_polprod/VBS_WZ_TT_WZrf_notop",0.009603*1000,plotCategory("kPlotEWKWZ")),
        980:(dirScratch+"/test_samples/WWJJto2L2Nu-SS-noTop-EWK_TuneCP5_13p6TeV_madgraph-pythia8",0.0295464*1000,plotCategory("kPlotEWKSSWW")),
        981:(dirScratch+"/test_samples/WZJJto3LNu-EWK_TuneCP5_13p6TeV_madgraph-pythia8",0.0429366*1000,plotCategory("kPlotEWKWZ")),
        982:(dirScratch+"/test_samples/WZJJto3LNu-QCD_TuneCP5_13p6TeV_madgraph-pythia8",0.4958618*1000*0.60,plotCategory("kPlotWZ")),
