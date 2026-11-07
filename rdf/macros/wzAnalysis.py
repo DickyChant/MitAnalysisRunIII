@@ -247,6 +247,10 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
             "TriLepton_flavor",
             "vbs_dphijjll",
             "vbs_rpt",
+            # generator-level VBS dijet mass (0 in data) and the NLO EW weight already inside "weight"
+            # (hWZ13p0_KF_CMS vs mjjGen for EW WZ, 1 otherwise), so analyses can re-apply or vary it
+            "mjjGen",
+            "weightEWKCorr",
     ]:
         branchList.push_back(branchName)
 
