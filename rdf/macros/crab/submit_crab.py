@@ -33,6 +33,9 @@ Options:
     --work-area=<dir>      CRAB project dir (default crab_projects)
     --exclude-lfns=<file>  LFNs (one per line) dropped from the MC normalization lists and
                            from every job's input: for files no site can serve intact
+    --runs-cache=<dir>     /eos dir of make_runs_cache.py outputs: an MC job whose dataset has an
+                           up-to-date cache normalizes from that one file instead of opening the
+                           whole dataset; the cache's unreadable files are excluded too
     --dry-run              resolve tasks and build the payload, do not query DAS or submit
 """
 
@@ -140,6 +143,26 @@ def das_files(dataset):
     return sorted(l.strip() for l in out.splitlines() if l.strip().startswith("/store/"))
 
 
+def runs_cache(cache_dir, dataset, files):
+    """(xrootd URL of the dataset's Runs cache, its unreadable LFNs), or None if missing or stale."""
+    import json
+    from make_runs_cache import cache_name, files_hash
+    base = os.path.join(cache_dir, cache_name(dataset))
+    if not (os.path.exists(base + ".root") and os.path.exists(base + ".json")):
+        print("  no Runs cache for {0}: jobs open the whole dataset".format(dataset))
+        return None
+    with open(base + ".json") as f:
+        meta = json.load(f)
+    if meta["das_hash"] != files_hash(files):
+        print("  STALE Runs cache for {0} (DAS file list changed): jobs open the whole dataset".format(dataset))
+        return None
+    path = os.path.abspath(base + ".root")
+    if not path.startswith("/eos/cms/"):
+        sys.exit("ERROR: --runs-cache must be under /eos/cms (read on the worker via eoscms)")
+    print("  Runs cache for {0}: {1} files, {2} unreadable excluded".format(dataset, meta["used"], len(meta["failed"])))
+    return "root://eoscms.cern.ch/" + path, set(meta["failed"]) | set(meta.get("excluded_up_front", []))
+
+
 def build_payload(ana, years, mc_norm, exclude=()):
     """Trimmed sandbox: code, config, corrections for the requested years only."""
     if os.path.isdir(BUILD_DIR):
@@ -239,10 +262,10 @@ def main():
     opts = {"tag": None, "site": None, "lfn_base": None, "ana": "wzAnalysis", "cfg": None,
             "years": set(), "processes": set(), "mc_fpj": 5, "data_fpj": 3, "ntuples": True,
             "redirector": "root://cms-xrd-global.cern.ch/", "work_area": "crab_projects",
-            "dry_run": False, "exclude_lfns": None}
+            "dry_run": False, "exclude_lfns": None, "runs_cache": None}
     valid = ["tag=", "site=", "lfn-base=", "ana=", "cfg=", "years=", "processes=",
              "mc-files-per-job=", "data-files-per-job=", "no-ntuples", "redirector=",
-             "work-area=", "dry-run", "exclude-lfns=", "help"]
+             "work-area=", "dry-run", "exclude-lfns=", "runs-cache=", "help"]
     try:
         parsed, _ = getopt.getopt(sys.argv[1:], "", valid)
     except getopt.GetoptError as ex:
@@ -313,6 +336,12 @@ def main():
                     sys.exit("ERROR: DAS query failed for {0}: {1}".format(t["dataset"], e))
                 if not files:
                     sys.exit("ERROR: DAS returned no files for {0}".format(t["dataset"]))
+                cached = runs_cache(opts["runs_cache"], t["dataset"], files) if opts["runs_cache"] else None
+                if cached:
+                    url, failed = cached
+                    exclude |= failed
+                    mc_norm[str(t["process"]) + ".txt"] = [url]
+                    continue
                 mc_norm[str(t["process"]) + ".txt"] = [opts["redirector"] + f for f in files if f not in exclude]
 
     payload = build_payload(opts["ana"], {t["year"] for t in tasks}, mc_norm, exclude)
