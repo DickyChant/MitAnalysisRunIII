@@ -1460,6 +1460,11 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
     for i in range(nhistoNonPrompt):
         if(histoNonPrompt[i] == 0): continue
         histoNonPrompt[i].Write()
+    # per-job normalization record: 1/weight is proportional to this job's genEventSumw (harvest reweighting)
+    hJobNorm = ROOT.TH1D("hJobNorm", "hJobNorm", 2, 0, 2)
+    hJobNorm.SetBinContent(1, 1.0/weight if weight != 0 else 0.0)
+    hJobNorm.SetBinContent(2, weight)
+    hJobNorm.Write()
     myfile.Close()
 
 def readMCSample(sampleNOW,year,skimType,whichJob,group,ewkCorrWeights,wsWeights,puWeights,histoBTVEffEtaPtLF,histoBTVEffEtaPtCJ,histoBTVEffEtaPtBJ,histoFakeEtaPt_mu,histoFakeEtaPt_el,histoLepSFEtaPt_mu,histoLepSFEtaPt_el,histoTriggerSFEtaPt_0_0,histoTriggerSFEtaPt_0_1,histoTriggerSFEtaPt_0_2,histoTriggerSFEtaPt_0_3,histoTriggerSFEtaPt_1_0,histoTriggerSFEtaPt_1_1,histoTriggerSFEtaPt_1_2,histoTriggerSFEtaPt_1_3,histoTriggerSFEtaPt_2_0,histoTriggerSFEtaPt_2_1,histoTriggerSFEtaPt_2_2,histoTriggerSFEtaPt_2_3,histoTriggerSFEtaPt_3_0,histoTriggerSFEtaPt_3_1,histoTriggerSFEtaPt_3_2,histoTriggerSFEtaPt_3_3):

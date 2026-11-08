@@ -33,6 +33,7 @@ Options:
     --work-area=<dir>      CRAB project dir (default crab_projects)
     --exclude-lfns=<file>  LFNs (one per line) dropped from the MC normalization lists and
                            from every job's input: for files no site can serve intact
+    --per-job-norm         MC jobs normalize to their own files (hJobNorm in fillhisto; the harvest reweights)
     --runs-cache=<dir>     /eos dir of make_runs_cache.py outputs: an MC job whose dataset has an
                            up-to-date cache normalizes from that one file instead of opening the
                            whole dataset; the cache's unreadable files are excluded too
@@ -224,7 +225,9 @@ def make_config(opts, task, payload):
     args = ["process={0}".format(task["process"]), "year={0}".format(task["year"]),
             "ana={0}".format(opts["ana"]), "ntuples={0}".format(1 if opts["ntuples"] else 0),
             "redirector={0}".format(opts["redirector"])]
-    if is_mc:
+    if is_mc and opts["per_job_norm"]:
+        args.append("perjobnorm=1")
+    elif is_mc:
         args.append("normlist=crab_norm/{0}.txt".format(task["process"]))
 
     cfg.JobType.pluginName = "Analysis"
@@ -262,10 +265,10 @@ def main():
     opts = {"tag": None, "site": None, "lfn_base": None, "ana": "wzAnalysis", "cfg": None,
             "years": set(), "processes": set(), "mc_fpj": 5, "data_fpj": 3, "ntuples": True,
             "redirector": "root://cms-xrd-global.cern.ch/", "work_area": "crab_projects",
-            "dry_run": False, "exclude_lfns": None, "runs_cache": None}
+            "dry_run": False, "exclude_lfns": None, "runs_cache": None, "per_job_norm": False}
     valid = ["tag=", "site=", "lfn-base=", "ana=", "cfg=", "years=", "processes=",
              "mc-files-per-job=", "data-files-per-job=", "no-ntuples", "redirector=",
-             "work-area=", "dry-run", "exclude-lfns=", "runs-cache=", "help"]
+             "work-area=", "dry-run", "exclude-lfns=", "runs-cache=", "per-job-norm", "help"]
     try:
         parsed, _ = getopt.getopt(sys.argv[1:], "", valid)
     except getopt.GetoptError as ex:
@@ -285,6 +288,8 @@ def main():
             opts["ntuples"] = False
         elif key == "dry_run":
             opts["dry_run"] = True
+        elif key == "per_job_norm":
+            opts["per_job_norm"] = True
         else:
             opts[key] = arg
 
@@ -329,7 +334,7 @@ def main():
             from CRABClient.UserUtilities import getUsername
             opts["lfn_base"] = "/store/user/{0}/{1}_crab".format(getUsername(), opts["ana"])
         for t in tasks:
-            if t["process"] < 1000 and str(t["process"]) + ".txt" not in mc_norm:
+            if t["process"] < 1000 and not opts["per_job_norm"] and str(t["process"]) + ".txt" not in mc_norm:
                 try:
                     files = das_files(t["dataset"])
                 except CalledProcessError as e:

@@ -22,6 +22,7 @@ for kv in "$@"; do
     ana=*)        ana=${kv#ana=} ;;
     ntuples=*)    ntuples=${kv#ntuples=} ;;
     normlist=*)   normlist=${kv#normlist=} ;;
+    perjobnorm=*) perjobnorm=${kv#perjobnorm=} ;;
     redirector=*) redirector=${kv#redirector=} ;;
   esac
 done
@@ -133,7 +134,9 @@ cat ${listName}
 export PYTHONNOUSERSITE=1
 export USE_DIRECT_NANOAOD=1
 export FILELIST_DIR=crab_filelists
-if [ ${process} -lt 1000 ]; then
+if [ ${process} -lt 1000 ] && [ "${perjobnorm}" = "1" ]; then
+  echo "Per-job normalization: genEventSumw of this job's files (hJobNorm in fillhisto)"
+elif [ ${process} -lt 1000 ]; then
   [ -n "${normlist}" ] && [ -s "${normlist}" ] || fail 84 "MC job without normalization list (${normlist})"
   # the list holds bare LFNs from DAS; resolve them like the job's own input files
   while read lfn; do resolveLFN ${lfn}; done < ${normlist} > crab_normlist_xrd.txt
