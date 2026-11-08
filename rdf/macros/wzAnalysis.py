@@ -136,6 +136,7 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
     nCat, nHisto, nhistoNonPrompt, nHistoMVA = plotCategory("kPlotCategories"), 700, 50, 700
     histo    = [[0 for y in range(nCat)] for x in range(nHisto)]
     histoNonPrompt = [0 for y in range(nhistoNonPrompt)]
+    snapHandles = []  # lazy ntuple snapshots, filled in the same event loop as the histograms
     histo2D = [[0 for y in range(nCat)] for x in range(nHistoMVA)]
 
     ROOT.initHisto2D(histoFakeEtaPt_mu[0],0)
@@ -801,7 +802,11 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
             branchListNtp = ROOT.vector('string')(branchList)
             for b in ["passMET","passMTW","passVBS","passWZjj","nbtag_goodbtag_Jet_bjet","PuppiMET_ptXY","PuppiMET_phiXY","PV_npvsGood"]:
                 branchListNtp.push_back(b)
-            dfntp.Snapshot("events", outputFile, branchListNtp)
+            # lazy: an eager Snapshot runs its own event loop, where the random MC lepton-momentum smearing is redrawn,
+            # so events near a cut would land differently in the ntuple and the histograms (and the input is read twice)
+            snapOpt = ROOT.RDF.RSnapshotOptions()
+            snapOpt.fLazy = True
+            snapHandles.append(dfntp.Snapshot("events", outputFile, branchListNtp, snapOpt))
 
         histo[37][x] = dfzgcat[x].Histo1D(("histo_{0}_{1}".format(37,x), "histo_{0}_{1}".format(37,x), 40, 10, 210), "m3l{0}".format(altMass),"weight")
         dfzgcat[x] = dfzgcat[x].Filter("abs(m3l{0}-91.1876)<15".format(altMass))
