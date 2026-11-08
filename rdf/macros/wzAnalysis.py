@@ -784,19 +784,23 @@ def analysis(df,count,category,weight,year,PDType,isData,whichJob,nTheoryReplica
 
         if(doNtuples == True and x == theCat):
             outputFile = "ntupleWZAna_sample{0}_year{1}_job{2}.root".format(count,year,whichJob)
-            # SR ntuple: the sample's own category plus the nonprompt one (theCat 11, fake-rate weight in "weight"),
-            # same selection as dfwzvbscat except MET > metCut OR mtW > mtWCut; passMET/passMTW pick the SR offline
+            # one ntuple for SR + CRs: the sample's own category plus the nonprompt one (theCat 11, fake-rate weight in
+            # "weight"); MET > metCut OR mtW > mtWCut; VBS SR or low-mjj WZjj CR, b tags kept (tVXjj, VBS+b CRs)
+            dtmc = "MC" if isData == "false" else "DATA"
             dfntp = (dfbase.Filter("theCat=={0} || theCat=={1}".format(theCat,plotCategory("kPlotNonPrompt")))
                            .Filter("abs(Sum(fake_Muon_charge)+Sum(fake_Electron_charge)) == 1")
                            .Filter("mll{0} > 0 && mllmin{0} > 1 && mllZ{0} < 15 && m3l{0} > 100 && ptlW{0} > 20".format(altMass))
-                           .Filter("nbtag_goodbtag_Jet_bjet == 0")
                            .Define("passMET","PuppiMET_ptDef > {0}".format(metCut))
                            .Define("passMTW","mtW > {0}".format(mtWCut))
                            .Filter("passMET || passMTW")
-                           .Filter(VBSSEL))
+                           .Define("passVBS",VBSSEL)
+                           .Define("passWZjj",VBSQCDSEL)
+                           .Filter("passVBS || passWZjj")
+                           .Define("PuppiMET_ptXY" ,"compute_JSON_MET(\"pt\" ,\"PuppiMET\",{0},\"{1}\",\"nom\",PuppiMET_ptDef,PuppiMET_phiDef,PV_npvsGood)".format(year,dtmc))
+                           .Define("PuppiMET_phiXY","compute_JSON_MET(\"phi\",\"PuppiMET\",{0},\"{1}\",\"nom\",PuppiMET_ptDef,PuppiMET_phiDef,PV_npvsGood)".format(year,dtmc)))
             branchListNtp = ROOT.vector('string')(branchList)
-            branchListNtp.push_back("passMET")
-            branchListNtp.push_back("passMTW")
+            for b in ["passMET","passMTW","passVBS","passWZjj","nbtag_goodbtag_Jet_bjet","PuppiMET_ptXY","PuppiMET_phiXY","PV_npvsGood"]:
+                branchListNtp.push_back(b)
             dfntp.Snapshot("events", outputFile, branchListNtp)
 
         histo[37][x] = dfzgcat[x].Histo1D(("histo_{0}_{1}".format(37,x), "histo_{0}_{1}".format(37,x), 40, 10, 210), "m3l{0}".format(altMass),"weight")
