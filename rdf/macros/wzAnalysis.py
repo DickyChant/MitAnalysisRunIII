@@ -80,12 +80,22 @@ elif(elSelChoice == 8):
 elif(elSelChoice == 9):
     ELEWP = "Veto"
 
+# Run 2 (UL NanoAODv15): legacy UL tight leptons, tuned for Run 2 pileup, instead of the Run 3-trained promptMVA
+# working points: muons cut-based tight ID + tight PF isolation (TIGHT_MU1), electrons Fall17V2 MVA-iso WP80
+# (TIGHT_EL3). The POG Medium SFs and the in-house residual-SF and fake-rate maps of that choice follow it.
+RUN2_LEGACY_CHOICE = (1, 3)
+def leptonChoice(year):
+    return RUN2_LEGACY_CHOICE if year < 20200 else (muSelChoice, elSelChoice)
+
 def selectionLL(df,year,PDType,isData,count):
 
     # Legacy mvaTTH scores need their existing version-12 selection thresholds.
     # Do not apply v15 promptMVA thresholds to a differently trained classifier.
     leptonVersion = 12 if year < 20200 and hasLegacyLeptonMVA(df) else None
     df = prepareWZNanoAOD(df, year)
+    # Run 2: the UL MET filters on data and MC (config/selection.json met_filters)
+    if(year < 20200):
+        df = df.Filter(getTriggerFromJson(jsonObject['met_filters'], "All", year), "MET filters")
 
     overallTriggers = jsonObject['triggers']
     TRIGGERMUEG = pruneWZTrigger(df, getTriggerFromJson(overallTriggers, "TRIGGERMUEG", year))
@@ -98,10 +108,10 @@ def selectionLL(df,year,PDType,isData,count):
 
     overallLeptonSel = jsonObject['leptonSel']
     FAKE_MU   = getLeptomSelFromJson(overallLeptonSel, "FAKE_MU",   year, version=leptonVersion)
-    TIGHT_MU  = getLeptomSelFromJson(overallLeptonSel, "TIGHT_MU{0}".format(muSelChoice),  year, 1, version=leptonVersion)
+    TIGHT_MU  = getLeptomSelFromJson(overallLeptonSel, "TIGHT_MU{0}".format(leptonChoice(year)[0]),  year, 1, version=leptonVersion)
 
     FAKE_EL   = getLeptomSelFromJson(overallLeptonSel, "FAKE_EL",   year, version=leptonVersion)
-    TIGHT_EL  = getLeptomSelFromJson(overallLeptonSel, "TIGHT_EL{0}".format(elSelChoice),  year, 1, version=leptonVersion)
+    TIGHT_EL  = getLeptomSelFromJson(overallLeptonSel, "TIGHT_EL{0}".format(leptonChoice(year)[1]),  year, 1, version=leptonVersion)
 
     dftag = selectionElMu(dftag,year,FAKE_MU,TIGHT_MU,FAKE_EL,TIGHT_EL)
 
@@ -1625,24 +1635,24 @@ if __name__ == "__main__":
     histoFakeEtaPt_el = []
     fakePath = "data/histoFakeEtaPt_{0}.root".format(year)
     fFakeFile = ROOT.TFile(fakePath)
-    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1001_anaType1".format(muSelChoice)))
-    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1002_anaType1".format(muSelChoice)))
-    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1003_anaType1".format(muSelChoice)))
-    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1001_anaType2".format(muSelChoice)))
-    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1002_anaType2".format(muSelChoice)))
-    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1003_anaType2".format(muSelChoice)))
-    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1001_anaType3".format(muSelChoice)))
-    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1002_anaType3".format(muSelChoice)))
-    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1003_anaType3".format(muSelChoice)))
-    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1001_anaType1".format(elSelChoice)))
-    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1002_anaType1".format(elSelChoice)))
-    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1003_anaType1".format(elSelChoice)))
-    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1001_anaType2".format(elSelChoice)))
-    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1002_anaType2".format(elSelChoice)))
-    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1003_anaType2".format(elSelChoice)))
-    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1001_anaType3".format(elSelChoice)))
-    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1002_anaType3".format(elSelChoice)))
-    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1003_anaType3".format(elSelChoice)))
+    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1001_anaType1".format(leptonChoice(year)[0])))
+    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1002_anaType1".format(leptonChoice(year)[0])))
+    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1003_anaType1".format(leptonChoice(year)[0])))
+    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1001_anaType2".format(leptonChoice(year)[0])))
+    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1002_anaType2".format(leptonChoice(year)[0])))
+    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1003_anaType2".format(leptonChoice(year)[0])))
+    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1001_anaType3".format(leptonChoice(year)[0])))
+    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1002_anaType3".format(leptonChoice(year)[0])))
+    histoFakeEtaPt_mu.append(fFakeFile.Get("histoFakeEffSelEtaPt_0_{0}_fakeAnalysis1003_anaType3".format(leptonChoice(year)[0])))
+    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1001_anaType1".format(leptonChoice(year)[1])))
+    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1002_anaType1".format(leptonChoice(year)[1])))
+    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1003_anaType1".format(leptonChoice(year)[1])))
+    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1001_anaType2".format(leptonChoice(year)[1])))
+    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1002_anaType2".format(leptonChoice(year)[1])))
+    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1003_anaType2".format(leptonChoice(year)[1])))
+    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1001_anaType3".format(leptonChoice(year)[1])))
+    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1002_anaType3".format(leptonChoice(year)[1])))
+    histoFakeEtaPt_el.append(fFakeFile.Get("histoFakeEffSelEtaPt_1_{0}_fakeAnalysis1003_anaType3".format(leptonChoice(year)[1])))
     for x in range(9):
         histoFakeEtaPt_mu[x].SetDirectory(0)
         histoFakeEtaPt_el[x].SetDirectory(0)
@@ -1650,8 +1660,8 @@ if __name__ == "__main__":
 
     lepSFPath = "data/histoLepSFEtaPt_{0}{1}.root".format(year,correctionString)
     fLepSFFile = ROOT.TFile(lepSFPath)
-    histoLepSFEtaPt_mu = fLepSFFile.Get("histoLepSFEtaPt_0_{0}".format(muSelChoice))
-    histoLepSFEtaPt_el = fLepSFFile.Get("histoLepSFEtaPt_1_{0}".format(elSelChoice))
+    histoLepSFEtaPt_mu = fLepSFFile.Get("histoLepSFEtaPt_0_{0}".format(leptonChoice(year)[0]))
+    histoLepSFEtaPt_el = fLepSFFile.Get("histoLepSFEtaPt_1_{0}".format(leptonChoice(year)[1]))
     histoLepSFEtaPt_mu.SetDirectory(0)
     histoLepSFEtaPt_el.SetDirectory(0)
     fLepSFFile.Close()

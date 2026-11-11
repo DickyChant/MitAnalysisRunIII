@@ -572,6 +572,8 @@ float compute_JSON_MET(const std::string pt_phiS, const std::string met_typeS, c
   const char *dtmc = dtmcS.c_str();
   const char *variation = variationS.c_str();
 
+  // Run 2: no met_xy payload is loaded (mysf.h), so pass the MET through before evaluating the null correction
+  if(year <= 20210) return pt_phiS == "pt" ? met_pt : met_phi;
   float result = corrSFs.eval_met_corr(pt_phi, met_type, epoch, dtmc, variation, met_pt,met_phi,npvGood);
 
   // NO CORRECTION APPLIED FOR >= 2024!!!
