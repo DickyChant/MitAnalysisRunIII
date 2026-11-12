@@ -2,6 +2,13 @@ import ROOT
 import os, json
 from utilsCategory import plotCategory
 
+# Jet-lepton overlap treatment (ssWW nonprompt study):
+#   nominal - jets linked to fakeable leptons are removed before every jet selection, the b veto included
+#   bveto   - as nominal, but the b veto also counts the b-tagged jets linked to fakeable leptons
+#   atlas   - ATLAS ssWW overlap removal: a fakeable lepton within dR < 0.4 of a surviving jet is removed
+JET_LEPTON_OR = "nominal"
+OR_BTAG_SEL = 1 # b-tag working point used by the atlas variant (ssWW b veto: medium)
+
 # DeepJet
 def getBTagCut_DeepJet(type,year):
 
@@ -254,7 +261,7 @@ def makeJES(df,year,postFix,bTagSel,jetEtaCut,jetTypeCorr):
 
               .Define("goodbtag_Jet_btagUnifiedParTB{0}".format(postFix), "clean_Jet_btagUnifiedParTB[goodbtag_jet{0}]".format(postFix))
               .Define("goodbtag_Jet_bjet{0}".format(postFix), "goodbtag_Jet_btagUnifiedParTB{0} > {1}".format(postFix,getBTagCut(bTagSel,year)))
-              .Define("nbtag_goodbtag_Jet_bjet{0}".format(postFix), "Sum(goodbtag_Jet_bjet{0})*1.0f".format(postFix))
+              .Define("nbtag_goodbtag_Jet_bjet{0}".format(postFix), "Sum(goodbtag_Jet_bjet{0})*1.0f{1}".format(postFix," + nbtag_lepjet" if JET_LEPTON_OR == "bveto" else ""))
 
               .Define("vbs_jet{0}".format(postFix), "abs(clean_Jet_eta) < 4.7 && clean_Jet_pt{0} > 50 && (clean_Jet_pt{0} > 50 or abs(clean_Jet_eta) < 2.5 or abs(clean_Jet_eta) > 3.0)".format(postFitDef))
               .Define("nvbs_jets{0}".format(postFix), "Sum(vbs_jet{0})*1.0f".format(postFix))
@@ -330,6 +337,7 @@ def selectionJetMet(df,year,bTagSel,isData,count,jetEtaCut):
               #.Define("clean_jet", "Jet_pt > 10 && jet_mask1 && jet_mask2 && jet_VetoMapMask > 0 && jet_SelMask0 && jet_SelMask1")
               .Define("clean_jet", "Jet_pt > 10 && jet_mask1 && jet_mask2 && jet_VetoMapMask > 0 && jet_SelMask0") # No Tight lepton veto
               .Define("clean_Jet_pt", "Jet_pt[clean_jet]")
+              .Define("nbtag_lepjet", "Sum(!(jet_mask1 && jet_mask2) && Jet_pt > 20 && abs(Jet_eta) < 2.5 && jet_VetoMapMask > 0 && jet_SelMask0 && Jet_btag{0}B > {1})*1.0f".format(BTAGName,getBTagCut(bTagSel,year)))
               .Define("clean_Jet_eta", "Jet_eta[clean_jet]")
               .Define("clean_Jet_phi", "Jet_phi[clean_jet]")
               .Define("clean_Jet_mass", "Jet_mass[clean_jet]")
@@ -945,13 +953,21 @@ def selectionTrigger1L(df,year,PDType,JSON,isData,triggerFAKEMU,triggerFAKEEL):
 
     return dftag
 
+def orBTagName(year):
+    if((year // 10) > 2021 and (year // 10) < 2024): return "RobustParTAK4"
+    return "UParTAK4"
+
+def orLepton(fakeSel,lep,year):
+    if(JET_LEPTON_OR != "atlas"): return fakeSel
+    return "({0}) && atlasLeptonJetOR({1}_pt,{1}_eta,{1}_phi,{1}_jetIdx,Jet_pt,Jet_eta,Jet_phi,Jet_rawFactor,Jet_btag{2}B,Jet_nConstituents,Jet_nMuons,Jet_nElectrons,{3})".format(fakeSel,lep,orBTagName(year),getBTagCut(OR_BTAG_SEL,year))
+
 def selectionElMu(df,year,fake_mu,tight_mu,fake_el,tight_el):
     MVAName = "promptMVA"
     if((year // 10) > 2021 and (year // 10) < 2024): MVAName = "mvaTTH"
     SCEtaName = "superclusterEta	"
     if((year // 10) > 2021 and (year // 10) < 2024): SCEtaName = "eta"
     dftag =(df.Define("loose_mu"                  ,"abs(Muon_eta) < 2.4 && Muon_pt > 10 && Muon_looseId == true")
-              .Define("fake_mu"                   ,"{0}".format(fake_mu))
+              .Define("fake_mu"                   ,"{0}".format(orLepton(fake_mu,"Muon",year)))
               .Define("fake_Muon_pt"              ,"Muon_pt[fake_mu]")
               .Define("fake_Muon_eta"             ,"Muon_eta[fake_mu]")
               .Define("fake_Muon_phi"             ,"Muon_phi[fake_mu]")
@@ -981,7 +997,7 @@ def selectionElMu(df,year,fake_mu,tight_mu,fake_el,tight_el):
               .Define("tight_mu"                  ,"{0}".format(tight_mu))
 
               .Define("loose_el"                          ,"abs(Electron_eta) < 2.5 && Electron_pt > 10 && Electron_cutBased >= 1")
-              .Define("fake_el"                           ,"{0}".format(fake_el))
+              .Define("fake_el"                           ,"{0}".format(orLepton(fake_el,"Electron",year)))
               .Define("fake_Electron_pt"                  ,"Electron_pt[fake_el]")
               .Define("fake_Electron_eta"                 ,"Electron_eta[fake_el]")
               .Define("fake_Electron_phi"                 ,"Electron_phi[fake_el]")
