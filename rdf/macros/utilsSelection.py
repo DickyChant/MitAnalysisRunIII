@@ -6,7 +6,7 @@ from utilsCategory import plotCategory
 #   nominal - jets linked to fakeable leptons are removed before every jet selection, the b veto included
 #   bveto   - as nominal, but the b veto also counts the b-tagged jets linked to fakeable leptons
 #   atlas   - ATLAS ssWW overlap removal: a fakeable lepton within dR < 0.4 of a surviving jet is removed
-JET_LEPTON_OR = "nominal"
+JET_LEPTON_OR = "bveto"
 OR_BTAG_SEL = 1 # b-tag working point used by the atlas variant (ssWW b veto: medium)
 
 # DeepJet
