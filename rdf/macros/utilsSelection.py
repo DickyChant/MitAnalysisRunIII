@@ -8,6 +8,7 @@ from utilsCategory import plotCategory
 #   atlas   - ATLAS ssWW overlap removal: a fakeable lepton within dR < 0.4 of a surviving jet is removed
 JET_LEPTON_OR = "bveto"
 OR_BTAG_SEL = 1 # b-tag working point used by the atlas variant (ssWW b veto: medium)
+OR_MIN_HAD_PT = 10 # GeV beyond the lepton for a lepton-linked jet to count as b jet (prompt loss ~0.5%/lepton)
 
 # DeepJet
 def getBTagCut_DeepJet(type,year):
@@ -337,7 +338,7 @@ def selectionJetMet(df,year,bTagSel,isData,count,jetEtaCut):
               #.Define("clean_jet", "Jet_pt > 10 && jet_mask1 && jet_mask2 && jet_VetoMapMask > 0 && jet_SelMask0 && jet_SelMask1")
               .Define("clean_jet", "Jet_pt > 10 && jet_mask1 && jet_mask2 && jet_VetoMapMask > 0 && jet_SelMask0") # No Tight lepton veto
               .Define("clean_Jet_pt", "Jet_pt[clean_jet]")
-              .Define("nbtag_lepjet", "Sum(!(jet_mask1 && jet_mask2) && Jet_pt > 20 && abs(Jet_eta) < 2.5 && jet_VetoMapMask > 0 && jet_SelMask0 && Jet_btag{0}B > {1})*1.0f".format(BTAGName,getBTagCut(bTagSel,year)))
+              .Define("nbtag_lepjet", "lepJetBTags(Muon_pt[fake_mu],Muon_jetIdx[fake_mu],Electron_pt[fake_el],Electron_jetIdx[fake_el],Jet_pt,Jet_rawFactor,Jet_btag{0}B,Jet_pt > 20 && abs(Jet_eta) < 2.5 && jet_VetoMapMask > 0 && jet_SelMask0,{1},{2})".format(BTAGName,getBTagCut(bTagSel,year),OR_MIN_HAD_PT))
               .Define("clean_Jet_eta", "Jet_eta[clean_jet]")
               .Define("clean_Jet_phi", "Jet_phi[clean_jet]")
               .Define("clean_Jet_mass", "Jet_mass[clean_jet]")
@@ -959,7 +960,7 @@ def orBTagName(year):
 
 def orLepton(fakeSel,lep,year):
     if(JET_LEPTON_OR != "atlas"): return fakeSel
-    return "({0}) && atlasLeptonJetOR({1}_pt,{1}_eta,{1}_phi,{1}_jetIdx,Jet_pt,Jet_eta,Jet_phi,Jet_rawFactor,Jet_btag{2}B,Jet_nConstituents,Jet_nMuons,Jet_nElectrons,{3})".format(fakeSel,lep,orBTagName(year),getBTagCut(OR_BTAG_SEL,year))
+    return "({0}) && atlasLeptonJetOR({1}_pt,{1}_eta,{1}_phi,{1}_jetIdx,Jet_pt,Jet_eta,Jet_phi,Jet_rawFactor,Jet_btag{2}B,Jet_nConstituents,Jet_nMuons,Jet_nElectrons,{3},{4})".format(fakeSel,lep,orBTagName(year),getBTagCut(OR_BTAG_SEL,year),OR_MIN_HAD_PT)
 
 def selectionElMu(df,year,fake_mu,tight_mu,fake_el,tight_el):
     MVAName = "promptMVA"
