@@ -188,6 +188,9 @@ def build_payload(ana, years, mc_norm, exclude=()):
         tar.add("jsns", filter=keep_jsns)
         if ana == "wzAnalysis":
             tar.add("weights_mva/bdt_BDTG_vbfinc_nsel0_v0.weights.xml")
+        if ana == "sswwAnalysis":
+            for w in ("vbfinc_nsel3_v0", "vbfpolwwcm_nsel1_v8", "vbfpolwwcm_nsel2_v8"):
+                tar.add("weights_mva/bdt_BDTG_%s.weights.xml" % w)
         for pog in sorted(os.listdir("jsonpog-integration/POG")):
             for sub in sorted({POG_SUBDIR[y] for y in years if y in POG_SUBDIR}):
                 path = os.path.join("jsonpog-integration/POG", pog, sub)
