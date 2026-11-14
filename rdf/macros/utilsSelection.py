@@ -338,14 +338,14 @@ def selectionJetMet(df,year,bTagSel,isData,count,jetEtaCut):
         df = (df.Define("jet_SelMask0", "cleaningJetSelMask(0,Jet_eta,Jet_chHEF,Jet_neHEF,Jet_chEmEF,Jet_neEmEF,Jet_muEF,{0},{1},{2},{3})".format(JMEName0,JMEName1,JMEName2,year))
                 .Define("jet_SelMask1", "cleaningJetSelMask(1,Jet_eta,Jet_chHEF,Jet_neHEF,Jet_chEmEF,Jet_neEmEF,Jet_muEF,{0},{1},{2},{3})".format(JMEName0,JMEName1,JMEName2,year)))
 
-    cleanSfx = "_pre" if JET_LEPTON_OR == "atlasdrop" else ""
-    dftag =(df.Define("jet_mask1", "cleaningMask(Muon_jetIdx[fake_mu{0}],nJet)".format(cleanSfx))
-              .Define("jet_mask2", "cleaningMask(Electron_jetIdx[fake_el{0}],nJet)".format(cleanSfx))
+    cleanSfx = " || rem_{0}" if JET_LEPTON_OR == "atlasdrop" else ""
+    dftag =(df.Define("jet_mask1", "cleaningMask(Muon_jetIdx[fake_mu{0}],nJet)".format(cleanSfx.format("mu")))
+              .Define("jet_mask2", "cleaningMask(Electron_jetIdx[fake_el{0}],nJet)".format(cleanSfx.format("el")))
               .Define("jet_VetoMapMask", "cleaningJetVetoMapMask(Jet_eta,Jet_phi,{0},{1})".format(jetTypeCorr,year))
               #.Define("clean_jet", "Jet_pt > 10 && jet_mask1 && jet_mask2 && jet_VetoMapMask > 0 && jet_SelMask0 && jet_SelMask1")
               .Define("clean_jet", "Jet_pt > 10 && jet_mask1 && jet_mask2 && jet_VetoMapMask > 0 && jet_SelMask0") # No Tight lepton veto
               .Define("clean_Jet_pt", "Jet_pt[clean_jet]")
-              .Define("remlep_jet", "!(cleaningMask(Muon_jetIdx[fake_mu_pre && !fake_mu],nJet) && cleaningMask(Electron_jetIdx[fake_el_pre && !fake_el],nJet))" if JET_LEPTON_OR == "atlasjet" else "ROOT::RVec<bool>(nJet, false)")
+              .Define("remlep_jet", "!(cleaningMask(Muon_jetIdx[rem_mu],nJet) && cleaningMask(Electron_jetIdx[rem_el],nJet))" if JET_LEPTON_OR == "atlasjet" else "ROOT::RVec<bool>(nJet, false)")
               .Define("clean_Jet_remlep", "remlep_jet[clean_jet]")
               .Define("nbtag_lepjet", "lepJetBTags(Muon_pt[fake_mu],Muon_jetIdx[fake_mu],Electron_pt[fake_el],Electron_jetIdx[fake_el],Jet_pt,Jet_rawFactor,Jet_btag{0}B,Jet_pt > 20 && abs(Jet_eta) < 2.5 && jet_VetoMapMask > 0 && jet_SelMask0,{1},{2})".format(BTAGName,getBTagCut(bTagSel,year),OR_MIN_HAD_PT))
               .Define("clean_Jet_eta", "Jet_eta[clean_jet]")
@@ -977,6 +977,7 @@ def selectionElMu(df,year,fake_mu,tight_mu,fake_el,tight_el):
     SCEtaName = "superclusterEta	"
     if((year // 10) > 2021 and (year // 10) < 2024): SCEtaName = "eta"
     dftag =(df.Define("loose_mu"                  ,"abs(Muon_eta) < 2.4 && Muon_pt > 10 && Muon_looseId == true")
+              .Define("loose_mu_or"               ,"{0}".format(orLepton("loose_mu","Muon",year)))
               .Define("fake_mu_pre"               ,"{0}".format(fake_mu))
               .Define("fake_mu"                   ,"{0}".format(orLepton(fake_mu,"Muon",year)))
               .Define("fake_Muon_pt"              ,"Muon_pt[fake_mu]")
@@ -1008,6 +1009,7 @@ def selectionElMu(df,year,fake_mu,tight_mu,fake_el,tight_el):
               .Define("tight_mu"                  ,"{0}".format(tight_mu))
 
               .Define("loose_el"                          ,"abs(Electron_eta) < 2.5 && Electron_pt > 10 && Electron_cutBased >= 1")
+              .Define("loose_el_or"                       ,"{0}".format(orLepton("loose_el","Electron",year)))
               .Define("fake_el_pre"                       ,"{0}".format(fake_el))
               .Define("fake_el"                           ,"{0}".format(orLepton(fake_el,"Electron",year)))
               .Define("fake_Electron_pt"                  ,"Electron_pt[fake_el]")
@@ -1040,6 +1042,9 @@ def selectionElMu(df,year,fake_mu,tight_mu,fake_el,tight_el):
               .Define("tight_el"                          ,"{0}".format(tight_el))
 
               .Define("nLoose","Sum(loose_mu)+Sum(loose_el)")
+              .Define("nLooseOR","Sum(loose_mu_or)+Sum(loose_el_or)")
+              .Define("rem_mu","(loose_mu && !loose_mu_or) || (fake_mu_pre && !fake_mu)")
+              .Define("rem_el","(loose_el && !loose_el_or) || (fake_el_pre && !fake_el)")
               .Define("nFake","Sum(fake_mu)+Sum(fake_el)")
               .Define("nTight","Sum(tight_mu)+Sum(tight_el)")
               )
