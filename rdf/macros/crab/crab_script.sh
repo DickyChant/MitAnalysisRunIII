@@ -157,6 +157,12 @@ grep -q "^FAILED" analysis.log && fail 86 "${ana}.py reported $(grep '^FAILED' a
 
 # Fixed output names (CRAB appends _<jobNumber>); validate before stage-out
 histoFile="fillhisto_${ana}_sample${process}_year${year}_job-1.root"
+if grep -q "^ALL_INPUTS_EMPTY" analysis.log && [ ${process} -ge 1000 ] && [ ! -f ${histoFile} ]; then
+  # every input of this data job has 0 events: stage out a marker file (no histograms; hadd and
+  # mergeHistograms read histograms by name, so it adds nothing)
+  python3 -c "import ROOT; f = ROOT.TFile('${histoFile}', 'RECREATE'); ROOT.TNamed('emptyInputJob', 'all inputs have 0 events').Write(); f.Close()"
+  [ "${ntuples}" = "1" ] && python3 -c "import ROOT; f = ROOT.TFile('ntupleEmptyAna_sample${process}_year${year}_job-1.root', 'RECREATE'); ROOT.TTree('events', 'empty input').Write(); f.Close()"
+fi
 [ -f ${histoFile} ] || fail 87 "missing ${histoFile}"
 mv ${histoFile} fillhisto.root
 
