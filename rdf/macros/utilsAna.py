@@ -216,6 +216,32 @@ def concatenate(result, tmp1):
     for f in tmp1:
         result.push_back(f)
 
+def dropEmptyInputs(files, isData):
+    """Drop input files whose Events tree has no entries.
+
+    A 0-event NanoAOD file has no branches (seen in 2022B DoubleMuon), so the RDataFrame JIT fails on
+    every column and the job can never succeed. Unreadable files are kept: a read error must still fail
+    the job rather than silently lose events. A data job left with no input prints ALL_INPUTS_EMPTY and
+    exits cleanly (crab_script.sh then writes a marker output); an MC job raises, since its
+    normalization bookkeeping needs a real output.
+    """
+    kept = ROOT.vector('string')()
+    for name in files:
+        f = ROOT.TFile.Open(str(name))
+        t = f.Get("Events") if f and not f.IsZombie() else None
+        if t and t.GetEntries() == 0:
+            print("Skipping empty input file (0 events): {0}".format(name))
+        else:
+            kept.push_back(name)
+        if f:
+            f.Close()
+    if len(kept) == 0:
+        if not isData:
+            raise RuntimeError("all {0} input files have 0 events".format(len(files)))
+        print("ALL_INPUTS_EMPTY: all {0} input files have 0 events".format(len(files)), flush=True)
+        sys.exit(0)
+    return kept
+
 def _read_filelist_mc(sample_id):
     """Read pre-built XRootD file list for an MC sample (direct NanoAOD mode)."""
     fpath = os.path.join(FILELIST_DIR, "{0}.txt".format(sample_id))
@@ -318,7 +344,7 @@ def readRunsSums(normFiles, nTheoryReplicas):
 def getMClist(sampleNOW, skimType):
 
     if USE_DIRECT_NANOAOD:
-        return _read_filelist_mc(sampleNOW)
+        return dropEmptyInputs(_read_filelist_mc(sampleNOW), False)
     files = findDIR("{}".format(SwitchSample(sampleNOW, skimType)[0]))
     return files
 
@@ -353,7 +379,7 @@ def getDATAlist(type, year, skimType):
         loadJSON(jsnName)
 
     if USE_DIRECT_NANOAOD:
-        return _read_filelist_data(type, year)
+        return dropEmptyInputs(_read_filelist_data(type, year), True)
 
     filesL = []
     ##### 2016 ####
