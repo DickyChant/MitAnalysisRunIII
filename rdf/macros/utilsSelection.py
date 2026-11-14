@@ -12,7 +12,7 @@ from utilsCategory import plotCategory
 #   atlasjet  - as atlas, but the jets linked to removed leptons are left out of the b veto (they still
 #             enter the other jet selections)
 #   The three atlas* modes share one fake-rate measurement (same lepton definition).
-JET_LEPTON_OR = "atlas"
+JET_LEPTON_OR = "atlasjet"
 OR_BTAG_SEL = 1 # b-tag working point used by the atlas variant (ssWW b veto: medium)
 OR_MIN_HAD_PT = 10 # GeV beyond the lepton for a lepton-linked jet to count as b jet (prompt loss ~0.5%/lepton)
 
