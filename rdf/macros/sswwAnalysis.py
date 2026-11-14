@@ -115,7 +115,7 @@ def selectionLL(df,year,PDType,isData,count):
 
     dftag = selectionElMu(dftag,year,FAKE_MU,TIGHT_MU,FAKE_EL,TIGHT_EL)
 
-    dftag =(dftag.Filter("nLoose == 2","Only two loose leptons")
+    dftag =(dftag.Filter("nLooseOR == 2","Only two loose leptons")
                  .Filter("nFake == 2","Two fake leptons")
                  .Filter("Sum(fake_Muon_charge)+Sum(fake_Electron_charge) != 0", "Sign-sign leptons")
                  .Define("eventNum", "event")
