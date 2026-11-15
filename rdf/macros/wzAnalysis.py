@@ -76,14 +76,15 @@ elif(elSelChoice == 6):
 elif(elSelChoice == 7):
     ELEWP = "wp80iso"
 elif(elSelChoice == 8):
-    ELEWP = "wp80iso"
+    ELEWP = "wp90iso"  # central-SF variant: legacy tight electron = MVA-iso WP90
 elif(elSelChoice == 9):
     ELEWP = "Veto"
 
-# Run 2 (UL NanoAODv15): legacy UL tight leptons, tuned for Run 2 pileup, instead of the Run 3-trained promptMVA
-# working points: muons cut-based tight ID + tight PF isolation (TIGHT_MU1), electrons Fall17V2 MVA-iso WP80
-# (TIGHT_EL3). The POG Medium SFs and the in-house residual-SF and fake-rate maps of that choice follow it.
-RUN2_LEGACY_CHOICE = (1, 3)
+# Run 2 (UL NanoAODv15): the SMP-20-006 tight leptons (lepton set 153, slot 8), tuned for Run 2 pileup, instead of
+# the Run 3-trained promptMVA: muons cut-based tight ID + PF relIso04 < 0.15 + tight IP, electrons Fall17V2 MVA-iso
+# WP90 + conversion veto + PF relIso03 < 0.06 + three-charge, over a cut-based Loose + HLT-safe fakeable electron.
+# The POG Medium SFs and the in-house residual-SF and fake-rate maps of that choice follow it.
+RUN2_LEGACY_CHOICE = (8, 8)
 def leptonChoice(year):
     return RUN2_LEGACY_CHOICE if year < 20200 else (muSelChoice, elSelChoice)
 
