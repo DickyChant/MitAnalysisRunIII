@@ -1,0 +1,2887 @@
+{
+ "/WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 4286831460,
+  "files": 25,
+  "events": 2776339
+ },
+ "/WZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 6681708660,
+  "files": 28,
+  "events": 4167791
+ },
+ "/ZZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 22380350595,
+  "files": 126,
+  "events": 14664788
+ },
+ "/ZZto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 20737237966,
+  "files": 118,
+  "events": 14555802
+ },
+ "/ZZto4L_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 21959210693,
+  "files": 82,
+  "events": 14629101
+ },
+ "/WWW_4F_TuneCP5_13p6TeV_amcatnlo-madspin-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 1033598541,
+  "files": 24,
+  "events": 450000
+ },
+ "/WWZ_4F_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 4354688919,
+  "files": 40,
+  "events": 1950044
+ },
+ "/WZZ_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 4438669186,
+  "files": 19,
+  "events": 1987058
+ },
+ "/ZZZ_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 3916161256,
+  "files": 23,
+  "events": 1970234
+ },
+ "/WZGtoLNuZG_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 559937399,
+  "files": 19,
+  "events": 245614
+ },
+ "/TTWW_TuneCP5_13p6TeV_madgraph-madspin-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 1589131015,
+  "files": 23,
+  "events": 448443
+ },
+ "/TTZZ_TuneCP5_13p6TeV_madgraph-madspin-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 1559661582,
+  "files": 22,
+  "events": 443238
+ },
+ "/GluGluHtoZZto4L_M-125_TuneCP5_13p6TeV_powheg2-JHUGenV752-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 965685607,
+  "files": 24,
+  "events": 486643
+ },
+ "/VBFHto2Zto4L_M125_TuneCP5_13p6TeV_powheg-jhugenv752-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 267061896,
+  "files": 18,
+  "events": 97160
+ },
+ "/TTLL_MLL-4to50_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v3/NANOAODSIM": {
+  "bytes": 897134085,
+  "files": 21,
+  "events": 299000
+ },
+ "/TTLL_MLL-50_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v3/NANOAODSIM": {
+  "bytes": 1307228275,
+  "files": 7,
+  "events": 399000
+ },
+ "/GluGluHto2Tau_M-125_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 1608206006,
+  "files": 29,
+  "events": 1038456
+ },
+ "/VBFHToTauTau_M125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 526575494,
+  "files": 9,
+  "events": 299337
+ },
+ "/VH_HtoNonbb_M-125_TuneCP5_13p6TeV_amcatnloFXFX-madspin-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v1/NANOAODSIM": {
+  "bytes": 282774336,
+  "files": 3,
+  "events": 147250
+ },
+ "/TTLNu-1Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer22NanoAODv12-mg35x_130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 6108853144,
+  "files": 26,
+  "events": 2056905
+ },
+ "/TZQB-Zto2L-4FS_MLL-30_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 2422519913,
+  "files": 32,
+  "events": 889780
+ },
+ "/GluGluHto2Wto2L2Nu_M-125_TuneCP5_13p6TeV_powheg-jhugen752-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 2369575873,
+  "files": 60,
+  "events": 1494981
+ },
+ "/VBFHto2Wto2L2Nu_M-125_TuneCP5_13p6TeV_powheg-jhugen752-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 2756434033,
+  "files": 43,
+  "events": 1497840
+ },
+ "/TTHtoNon2B_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v4/NANOAODSIM": {
+  "bytes": 12053372543,
+  "files": 46,
+  "events": 3846525
+ },
+ "/GluGlutoContinto2Zto4E_TuneCP5_13p6TeV_mcfm-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 689633473,
+  "files": 30,
+  "events": 298185
+ },
+ "/GluGlutoContinto2Zto4Mu_TuneCP5_13p6TeV_mcfm-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 549710142,
+  "files": 30,
+  "events": 296985
+ },
+ "/GluGlutoContinto2Zto4Tau_TuneCP5_13p6TeV_mcfm-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 530250172,
+  "files": 30,
+  "events": 298152
+ },
+ "/GluGluToContinto2Zto2E2Tau_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 340218277,
+  "files": 27,
+  "events": 144855
+ },
+ "/GluGluToContinto2Zto2Mu2Tau_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 306573797,
+  "files": 26,
+  "events": 146285
+ },
+ "/GluGlutoContinto2Zto2E2Mu_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v1/NANOAODSIM": {
+  "bytes": 282010621,
+  "files": 1,
+  "events": 150000
+ },
+ "/WZto3LNu-2Jets_EW_TuneCP5_13p6TeV_madgraph-madspin-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 250059193,
+  "files": 4,
+  "events": 98630
+ },
+ "/ZZto2L2Nu-2Jets_EW_TuneCP5_13p6TeV_madgraph-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 17100874,
+  "files": 2,
+  "events": 5000
+ },
+ "/ZZto4L-2Jets_EW_TuneCP5_13p6TeV_madgraph-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM": {
+  "bytes": 286521368,
+  "files": 4,
+  "events": 97088
+ },
+ "/WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 14804975448,
+  "files": 63,
+  "events": 9779090
+ },
+ "/WZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 23483304642,
+  "files": 59,
+  "events": 14935574
+ },
+ "/ZZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 73652547951,
+  "files": 167,
+  "events": 49486766
+ },
+ "/ZZto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 70473191977,
+  "files": 181,
+  "events": 50736009
+ },
+ "/ZZto4L_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 90392173610,
+  "files": 208,
+  "events": 61372656
+ },
+ "/WWW_4F_TuneCP5_13p6TeV_amcatnlo-madspin-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 3250394122,
+  "files": 45,
+  "events": 1482480
+ },
+ "/WWZ_4F_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 12129596875,
+  "files": 45,
+  "events": 5601076
+ },
+ "/WZZ_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 11633293848,
+  "files": 40,
+  "events": 5290014
+ },
+ "/ZZZ_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 11315384731,
+  "files": 45,
+  "events": 5803440
+ },
+ "/WZGtoLNuZG_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 1587487947,
+  "files": 28,
+  "events": 750000
+ },
+ "/TTWW_TuneCP5_13p6TeV_madgraph-madspin-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 5293099250,
+  "files": 52,
+  "events": 1536000
+ },
+ "/TTZZ_TuneCP5_13p6TeV_madgraph-madspin-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v3/NANOAODSIM": {
+  "bytes": 3546112563,
+  "files": 17,
+  "events": 1054000
+ },
+ "/GluGluHtoZZto4L_M-125_TuneCP5_13p6TeV_powheg2-JHUGenV752-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 3063729800,
+  "files": 19,
+  "events": 1666666
+ },
+ "/VBFHto2Zto4L_M125_TuneCP5_13p6TeV_powheg-jhugenv752-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 795030494,
+  "files": 20,
+  "events": 343610
+ },
+ "/TTLL_MLL-4to50_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v3/NANOAODSIM": {
+  "bytes": 3002831617,
+  "files": 40,
+  "events": 1049000
+ },
+ "/TTLL_MLL-50_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v3/NANOAODSIM": {
+  "bytes": 4613454530,
+  "files": 50,
+  "events": 1400000
+ },
+ "/GluGluHto2Tau_M-125_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 5353775104,
+  "files": 89,
+  "events": 3533459
+ },
+ "/VBFHToTauTau_M125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/VH_HtoNonbb_M-125_TuneCP5_13p6TeV_amcatnloFXFX-madspin-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v1/NANOAODSIM": {
+  "bytes": 952497984,
+  "files": 10,
+  "events": 502646
+ },
+ "/TTLNu-1Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer22EENanoAODv12-mg35x_130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 21419891935,
+  "files": 171,
+  "events": 7212758
+ },
+ "/TZQB-Zto2L-4FS_MLL-30_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 7968617632,
+  "files": 40,
+  "events": 3047512
+ },
+ "/GluGluHto2Wto2L2Nu_M-125_TuneCP5_13p6TeV_powheg-jhugen752-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 7444779949,
+  "files": 93,
+  "events": 4980263
+ },
+ "/VBFHto2Wto2L2Nu_M-125_TuneCP5_13p6TeV_powheg-jhugen752-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 8908469546,
+  "files": 96,
+  "events": 4987403
+ },
+ "/TTHtoNon2B_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 43089867155,
+  "files": 122,
+  "events": 13955780
+ },
+ "/GluGlutoContinto2Zto4E_TuneCP5_13p6TeV_mcfm-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 2156890222,
+  "files": 35,
+  "events": 1035740
+ },
+ "/GluGlutoContinto2Zto4Mu_TuneCP5_13p6TeV_mcfm-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 1669773941,
+  "files": 35,
+  "events": 1032472
+ },
+ "/GluGlutoContinto2Zto4Tau_TuneCP5_13p6TeV_mcfm-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 1619034946,
+  "files": 36,
+  "events": 1044896
+ },
+ "/GluGluToContinto2Zto2E2Tau_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v4/NANOAODSIM": {
+  "bytes": 1004087912,
+  "files": 34,
+  "events": 517620
+ },
+ "/GluGluToContinto2Zto2Mu2Tau_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v4/NANOAODSIM": {
+  "bytes": 896343971,
+  "files": 33,
+  "events": 525000
+ },
+ "/GluGluToContinto2Zto2E2Mu_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 962780837,
+  "files": 1,
+  "events": 523444
+ },
+ "/WZto3LNu-2Jets_EW_TuneCP5_13p6TeV_madgraph-madspin-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 933982481,
+  "files": 35,
+  "events": 347428
+ },
+ "/ZZto2L2Nu-2Jets_EW_TuneCP5_13p6TeV_madgraph-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 13987345,
+  "files": 1,
+  "events": 5000
+ },
+ "/ZZto4L-2Jets_EW_TuneCP5_13p6TeV_madgraph-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM": {
+  "bytes": 977146704,
+  "files": 5,
+  "events": 345710
+ },
+ "/WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v14-v2/NANOAODSIM": {
+  "bytes": 8658360302,
+  "files": 59,
+  "events": 5522000
+ },
+ "/WZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v14-v3/NANOAODSIM": {
+  "bytes": 13556509604,
+  "files": 71,
+  "events": 8354000
+ },
+ "/ZZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v14-v1/NANOAODSIM": {
+  "bytes": 2802428663,
+  "files": 2,
+  "events": 1848000
+ },
+ "/ZZto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v14-v1/NANOAODSIM": {
+  "bytes": 1407160130,
+  "files": 3,
+  "events": 987000
+ },
+ "/ZZto4L_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v14-v3/NANOAODSIM": {
+  "bytes": 45316098245,
+  "files": 165,
+  "events": 29832000
+ },
+ "/WWW_4F_TuneCP5_13p6TeV_amcatnlo-madspin-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v14-v2/NANOAODSIM": {
+  "bytes": 2035269331,
+  "files": 8,
+  "events": 936000
+ },
+ "/WWZ_4F_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v14-v2/NANOAODSIM": {
+  "bytes": 8002479232,
+  "files": 35,
+  "events": 3600000
+ },
+ "/WZZ_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v14-v2/NANOAODSIM": {
+  "bytes": 8106314575,
+  "files": 36,
+  "events": 3591000
+ },
+ "/ZZZ_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v14-v2/NANOAODSIM": {
+  "bytes": 7221978875,
+  "files": 39,
+  "events": 3600000
+ },
+ "/WZGtoLNuZG_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v2/NANOAODSIM": {
+  "bytes": 1323126462,
+  "files": 21,
+  "events": 613000
+ },
+ "/TTWW_TuneCP5_13p6TeV_madgraph-madspin-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v2/NANOAODSIM": {
+  "bytes": 51337941899,
+  "files": 151,
+  "events": 14912000
+ },
+ "/TTZZ_TuneCP5_13p6TeV_madgraph-madspin-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v4/NANOAODSIM": {
+  "bytes": 6868282213,
+  "files": 38,
+  "events": 1994000
+ },
+ "/GluGluHtoZZto4L_M-125_TuneCP5_13p6TeV_powheg-jhugen-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v3/NANOAODSIM": {
+  "bytes": 478674791,
+  "files": 5,
+  "events": 250000
+ },
+ "/VBFHto2Zto4L_M-125_TuneCP5_13p6TeV_powheg-jhugen-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v3/NANOAODSIM": {
+  "bytes": 607734405,
+  "files": 19,
+  "events": 250000
+ },
+ "/TTLL_MLL-4to50_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v4/NANOAODSIM": {
+  "bytes": 1712464028,
+  "files": 18,
+  "events": 590000
+ },
+ "/TTLL_MLL-50_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v3/NANOAODSIM": {
+  "bytes": 2620621719,
+  "files": 5,
+  "events": 800000
+ },
+ "/GluGluHto2Tau_M-125_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v2/NANOAODSIM": {
+  "bytes": 5057679127,
+  "files": 30,
+  "events": 3363684
+ },
+ "/VBFHToTauTau_M125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v2/NANOAODSIM": {
+  "bytes": 6678512581,
+  "files": 30,
+  "events": 3900000
+ },
+ "/VH_HtoNonbb_M-125_TuneCP5_13p6TeV_amcatnloFXFX-madspin-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v2/NANOAODSIM": {
+  "bytes": 997660218,
+  "files": 9,
+  "events": 518559
+ },
+ "/TTLNu-1Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer23NanoAODv12-mg35x_130X_mcRun3_2023_realistic_v15-v2/NANOAODSIM": {
+  "bytes": 11759009253,
+  "files": 34,
+  "events": 3935565
+ },
+ "/TZQB-Zto2L-4FS_MLL-30_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v2/NANOAODSIM": {
+  "bytes": 4848941861,
+  "files": 32,
+  "events": 1800000
+ },
+ "/GluGluHto2Wto2L2Nu_M-125_TuneCP5_13p6TeV_powheg-jhugen752-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v2/NANOAODSIM": {
+  "bytes": 5289189619,
+  "files": 40,
+  "events": 3500000
+ },
+ "/VBFHto2Wto2L2Nu_M-125_TuneCP5_13p6TeV_powheg-jhugen752-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v2/NANOAODSIM": {
+  "bytes": 6302758394,
+  "files": 33,
+  "events": 3491000
+ },
+ "/TTHtoNon2B_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v14-v2/NANOAODSIM": {
+  "bytes": 38001490808,
+  "files": 236,
+  "events": 11901980
+ },
+ "/GluGlutoContinto2Zto4E_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v3/NANOAODSIM": {
+  "bytes": 1580978896,
+  "files": 19,
+  "events": 748000
+ },
+ "/GluGlutoContinto2Zto4Mu_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v3/NANOAODSIM": {
+  "bytes": 1251788232,
+  "files": 26,
+  "events": 748000
+ },
+ "/GluGlutoContinto2Zto4Tau_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v3/NANOAODSIM": {
+  "bytes": 1167316868,
+  "files": 21,
+  "events": 746000
+ },
+ "/GluGlutoContinto2Zto2E2Tau_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v3/NANOAODSIM": {
+  "bytes": 704860344,
+  "files": 11,
+  "events": 375000
+ },
+ "/GluGlutoContinto2Zto2Mu2Tau_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v3/NANOAODSIM": {
+  "bytes": 599304171,
+  "files": 4,
+  "events": 375000
+ },
+ "/GluGluToContinto2Zto2E2Mu_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v2/NANOAODSIM": {
+  "bytes": 1099575168,
+  "files": 32,
+  "events": 525000
+ },
+ "/WZto3LNu-2Jets_EW_TuneCP5_13p6TeV_madgraph-madspin-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v2/NANOAODSIM": {
+  "bytes": 715960249,
+  "files": 36,
+  "events": 247000
+ },
+ "/ZZto2L2Nu-2Jets_EW_TuneCP5_13p6TeV_madgraph-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v2/NANOAODSIM": {
+  "bytes": 17366875,
+  "files": 2,
+  "events": 5000
+ },
+ "/ZZto4L-2Jets_EW_TuneCP5_13p6TeV_madgraph-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v2/NANOAODSIM": {
+  "bytes": 748788530,
+  "files": 14,
+  "events": 246000
+ },
+ "/WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v2/NANOAODSIM": {
+  "bytes": 4270954756,
+  "files": 34,
+  "events": 2713000
+ },
+ "/WZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v2/NANOAODSIM": {
+  "bytes": 6982095069,
+  "files": 55,
+  "events": 4267000
+ },
+ "/ZZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v3/NANOAODSIM": {
+  "bytes": 22766304249,
+  "files": 65,
+  "events": 14907000
+ },
+ "/ZZto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v1/NANOAODSIM": {
+  "bytes": 1277242910,
+  "files": 1,
+  "events": 900000
+ },
+ "/ZZto4L_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v3/NANOAODSIM": {
+  "bytes": 22227561896,
+  "files": 81,
+  "events": 14625000
+ },
+ "/WWW_4F_TuneCP5_13p6TeV_amcatnlo-madspin-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v2/NANOAODSIM": {
+  "bytes": 1007082448,
+  "files": 2,
+  "events": 466500
+ },
+ "/WWZ_4F_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v3/NANOAODSIM": {
+  "bytes": 3915318674,
+  "files": 28,
+  "events": 1746000
+ },
+ "/WZZ_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v2/NANOAODSIM": {
+  "bytes": 4008251029,
+  "files": 9,
+  "events": 1788000
+ },
+ "/ZZZ_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v2/NANOAODSIM": {
+  "bytes": 3550757395,
+  "files": 8,
+  "events": 1788000
+ },
+ "/WZGtoLNuZG_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 688469291,
+  "files": 21,
+  "events": 305000
+ },
+ "/TTWW_TuneCP5_13p6TeV_madgraph-madspin-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 25076194296,
+  "files": 74,
+  "events": 7288000
+ },
+ "/TTZZ_TuneCP5_13p6TeV_madgraph-madspin-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 3426185584,
+  "files": 22,
+  "events": 992000
+ },
+ "/GluGluHtoZZto4L_M-125_TuneCP5_13p6TeV_powheg-jhugen-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 266161905,
+  "files": 14,
+  "events": 121000
+ },
+ "/VBFHto2Zto4L_M-125_TuneCP5_13p6TeV_powheg-jhugen-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 309154117,
+  "files": 11,
+  "events": 125000
+ },
+ "/TTLL_MLL-4to50_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v3/NANOAODSIM": {
+  "bytes": 835449696,
+  "files": 7,
+  "events": 290000
+ },
+ "/TTLL_MLL-50_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v3/NANOAODSIM": {
+  "bytes": 1324350597,
+  "files": 7,
+  "events": 400000
+ },
+ "/GluGluHToTauTau_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v2/NANOAODSIM": {
+  "bytes": 5469143080,
+  "files": 52,
+  "events": 3922000
+ },
+ "/VBFHToTauTau_M125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 6549107214,
+  "files": 24,
+  "events": 3834000
+ },
+ "/VH_HtoNonbb_M-125_TuneCP5_13p6TeV_amcatnloFXFX-madspin-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 970603467,
+  "files": 9,
+  "events": 503175
+ },
+ "/TTLNu-1Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer23BPixNanoAODv12-mg35x_130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 5891544731,
+  "files": 10,
+  "events": 1981391
+ },
+ "/TZQB-Zto2L-4FS_MLL-30_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v3/NANOAODSIM": {
+  "bytes": 2414002968,
+  "files": 16,
+  "events": 897000
+ },
+ "/GluGluHto2Wto2L2Nu_M-125_TuneCP5_13p6TeV_powheg-jhugen752-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 2569009262,
+  "files": 20,
+  "events": 1697000
+ },
+ "/VBFHto2Wto2L2Nu_M-125_TuneCP5_13p6TeV_powheg-jhugen752-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 3090446074,
+  "files": 30,
+  "events": 1688000
+ },
+ "/TTHtoNon2B_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v2/NANOAODSIM": {
+  "bytes": 18646603125,
+  "files": 135,
+  "events": 5823987
+ },
+ "/GluGlutoContinto2Zto4E_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 787563734,
+  "files": 8,
+  "events": 375000
+ },
+ "/GluGlutoContinto2Zto4Mu_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 625289344,
+  "files": 14,
+  "events": 371000
+ },
+ "/GluGlutoContinto2Zto4Tau_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 615510714,
+  "files": 20,
+  "events": 375000
+ },
+ "/GluGlutoContinto2Zto2E2Tau_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 343597019,
+  "files": 5,
+  "events": 183500
+ },
+ "/GluGlutoContinto2Zto2Mu2Tau_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 311788863,
+  "files": 6,
+  "events": 187500
+ },
+ "/GluGluToContinto2Zto2E2Mu_TuneCP5_13p6TeV_mcfm701-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 1060958350,
+  "files": 27,
+  "events": 512000
+ },
+ "/WZto3LNu-2Jets_EW_TuneCP5_13p6TeV_madgraph-madspin-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 376363127,
+  "files": 22,
+  "events": 125000
+ },
+ "/ZZto2L2Nu-2Jets_EW_TuneCP5_13p6TeV_madgraph-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 17387075,
+  "files": 2,
+  "events": 5000
+ },
+ "/ZZto4L-2Jets_EW_TuneCP5_13p6TeV_madgraph-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM": {
+  "bytes": 358486464,
+  "files": 4,
+  "events": 121000
+ },
+ "/WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 509421749938,
+  "files": 296,
+  "events": 248149069
+ },
+ "/WZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 509626414945,
+  "files": 257,
+  "events": 236049432
+ },
+ "/ZZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 347579023727,
+  "files": 215,
+  "events": 171627615
+ },
+ "/ZZto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 357185280776,
+  "files": 228,
+  "events": 188715312
+ },
+ "/ZZto4L_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 475159303275,
+  "files": 273,
+  "events": 236757511
+ },
+ "/WWW-4F_TuneCP5_13p6TeV_amcatnlo-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 12900897997,
+  "files": 49,
+  "events": 4299284
+ },
+ "/WWZ-4F_TuneCP5_13p6TeV_amcatnlo-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 50495272808,
+  "files": 171,
+  "events": 16184379
+ },
+ "/WZZ-5F_TuneCP5_13p6TeV_amcatnlo-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 50240647761,
+  "files": 127,
+  "events": 16199286
+ },
+ "/ZZZ-5F_TuneCP5_13p6TeV_amcatnlo-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 44479905368,
+  "files": 201,
+  "events": 16192091
+ },
+ "/WZGtoLNuZG_TuneCP5_13p6TeV_amcatnlo-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 8136022038,
+  "files": 39,
+  "events": 2800000
+ },
+ "/TTWW_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 28526901511,
+  "files": 56,
+  "events": 5801000
+ },
+ "/TTWZ_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 26075059583,
+  "files": 51,
+  "events": 5529000
+ },
+ "/GluGluHto2Zto4L_Par-M-125_TuneCP5_13p6TeV_powhegMINNLO-jhugen-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 40337860590,
+  "files": 157,
+  "events": 14967000
+ },
+ "/VBFH-Hto2Zto4L_Par-M-125_TuneCP5_13p6TeV_powheg-jhugen-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 4270833088,
+  "files": 19,
+  "events": 1396000
+ },
+ "/TTLL_Bin-MLL-4to50_TuneCP5_13p6TeV_amcatnlo-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 11711175636,
+  "files": 37,
+  "events": 2965000
+ },
+ "/TTLL_Bin-MLL-50_TuneCP5_13p6TeV_amcatnlo-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 18455920890,
+  "files": 47,
+  "events": 3952000
+ },
+ "/GluGluH-HTo2Tau_Par-M-125_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 23552083998,
+  "files": 120,
+  "events": 11984270
+ },
+ "/VBFH-HTo2Tau_Par-M-125_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 28728800020,
+  "files": 173,
+  "events": 11987544
+ },
+ "/VH_HtoNonbb_M-125_TuneCP5_13p6TeV_amcatnloFXFX-madspin-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIMFAKE": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/TTLNu-1Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/RunIII2024Summer24NanoAODv15-mg35x_150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 85826569083,
+  "files": 186,
+  "events": 20362371
+ },
+ "/TZQB-Zto2L-4FS_Bin-MLL-30_TuneCP5_13p6TeV_amcatnlo-pythia8/RunIII2024Summer24NanoAODv15-Madgraph_2_6_5_150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 32765330933,
+  "files": 73,
+  "events": 8839000
+ },
+ "/GluGluHto2Wto2L2Nu_Par-M-125_TuneCP5_13p6TeV_powheg-jhugen-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 36039983451,
+  "files": 153,
+  "events": 17941370
+ },
+ "/VBFHto2Wto2L2Nu_Par-M-125_TuneCP5_13p6TeV_powheg-jhugen-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 43468401344,
+  "files": 135,
+  "events": 17957727
+ },
+ "/TTH-HtoNon2B_Par-M-125_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 239384658158,
+  "files": 531,
+  "events": 53980865
+ },
+ "/GluGlu2Zto4E_TuneCP5_13p6TeV_mcfm-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 6113914410,
+  "files": 33,
+  "events": 2100000
+ },
+ "/GluGlu2Zto4Mu_TuneCP5_13p6TeV_mcfm-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 4783696204,
+  "files": 34,
+  "events": 2097498
+ },
+ "/GluGlu2Zto4Tau_TuneCP5_13p6TeV_mcfm-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 4443886718,
+  "files": 34,
+  "events": 2099160
+ },
+ "/GluGlu2Zto2E2Tau_TuneCP5_13p6TeV_mcfm-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 5471640281,
+  "files": 51,
+  "events": 2100000
+ },
+ "/GluGlu2Zto2Mu2Tau_TuneCP5_13p6TeV_mcfm-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 4721228360,
+  "files": 31,
+  "events": 2095000
+ },
+ "/GluGlu2Zto2E2Mu_TuneCP5_13p6TeV_mcfm-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 5704206369,
+  "files": 49,
+  "events": 2078216
+ },
+ "/WZJJto3LNu-EWK_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 3467789284,
+  "files": 27,
+  "events": 986719
+ },
+ "/ZZJJto2L2Nu-EWK_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 3129760151,
+  "files": 13,
+  "events": 985460
+ },
+ "/ZZJJto4L-EWK_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 4128785927,
+  "files": 8,
+  "events": 995632
+ },
+ "/ZH-HtoNon2B_Par-M-125_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 10726609034,
+  "files": 46,
+  "events": 4188141
+ },
+ "/WplusH-HtoNon2B_Par-M-125_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 10468480997,
+  "files": 51,
+  "events": 4074508
+ },
+ "/WminusH-HtoNon2B_Par-M-125_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM": {
+  "bytes": 9490147071,
+  "files": 46,
+  "events": 3697133
+ },
+ "/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 11430270853,
+  "files": 7,
+  "events": 2850164
+ },
+ "/tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 12754363619,
+  "files": 5,
+  "events": 3723000
+ },
+ "/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 8427102943,
+  "files": 4,
+  "events": 1977996
+ },
+ "/GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 2761696381,
+  "files": 3,
+  "events": 972000
+ },
+ "/GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 2228017401,
+  "files": 2,
+  "events": 968675
+ },
+ "/GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v2/NANOAODSIM": {
+  "bytes": 1072823417,
+  "files": 1,
+  "events": 497032
+ },
+ "/GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 1275633385,
+  "files": 1,
+  "events": 500000
+ },
+ "/GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 1143516850,
+  "files": 1,
+  "events": 500000
+ },
+ "/GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 1343119398,
+  "files": 2,
+  "events": 500000
+ },
+ "/ZH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2-minlo-HZJ_JHUGenV7011_pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 1616833817,
+  "files": 3,
+  "events": 536247
+ },
+ "/WplusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 897703960,
+  "files": 1,
+  "events": 299993
+ },
+ "/WminusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 605953488,
+  "files": 1,
+  "events": 199996
+ },
+ "/HZJ_HToWWTo2L2Nu_ZTo2L_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 8021487138,
+  "files": 5,
+  "events": 2902690
+ },
+ "/WZJJ_EWK_LLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_LTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_TLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_TTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 6555780446,
+  "files": 4,
+  "events": 1950000
+ },
+ "/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 13379997627,
+  "files": 8,
+  "events": 3322643
+ },
+ "/tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 13918262031,
+  "files": 8,
+  "events": 4048000
+ },
+ "/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 9596864319,
+  "files": 6,
+  "events": 2240994
+ },
+ "/GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 2824066222,
+  "files": 2,
+  "events": 992608
+ },
+ "/GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 2292139214,
+  "files": 2,
+  "events": 997445
+ },
+ "/GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 1081795992,
+  "files": 1,
+  "events": 499183
+ },
+ "/GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 1279005764,
+  "files": 1,
+  "events": 500000
+ },
+ "/GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 1145894167,
+  "files": 1,
+  "events": 500000
+ },
+ "/GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 1338775871,
+  "files": 1,
+  "events": 499000
+ },
+ "/ZH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2-minlo-HZJ_JHUGenV7011_pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 1465877490,
+  "files": 1,
+  "events": 486281
+ },
+ "/WplusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 884684072,
+  "files": 1,
+  "events": 294744
+ },
+ "/WminusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 587160631,
+  "files": 1,
+  "events": 193088
+ },
+ "/HZJ_HToWWTo2L2Nu_ZTo2L_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 8246385185,
+  "files": 5,
+  "events": 2976898
+ },
+ "/WZJJ_EWK_LLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_LTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_TLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_TTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 6266690370,
+  "files": 5,
+  "events": 1858000
+ },
+ "/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 30643425246,
+  "files": 13,
+  "events": 7460671
+ },
+ "/tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 33536339504,
+  "files": 16,
+  "events": 9530000
+ },
+ "/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 22094583082,
+  "files": 12,
+  "events": 5070989
+ },
+ "/GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 2925571706,
+  "files": 2,
+  "events": 997000
+ },
+ "/GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 2326188092,
+  "files": 3,
+  "events": 975090
+ },
+ "/GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 1110067793,
+  "files": 1,
+  "events": 499000
+ },
+ "/GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 1307877009,
+  "files": 1,
+  "events": 498000
+ },
+ "/GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 1182145880,
+  "files": 1,
+  "events": 500000
+ },
+ "/GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 1384166465,
+  "files": 1,
+  "events": 500000
+ },
+ "/ZH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2-minlo-HZJ_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 1616388375,
+  "files": 2,
+  "events": 520283
+ },
+ "/WplusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 924363983,
+  "files": 1,
+  "events": 299992
+ },
+ "/WminusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 618158363,
+  "files": 1,
+  "events": 198461
+ },
+ "/HZJ_HToWWTo2L2Nu_ZTo2L_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 18938103757,
+  "files": 12,
+  "events": 6643520
+ },
+ "/WZJJ_EWK_LLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_LTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_TLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_TTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 6912854303,
+  "files": 5,
+  "events": 2000000
+ },
+ "/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 42727760456,
+  "files": 21,
+  "events": 10516349
+ },
+ "/tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 41419737249,
+  "files": 18,
+  "events": 11916000
+ },
+ "/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 31576728839,
+  "files": 17,
+  "events": 7328993
+ },
+ "/GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 2820546368,
+  "files": 3,
+  "events": 974000
+ },
+ "/GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 1993762932,
+  "files": 1,
+  "events": 845232
+ },
+ "/GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 1089961833,
+  "files": 2,
+  "events": 493998
+ },
+ "/GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 1299477592,
+  "files": 1,
+  "events": 500000
+ },
+ "/GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 1165812023,
+  "files": 2,
+  "events": 496000
+ },
+ "/GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 1379348692,
+  "files": 1,
+  "events": 500000
+ },
+ "/ZH_HToZZ_4LFilter_M125_TuneCP5_13TeV_powheg2-minlo-HZJ_JHUGenV7011_pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 1665846067,
+  "files": 1,
+  "events": 544550
+ },
+ "/WplusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 910664981,
+  "files": 1,
+  "events": 298674
+ },
+ "/WminusH_HToZZTo4L_M125_TuneCP5_13TeV_powheg2-minlo-HWJ_JHUGenV7011_pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 598819666,
+  "files": 1,
+  "events": 193853
+ },
+ "/HZJ_HToWWTo2L2Nu_ZTo2L_M-125_TuneCP5_13TeV-powheg-jhugen727-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 27589090482,
+  "files": 16,
+  "events": 9771771
+ },
+ "/WZJJ_EWK_LLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_LTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_TLPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_TTPolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/sqian-RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1_private-00000000000000000000000000000000/USER": {
+  "bytes": 0,
+  "files": 0,
+  "events": 0
+ },
+ "/WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 6418238286,
+  "files": 3,
+  "events": 1878000
+ },
+ "/WLLJJ_WToLNu_EWK_TuneCP5_13TeV_madgraph-madspin-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 1627437028,
+  "files": 1,
+  "events": 500000
+ },
+ "/WZTo3LNu_mllmin4p0_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 2068236278,
+  "files": 3,
+  "events": 1080000
+ },
+ "/ZZJJTo4L_EWKnotop_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 5081923624,
+  "files": 4,
+  "events": 1290000
+ },
+ "/ZZTo4L_TuneCP5_13TeV_powheg_pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 92544907576,
+  "files": 46,
+  "events": 49691000
+ },
+ "/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 197406346,
+  "files": 1,
+  "events": 71000
+ },
+ "/WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 241687505,
+  "files": 1,
+  "events": 81000
+ },
+ "/WZZ_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 477906802,
+  "files": 2,
+  "events": 160000
+ },
+ "/ZZZ_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 213719765,
+  "files": 1,
+  "events": 81000
+ },
+ "/WZG_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 1553090525,
+  "files": 1,
+  "events": 584000
+ },
+ "/TTWW_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 1273083915,
+  "files": 1,
+  "events": 278000
+ },
+ "/TTWZ_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 630009234,
+  "files": 2,
+  "events": 140000
+ },
+ "/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 2394596718,
+  "files": 3,
+  "events": 1000000
+ },
+ "/VBF_HToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 1422833619,
+  "files": 1,
+  "events": 500000
+ },
+ "/TTZToLL_M-1to10_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 1034860975,
+  "files": 1,
+  "events": 290000
+ },
+ "/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODAPVv15-150X_mcRun2_asymptotic_preVFP_v1-v1/NANOAODSIM": {
+  "bytes": 21772320079,
+  "files": 11,
+  "events": 5792000
+ },
+ "/WLLJJ_WToLNu_EWK_TuneCP5_13TeV_madgraph-madspin-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 1631724789,
+  "files": 1,
+  "events": 500000
+ },
+ "/WZTo3LNu_mllmin4p0_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 1733470261,
+  "files": 2,
+  "events": 904000
+ },
+ "/ZZJJTo4L_EWKnotop_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 4538132065,
+  "files": 3,
+  "events": 1149069
+ },
+ "/ZZTo4L_TuneCP5_13TeV_powheg_pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v2/NANOAODSIM": {
+  "bytes": 78170594626,
+  "files": 41,
+  "events": 41931000
+ },
+ "/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 192499253,
+  "files": 1,
+  "events": 69000
+ },
+ "/WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 201148377,
+  "files": 1,
+  "events": 67000
+ },
+ "/WZZ_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 407320120,
+  "files": 1,
+  "events": 137000
+ },
+ "/ZZZ_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 190253287,
+  "files": 1,
+  "events": 72000
+ },
+ "/WZG_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 1597632338,
+  "files": 1,
+  "events": 598000
+ },
+ "/TTWW_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 1422557608,
+  "files": 1,
+  "events": 309000
+ },
+ "/TTWZ_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 714763756,
+  "files": 1,
+  "events": 159000
+ },
+ "/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 2392920742,
+  "files": 3,
+  "events": 1000000
+ },
+ "/VBF_HToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 1423939065,
+  "files": 1,
+  "events": 498000
+ },
+ "/TTZToLL_M-1to10_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 1149983216,
+  "files": 2,
+  "events": 320000
+ },
+ "/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL16NanoAODv15-150X_mcRun2_asymptotic_v1-v1/NANOAODSIM": {
+  "bytes": 22858133547,
+  "files": 10,
+  "events": 6057000
+ },
+ "/WLLJJ_WToLNu_EWK_TuneCP5_13TeV_madgraph-madspin-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 3350834745,
+  "files": 2,
+  "events": 1000000
+ },
+ "/WZTo3LNu_mllmin4p0_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 3956613344,
+  "files": 3,
+  "events": 1994000
+ },
+ "/ZZJJTo4L_EWKnotop_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 11123731753,
+  "files": 7,
+  "events": 2747000
+ },
+ "/ZZTo4L_TuneCP5_13TeV_powheg_pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 192311603067,
+  "files": 86,
+  "events": 99388000
+ },
+ "/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 482504739,
+  "files": 1,
+  "events": 171000
+ },
+ "/WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 540527421,
+  "files": 1,
+  "events": 178000
+ },
+ "/WZZ_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 902440215,
+  "files": 1,
+  "events": 298000
+ },
+ "/ZZZ_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 481420698,
+  "files": 2,
+  "events": 178000
+ },
+ "/WZG_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 3830377608,
+  "files": 3,
+  "events": 1400000
+ },
+ "/TTWW_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 3265707678,
+  "files": 2,
+  "events": 698000
+ },
+ "/TTWZ_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 1595367214,
+  "files": 1,
+  "events": 350000
+ },
+ "/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 2464172162,
+  "files": 3,
+  "events": 998000
+ },
+ "/VBF_HToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 1463000274,
+  "files": 1,
+  "events": 499000
+ },
+ "/TTZToLL_M-1to10_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 2586890083,
+  "files": 2,
+  "events": 707000
+ },
+ "/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL17NanoAODv15-150X_mc2017_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 54695860939,
+  "files": 23,
+  "events": 14196000
+ },
+ "/WLLJJ_WToLNu_EWK_TuneCP5_13TeV_madgraph-madspin-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 3313657901,
+  "files": 3,
+  "events": 999000
+ },
+ "/WZTo3LNu_mllmin4p0_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 3926278840,
+  "files": 4,
+  "events": 1998000
+ },
+ "/ZZJJTo4L_EWKnotop_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 15936441330,
+  "files": 7,
+  "events": 3973000
+ },
+ "/ZZTo4L_TuneCP5_13TeV_powheg_pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 190395763294,
+  "files": 88,
+  "events": 99191000
+ },
+ "/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 670216587,
+  "files": 2,
+  "events": 240000
+ },
+ "/WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 744677633,
+  "files": 2,
+  "events": 248000
+ },
+ "/WZZ_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 898353392,
+  "files": 1,
+  "events": 300000
+ },
+ "/ZZZ_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 663348152,
+  "files": 2,
+  "events": 250000
+ },
+ "/WZG_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 5399410640,
+  "files": 4,
+  "events": 2000000
+ },
+ "/TTWW_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 4378724157,
+  "files": 3,
+  "events": 944000
+ },
+ "/TTWZ_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 2251460929,
+  "files": 2,
+  "events": 498000
+ },
+ "/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 2297394727,
+  "files": 3,
+  "events": 940000
+ },
+ "/VBF_HToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 1385885203,
+  "files": 2,
+  "events": 477000
+ },
+ "/TTZToLL_M-1to10_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 3588061363,
+  "files": 3,
+  "events": 994000
+ },
+ "/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL18NanoAODv15-150X_mc2018_realistic_v1-v1/NANOAODSIM": {
+  "bytes": 74643320575,
+  "files": 29,
+  "events": 19608000
+ },
+ "/SingleMuon/Run2018A-UL2018_NanoAODv15-v2/NANOAOD": {
+  "bytes": 303322040113,
+  "files": 165,
+  "events": 241600265
+ },
+ "/SingleMuon/Run2016B-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 2944672434,
+  "files": 4,
+  "events": 2789243
+ },
+ "/SingleMuon/Run2016B-HIPM_UL2016_NanoAODv15_v2-v1/NANOAOD": {
+  "bytes": 183389662242,
+  "files": 111,
+  "events": 158145722
+ },
+ "/SingleMuon/Run2017B-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 145769957201,
+  "files": 109,
+  "events": 136231038
+ },
+ "/SingleMuon/Run2018B-UL2018_NanoAODv15-v2/NANOAOD": {
+  "bytes": 150801411131,
+  "files": 108,
+  "events": 119876473
+ },
+ "/SingleMuon/Run2022B-22Sep2023-v1/NANOAOD": {
+  "bytes": 3848872952,
+  "files": 12,
+  "events": 5299377
+ },
+ "/SingleMuon/Run2016C-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 80262688577,
+  "files": 64,
+  "events": 67441308
+ },
+ "/SingleMuon/Run2017C-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 196297495470,
+  "files": 165,
+  "events": 165652756
+ },
+ "/SingleMuon/Run2018C-UL2018_NanoAODv15-v2/NANOAOD": {
+  "bytes": 140400574260,
+  "files": 96,
+  "events": 110032072
+ },
+ "/SingleMuon/Run2022C-22Sep2023-v1/NANOAOD": {
+  "bytes": 16854653265,
+  "files": 35,
+  "events": 20162441
+ },
+ "/SingleMuon/Run2016D-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 115085240390,
+  "files": 82,
+  "events": 98017996
+ },
+ "/SingleMuon/Run2017D-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 83294680026,
+  "files": 76,
+  "events": 70319399
+ },
+ "/SingleMuon/Run2018D-UL2018_NanoAODv15-v2/NANOAOD": {
+  "bytes": 648705587750,
+  "files": 371,
+  "events": 513884680
+ },
+ "/SingleMuon/Run2016E-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 108537268191,
+  "files": 79,
+  "events": 90984718
+ },
+ "/SingleMuon/Run2017E-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 190622604630,
+  "files": 127,
+  "events": 154618774
+ },
+ "/SingleMuon/Run2016F-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 68811348015,
+  "files": 56,
+  "events": 57465359
+ },
+ "/SingleMuon/Run2017F-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 303235548532,
+  "files": 236,
+  "events": 242140980
+ },
+ "/SingleMuon/Run2016F-UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 9530353317,
+  "files": 8,
+  "events": 8024195
+ },
+ "/SingleMuon/Run2016G-UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 179019000168,
+  "files": 122,
+  "events": 149916849
+ },
+ "/SingleMuon/Run2016H-UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 207793355736,
+  "files": 132,
+  "events": 174035164
+ },
+ "/DoubleMuon/Run2018A-UL2018_NanoAODv15-v2/NANOAOD": {
+  "bytes": 113825403110,
+  "files": 95,
+  "events": 75499908
+ },
+ "/DoubleMuon/Run2016B-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 4200453198,
+  "files": 5,
+  "events": 4199947
+ },
+ "/DoubleMuon/Run2016B-HIPM_UL2016_NanoAODv15_v2-v1/NANOAOD": {
+  "bytes": 97538954156,
+  "files": 63,
+  "events": 82535526
+ },
+ "/DoubleMuon/Run2017B-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 18839665138,
+  "files": 16,
+  "events": 14501767
+ },
+ "/DoubleMuon/Run2018B-UL2018_NanoAODv15-v2/NANOAOD": {
+  "bytes": 52253816005,
+  "files": 34,
+  "events": 35057758
+ },
+ "/DoubleMuon/Run2022B-22Sep2023-v1/NANOAOD": {
+  "bytes": 750948173,
+  "files": 7,
+  "events": 929009
+ },
+ "/DoubleMuon/Run2016C-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 35980998909,
+  "files": 30,
+  "events": 27934629
+ },
+ "/DoubleMuon/Run2017C-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 71437143233,
+  "files": 56,
+  "events": 49636525
+ },
+ "/DoubleMuon/Run2018C-UL2018_NanoAODv15-v2/NANOAOD": {
+  "bytes": 50975685524,
+  "files": 31,
+  "events": 34565869
+ },
+ "/DoubleMuon/Run2022C-22Sep2023-v1/NANOAOD": {
+  "bytes": 4121944908,
+  "files": 12,
+  "events": 4646904
+ },
+ "/DoubleMuon/Run2016D-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 44200781213,
+  "files": 32,
+  "events": 33861745
+ },
+ "/DoubleMuon/Run2017D-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 33341312754,
+  "files": 26,
+  "events": 23075733
+ },
+ "/DoubleMuon/Run2018D-UL2018_NanoAODv15-v2/NANOAOD": {
+  "bytes": 242037358440,
+  "files": 154,
+  "events": 168520053
+ },
+ "/DoubleMuon/Run2016E-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 38082103095,
+  "files": 32,
+  "events": 28246946
+ },
+ "/DoubleMuon/Run2017E-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 76872305657,
+  "files": 55,
+  "events": 51531477
+ },
+ "/DoubleMuon/Run2016F-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 24541470052,
+  "files": 17,
+  "events": 17900759
+ },
+ "/DoubleMuon/Run2017F-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 115993954192,
+  "files": 84,
+  "events": 79756560
+ },
+ "/DoubleMuon/Run2016F-UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 3400276784,
+  "files": 3,
+  "events": 2429162
+ },
+ "/DoubleMuon/Run2016G-UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 64041892566,
+  "files": 42,
+  "events": 45235604
+ },
+ "/DoubleMuon/Run2016H-UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 69903211518,
+  "files": 51,
+  "events": 48912812
+ },
+ "/MuonEG/Run2018A-UL2018_NanoAODv15-v2/NANOAOD": {
+  "bytes": 60889491062,
+  "files": 33,
+  "events": 32958503
+ },
+ "/MuonEG/Run2026A-PromptReco-v1/NANOAOD": {
+  "bytes": 5419536963,
+  "files": 38,
+  "events": 2699844
+ },
+ "/MuonEG/Run2016B-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 376484756,
+  "files": 3,
+  "events": 225271
+ },
+ "/MuonEG/Run2016B-HIPM_UL2016_NanoAODv15_v2-v1/NANOAOD": {
+  "bytes": 51314815022,
+  "files": 38,
+  "events": 32727796
+ },
+ "/MuonEG/Run2017B-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 7489190953,
+  "files": 8,
+  "events": 4453465
+ },
+ "/MuonEG/Run2018B-UL2018_NanoAODv15-v2/NANOAOD": {
+  "bytes": 30026571375,
+  "files": 18,
+  "events": 16204062
+ },
+ "/MuonEG/Run2022B-22Sep2023-v1/NANOAOD": {
+  "bytes": 335767614,
+  "files": 7,
+  "events": 254803
+ },
+ "/MuonEG/Run2025B-PromptReco-v1/NANOAOD": {
+  "bytes": 1821413920,
+  "files": 47,
+  "events": 910971
+ },
+ "/MuonEG/Run2026B-PromptReco-v1/NANOAOD": {
+  "bytes": 102456903835,
+  "files": 193,
+  "events": 50921430
+ },
+ "/MuonEG/Run2016C-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 24388867576,
+  "files": 21,
+  "events": 15405678
+ },
+ "/MuonEG/Run2017C-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 28701135684,
+  "files": 23,
+  "events": 15595214
+ },
+ "/MuonEG/Run2018C-UL2018_NanoAODv15-v2/NANOAOD": {
+  "bytes": 29472931797,
+  "files": 18,
+  "events": 15652198
+ },
+ "/MuonEG/Run2022C-22Sep2023-v1/NANOAOD": {
+  "bytes": 18585627343,
+  "files": 28,
+  "events": 15768439
+ },
+ "/MuonEG/Run2023C-22Sep2023_v1-v1/NANOAOD": {
+  "bytes": 11321043709,
+  "files": 25,
+  "events": 9772655
+ },
+ "/MuonEG/Run2023C-22Sep2023_v2-v1/NANOAOD": {
+  "bytes": 3168188744,
+  "files": 8,
+  "events": 2735170
+ },
+ "/MuonEG/Run2023C-22Sep2023_v3-v1/NANOAOD": {
+  "bytes": 4059959473,
+  "files": 11,
+  "events": 3502967
+ },
+ "/MuonEG/Run2023C-22Sep2023_v4-v1/NANOAOD": {
+  "bytes": 28836721117,
+  "files": 41,
+  "events": 24205121
+ },
+ "/MuonEG/Run2024C-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 34949443078,
+  "files": 35,
+  "events": 18312408
+ },
+ "/MuonEG/Run2025C-PromptReco-v1/NANOAOD": {
+  "bytes": 82731158678,
+  "files": 172,
+  "events": 41994774
+ },
+ "/MuonEG/Run2025C-PromptReco-v2/NANOAOD": {
+  "bytes": 45671037015,
+  "files": 92,
+  "events": 23203653
+ },
+ "/MuonEG/Run2026C-PromptReco-v1/NANOAOD": {
+  "bytes": 9535138874,
+  "files": 65,
+  "events": 5291221
+ },
+ "/MuonEG/Run2016D-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 36640705798,
+  "files": 27,
+  "events": 23482352
+ },
+ "/MuonEG/Run2017D-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 16883519769,
+  "files": 15,
+  "events": 9164365
+ },
+ "/MuonEG/Run2018D-UL2018_NanoAODv15-v1/NANOAOD": {
+  "bytes": 134258640952,
+  "files": 72,
+  "events": 71947999
+ },
+ "/MuonEG/Run2022D-22Sep2023-v1/NANOAOD": {
+  "bytes": 9348331020,
+  "files": 16,
+  "events": 8007031
+ },
+ "/MuonEG/Run2023D-22Sep2023_v1-v1/NANOAOD": {
+  "bytes": 20829868377,
+  "files": 32,
+  "events": 17530531
+ },
+ "/MuonEG/Run2023D-22Sep2023_v2-v1/NANOAOD": {
+  "bytes": 4465605008,
+  "files": 11,
+  "events": 3751587
+ },
+ "/MuonEG/Run2024D-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 35621755540,
+  "files": 47,
+  "events": 18827708
+ },
+ "/MuonEG/Run2025D-PromptReco-v1/NANOAOD": {
+  "bytes": 145511401202,
+  "files": 329,
+  "events": 72820407
+ },
+ "/MuonEG/Run2026D-PromptReco-v1/NANOAOD": {
+  "bytes": 65724385335,
+  "files": 120,
+  "events": 32379047
+ },
+ "/MuonEG/Run2016E-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 35457360077,
+  "files": 27,
+  "events": 22519303
+ },
+ "/MuonEG/Run2017E-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 35752059746,
+  "files": 24,
+  "events": 19043421
+ },
+ "/MuonEG/Run2022E-22Sep2023-v1/NANOAOD": {
+  "bytes": 14914848935,
+  "files": 29,
+  "events": 12873327
+ },
+ "/MuonEG/Run2024E-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 49954180806,
+  "files": 63,
+  "events": 26319233
+ },
+ "/MuonEG/Run2025E-PromptReco-v1/NANOAOD": {
+  "bytes": 81241284675,
+  "files": 165,
+  "events": 40691496
+ },
+ "/MuonEG/Run2016F-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 22366565871,
+  "files": 19,
+  "events": 14100826
+ },
+ "/MuonEG/Run2017F-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 48858852454,
+  "files": 40,
+  "events": 25776363
+ },
+ "/MuonEG/Run2022F-22Sep2023-v1/NANOAOD": {
+  "bytes": 44292216022,
+  "files": 95,
+  "events": 38219969
+ },
+ "/MuonEG/Run2024F-MINIv6NANOv15-v2/NANOAOD": {
+  "bytes": 127044713498,
+  "files": 106,
+  "events": 67341687
+ },
+ "/MuonEG/Run2025F-PromptReco-v1/NANOAOD": {
+  "bytes": 115263503245,
+  "files": 270,
+  "events": 58301670
+ },
+ "/MuonEG/Run2025F-PromptReco-v2/NANOAOD": {
+  "bytes": 44386350892,
+  "files": 105,
+  "events": 22447339
+ },
+ "/MuonEG/Run2016F-UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 3078025591,
+  "files": 3,
+  "events": 1901339
+ },
+ "/MuonEG/Run2022G-22Sep2023-v1/NANOAOD": {
+  "bytes": 7269094667,
+  "files": 27,
+  "events": 6238527
+ },
+ "/MuonEG/Run2024G-MINIv6NANOv15-v3/NANOAOD": {
+  "bytes": 184154619698,
+  "files": 150,
+  "events": 97985222
+ },
+ "/MuonEG/Run2025G-PromptReco-v1/NANOAOD": {
+  "bytes": 131554896364,
+  "files": 282,
+  "events": 67268221
+ },
+ "/MuonEG/Run2016G-UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 55625128002,
+  "files": 36,
+  "events": 33854612
+ },
+ "/MuonEG/Run2024H-MINIv6NANOv15-v2/NANOAOD": {
+  "bytes": 26855456844,
+  "files": 25,
+  "events": 14323522
+ },
+ "/MuonEG/Run2016H-UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 50646346955,
+  "files": 33,
+  "events": 29236516
+ },
+ "/MuonEG/Run2024I-MINIv6NANOv15-v2/NANOAOD": {
+  "bytes": 26974508988,
+  "files": 23,
+  "events": 14579063
+ },
+ "/MuonEG/Run2024I-MINIv6NANOv15_v2-v2/NANOAOD": {
+  "bytes": 27085311494,
+  "files": 22,
+  "events": 14674636
+ },
+ "/EGamma/Run2018A-UL2018_NanoAODv15-v2/NANOAOD": {
+  "bytes": 515664127509,
+  "files": 307,
+  "events": 339013231
+ },
+ "/EGamma0/Run2026A-PromptReco-v1/NANOAOD": {
+  "bytes": 19179259539,
+  "files": 62,
+  "events": 11733359
+ },
+ "/EGamma1/Run2026A-PromptReco-v1/NANOAOD": {
+  "bytes": 19182055456,
+  "files": 61,
+  "events": 11731043
+ },
+ "/EGamma2/Run2026A-PromptReco-v1/NANOAOD": {
+  "bytes": 19203180956,
+  "files": 66,
+  "events": 11732795
+ },
+ "/EGamma3/Run2026A-PromptReco-v1/NANOAOD": {
+  "bytes": 19194502201,
+  "files": 65,
+  "events": 11731165
+ },
+ "/EGamma4/Run2026A-PromptReco-v1/NANOAOD": {
+  "bytes": 19181051516,
+  "files": 60,
+  "events": 11733095
+ },
+ "/EGamma5/Run2026A-PromptReco-v1/NANOAOD": {
+  "bytes": 19177256454,
+  "files": 60,
+  "events": 11731599
+ },
+ "/DoubleEG/Run2016B-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 6769296030,
+  "files": 7,
+  "events": 5686987
+ },
+ "/DoubleEG/Run2016B-HIPM_UL2016_NanoAODv15_v2-v1/NANOAOD": {
+  "bytes": 189924194484,
+  "files": 116,
+  "events": 143073268
+ },
+ "/DoubleEG/Run2017B-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 86540659445,
+  "files": 55,
+  "events": 58088760
+ },
+ "/EGamma/Run2018B-UL2018_NanoAODv15-v2/NANOAOD": {
+  "bytes": 239926958230,
+  "files": 123,
+  "events": 153822427
+ },
+ "/EGamma/Run2022B-22Sep2023-v2/NANOAOD": {
+  "bytes": 8667675377,
+  "files": 14,
+  "events": 11074301
+ },
+ "/EGamma0/Run2025B-PromptReco-v1/NANOAOD": {
+  "bytes": 7885062700,
+  "files": 75,
+  "events": 5256904
+ },
+ "/EGamma1/Run2025B-PromptReco-v1/NANOAOD": {
+  "bytes": 7886212725,
+  "files": 75,
+  "events": 5253103
+ },
+ "/EGamma2/Run2025B-PromptReco-v1/NANOAOD": {
+  "bytes": 7888811847,
+  "files": 75,
+  "events": 5254123
+ },
+ "/EGamma3/Run2025B-PromptReco-v1/NANOAOD": {
+  "bytes": 7885581313,
+  "files": 75,
+  "events": 5253489
+ },
+ "/EGamma0/Run2026B-PromptReco-v1/NANOAOD": {
+  "bytes": 339833459727,
+  "files": 536,
+  "events": 205275441
+ },
+ "/EGamma1/Run2026B-PromptReco-v1/NANOAOD": {
+  "bytes": 339852011624,
+  "files": 532,
+  "events": 205266455
+ },
+ "/EGamma2/Run2026B-PromptReco-v1/NANOAOD": {
+  "bytes": 339862453631,
+  "files": 534,
+  "events": 205274221
+ },
+ "/EGamma3/Run2026B-PromptReco-v1/NANOAOD": {
+  "bytes": 339750106031,
+  "files": 529,
+  "events": 205271520
+ },
+ "/EGamma4/Run2026B-PromptReco-v1/NANOAOD": {
+  "bytes": 339901977749,
+  "files": 533,
+  "events": 205273231
+ },
+ "/EGamma5/Run2026B-PromptReco-v1/NANOAOD": {
+  "bytes": 339849768141,
+  "files": 535,
+  "events": 205265468
+ },
+ "/DoubleEG/Run2016C-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 68140016721,
+  "files": 52,
+  "events": 47677856
+ },
+ "/DoubleEG/Run2017C-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 101079742613,
+  "files": 61,
+  "events": 65174039
+ },
+ "/EGamma/Run2018C-UL2018_NanoAODv15-v2/NANOAOD": {
+  "bytes": 234842650260,
+  "files": 153,
+  "events": 147827904
+ },
+ "/EGamma/Run2022C-22Sep2023-v1/NANOAOD": {
+  "bytes": 250478080158,
+  "files": 313,
+  "events": 263689151
+ },
+ "/EGamma0/Run2023C-22Sep2023_v1-v1/NANOAOD": {
+  "bytes": 64917127631,
+  "files": 90,
+  "events": 67598081
+ },
+ "/EGamma0/Run2023C-22Sep2023_v2-v1/NANOAOD": {
+  "bytes": 16755432675,
+  "files": 22,
+  "events": 17233307
+ },
+ "/EGamma0/Run2023C-22Sep2023_v3-v1/NANOAOD": {
+  "bytes": 21406311092,
+  "files": 26,
+  "events": 21993048
+ },
+ "/EGamma0/Run2023C-22Sep2023_v4-v1/NANOAOD": {
+  "bytes": 160990136567,
+  "files": 168,
+  "events": 160108119
+ },
+ "/EGamma1/Run2023C-22Sep2023_v1-v1/NANOAOD": {
+  "bytes": 64826915126,
+  "files": 71,
+  "events": 67582665
+ },
+ "/EGamma1/Run2023C-22Sep2023_v2-v1/NANOAOD": {
+  "bytes": 16762526365,
+  "files": 24,
+  "events": 17230822
+ },
+ "/EGamma1/Run2023C-22Sep2023_v3-v1/NANOAOD": {
+  "bytes": 21457930032,
+  "files": 25,
+  "events": 21987586
+ },
+ "/EGamma1/Run2023C-22Sep2023_v4-v1/NANOAOD": {
+  "bytes": 161064966548,
+  "files": 177,
+  "events": 160049621
+ },
+ "/EGamma0/Run2024C-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 250738438238,
+  "files": 167,
+  "events": 157351226
+ },
+ "/EGamma1/Run2024C-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 252139627451,
+  "files": 247,
+  "events": 157860731
+ },
+ "/EGamma0/Run2025C-PromptReco-v1/NANOAOD": {
+  "bytes": 387155423444,
+  "files": 655,
+  "events": 243682359
+ },
+ "/EGamma1/Run2025C-PromptReco-v1/NANOAOD": {
+  "bytes": 387163042950,
+  "files": 652,
+  "events": 243674671
+ },
+ "/EGamma2/Run2025C-PromptReco-v1/NANOAOD": {
+  "bytes": 387187003064,
+  "files": 656,
+  "events": 243672282
+ },
+ "/EGamma3/Run2025C-PromptReco-v1/NANOAOD": {
+  "bytes": 387211781780,
+  "files": 660,
+  "events": 243679348
+ },
+ "/EGamma0/Run2025C-PromptReco-v2/NANOAOD": {
+  "bytes": 212914625066,
+  "files": 342,
+  "events": 133952379
+ },
+ "/EGamma1/Run2025C-PromptReco-v2/NANOAOD": {
+  "bytes": 212930303512,
+  "files": 347,
+  "events": 133951067
+ },
+ "/EGamma2/Run2025C-PromptReco-v2/NANOAOD": {
+  "bytes": 212981687850,
+  "files": 351,
+  "events": 133950574
+ },
+ "/EGamma3/Run2025C-PromptReco-v2/NANOAOD": {
+  "bytes": 212948307740,
+  "files": 343,
+  "events": 133949781
+ },
+ "/EGamma0/Run2026C-PromptReco-v1/NANOAOD": {
+  "bytes": 421520023798,
+  "files": 603,
+  "events": 375030929
+ },
+ "/EGamma1/Run2026C-PromptReco-v1/NANOAOD": {
+  "bytes": 421309881094,
+  "files": 611,
+  "events": 374809724
+ },
+ "/EGamma2/Run2026C-PromptReco-v1/NANOAOD": {
+  "bytes": 421189016559,
+  "files": 594,
+  "events": 374832870
+ },
+ "/EGamma3/Run2026C-PromptReco-v1/NANOAOD": {
+  "bytes": 421164504422,
+  "files": 590,
+  "events": 374811337
+ },
+ "/EGamma4/Run2026C-PromptReco-v1/NANOAOD": {
+  "bytes": 421156420269,
+  "files": 592,
+  "events": 374793369
+ },
+ "/EGamma5/Run2026C-PromptReco-v1/NANOAOD": {
+  "bytes": 421143446124,
+  "files": 589,
+  "events": 374804007
+ },
+ "/DoubleEG/Run2016D-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 76066099883,
+  "files": 61,
+  "events": 53324960
+ },
+ "/DoubleEG/Run2017D-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 40617252761,
+  "files": 24,
+  "events": 25911432
+ },
+ "/EGamma/Run2018D-UL2018_NanoAODv15-v2/NANOAOD": {
+  "bytes": 1160071902847,
+  "files": 554,
+  "events": 750969448
+ },
+ "/EGamma/Run2022D-22Sep2023-v1/NANOAOD": {
+  "bytes": 87706234303,
+  "files": 109,
+  "events": 89134996
+ },
+ "/EGamma0/Run2023D-22Sep2023_v1-v1/NANOAOD": {
+  "bytes": 106362115433,
+  "files": 124,
+  "events": 105892646
+ },
+ "/EGamma0/Run2023D-22Sep2023_v2-v1/NANOAOD": {
+  "bytes": 22851463854,
+  "files": 33,
+  "events": 22657211
+ },
+ "/EGamma1/Run2023D-22Sep2023_v1-v1/NANOAOD": {
+  "bytes": 106255760941,
+  "files": 104,
+  "events": 105824276
+ },
+ "/EGamma1/Run2023D-22Sep2023_v2-v1/NANOAOD": {
+  "bytes": 22813681205,
+  "files": 30,
+  "events": 22653287
+ },
+ "/EGamma0/Run2024D-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 248903435759,
+  "files": 173,
+  "events": 156558757
+ },
+ "/EGamma1/Run2024D-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 248975237884,
+  "files": 279,
+  "events": 156275778
+ },
+ "/EGamma0/Run2025D-PromptReco-v1/NANOAOD": {
+  "bytes": 673636223773,
+  "files": 1105,
+  "events": 414017171
+ },
+ "/EGamma1/Run2025D-PromptReco-v1/NANOAOD": {
+  "bytes": 672934692811,
+  "files": 1095,
+  "events": 413556254
+ },
+ "/EGamma2/Run2025D-PromptReco-v1/NANOAOD": {
+  "bytes": 673866690264,
+  "files": 1121,
+  "events": 414008481
+ },
+ "/EGamma3/Run2025D-PromptReco-v1/NANOAOD": {
+  "bytes": 673711721173,
+  "files": 1090,
+  "events": 414010046
+ },
+ "/EGamma0/Run2026D-PromptReco-v1/NANOAOD": {
+  "bytes": 210873111495,
+  "files": 334,
+  "events": 125742096
+ },
+ "/EGamma1/Run2026D-PromptReco-v1/NANOAOD": {
+  "bytes": 210873869174,
+  "files": 325,
+  "events": 125740549
+ },
+ "/EGamma2/Run2026D-PromptReco-v1/NANOAOD": {
+  "bytes": 210854703770,
+  "files": 335,
+  "events": 125741242
+ },
+ "/EGamma3/Run2026D-PromptReco-v1/NANOAOD": {
+  "bytes": 210807412762,
+  "files": 327,
+  "events": 125739959
+ },
+ "/EGamma4/Run2026D-PromptReco-v1/NANOAOD": {
+  "bytes": 210942018704,
+  "files": 332,
+  "events": 125741715
+ },
+ "/EGamma5/Run2026D-PromptReco-v1/NANOAOD": {
+  "bytes": 210814113247,
+  "files": 327,
+  "events": 125738632
+ },
+ "/DoubleEG/Run2016E-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 72199884578,
+  "files": 57,
+  "events": 49877710
+ },
+ "/DoubleEG/Run2017E-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 91832055805,
+  "files": 54,
+  "events": 56237908
+ },
+ "/EGamma/Run2022E-22Sep2023-v1/NANOAOD": {
+  "bytes": 145940499225,
+  "files": 188,
+  "events": 148654795
+ },
+ "/EGamma0/Run2024E-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 392918242385,
+  "files": 267,
+  "events": 249417634
+ },
+ "/EGamma1/Run2024E-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 393466558583,
+  "files": 335,
+  "events": 249489829
+ },
+ "/EGamma0/Run2025E-PromptReco-v1/NANOAOD": {
+  "bytes": 392755724035,
+  "files": 595,
+  "events": 240927385
+ },
+ "/EGamma1/Run2025E-PromptReco-v1/NANOAOD": {
+  "bytes": 392826436160,
+  "files": 596,
+  "events": 240921314
+ },
+ "/EGamma2/Run2025E-PromptReco-v1/NANOAOD": {
+  "bytes": 392823462595,
+  "files": 593,
+  "events": 240923259
+ },
+ "/EGamma3/Run2025E-PromptReco-v1/NANOAOD": {
+  "bytes": 392833028380,
+  "files": 598,
+  "events": 240923335
+ },
+ "/DoubleEG/Run2016F-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 44703520771,
+  "files": 31,
+  "events": 30216940
+ },
+ "/DoubleEG/Run2017F-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 123467652303,
+  "files": 76,
+  "events": 74265012
+ },
+ "/EGamma/Run2022F-22Sep2023-v1/NANOAOD": {
+  "bytes": 458758402406,
+  "files": 490,
+  "events": 464373259
+ },
+ "/EGamma0/Run2024F-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 1012441569273,
+  "files": 719,
+  "events": 638196622
+ },
+ "/EGamma1/Run2024F-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 1000028866937,
+  "files": 747,
+  "events": 631079889
+ },
+ "/EGamma0/Run2025F-PromptReco-v1/NANOAOD": {
+  "bytes": 557841407232,
+  "files": 888,
+  "events": 346019505
+ },
+ "/EGamma1/Run2025F-PromptReco-v1/NANOAOD": {
+  "bytes": 557871431222,
+  "files": 875,
+  "events": 346000262
+ },
+ "/EGamma2/Run2025F-PromptReco-v1/NANOAOD": {
+  "bytes": 557864383738,
+  "files": 876,
+  "events": 346008679
+ },
+ "/EGamma3/Run2025F-PromptReco-v1/NANOAOD": {
+  "bytes": 557876679623,
+  "files": 889,
+  "events": 346009210
+ },
+ "/EGamma0/Run2025F-PromptReco-v2/NANOAOD": {
+  "bytes": 224923137705,
+  "files": 351,
+  "events": 139317024
+ },
+ "/EGamma1/Run2025F-PromptReco-v2/NANOAOD": {
+  "bytes": 224930903729,
+  "files": 350,
+  "events": 139310909
+ },
+ "/EGamma2/Run2025F-PromptReco-v2/NANOAOD": {
+  "bytes": 224977995937,
+  "files": 358,
+  "events": 139313488
+ },
+ "/EGamma3/Run2025F-PromptReco-v2/NANOAOD": {
+  "bytes": 224932879253,
+  "files": 340,
+  "events": 139314438
+ },
+ "/DoubleEG/Run2016F-UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 6582714311,
+  "files": 6,
+  "events": 4360689
+ },
+ "/EGamma/Run2022G-22Sep2023-v2/NANOAOD": {
+  "bytes": 75950426851,
+  "files": 87,
+  "events": 76807350
+ },
+ "/EGamma0/Run2024G-MINIv6NANOv15-v2/NANOAOD": {
+  "bytes": 1428952235031,
+  "files": 850,
+  "events": 903520258
+ },
+ "/EGamma1/Run2024G-MINIv6NANOv15-v2/NANOAOD": {
+  "bytes": 1429052849224,
+  "files": 888,
+  "events": 903441926
+ },
+ "/EGamma0/Run2025G-PromptReco-v1/NANOAOD": {
+  "bytes": 672276737883,
+  "files": 1012,
+  "events": 421398444
+ },
+ "/EGamma1/Run2025G-PromptReco-v1/NANOAOD": {
+  "bytes": 671765973516,
+  "files": 1010,
+  "events": 421102377
+ },
+ "/EGamma2/Run2025G-PromptReco-v1/NANOAOD": {
+  "bytes": 672415782134,
+  "files": 1016,
+  "events": 421453068
+ },
+ "/EGamma3/Run2025G-PromptReco-v1/NANOAOD": {
+  "bytes": 671881602678,
+  "files": 1012,
+  "events": 421124471
+ },
+ "/DoubleEG/Run2016G-UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 121333053296,
+  "files": 75,
+  "events": 78797031
+ },
+ "/EGamma0/Run2024H-MINIv6NANOv15-v2/NANOAOD": {
+  "bytes": 213213759899,
+  "files": 138,
+  "events": 134680448
+ },
+ "/EGamma1/Run2024H-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 213679288282,
+  "files": 191,
+  "events": 134835799
+ },
+ "/DoubleEG/Run2016H-UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 133501063836,
+  "files": 87,
+  "events": 85388734
+ },
+ "/EGamma0/Run2024I-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 207901997989,
+  "files": 211,
+  "events": 132904290
+ },
+ "/EGamma1/Run2024I-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 207758553084,
+  "files": 176,
+  "events": 132903874
+ },
+ "/EGamma0/Run2024I-MINIv6NANOv15_v2-v1/NANOAOD": {
+  "bytes": 229332670236,
+  "files": 198,
+  "events": 150687674
+ },
+ "/EGamma1/Run2024I-MINIv6NANOv15_v2-v1/NANOAOD": {
+  "bytes": 229352604127,
+  "files": 179,
+  "events": 150687112
+ },
+ "/Muon0/Run2026A-PromptReco-v1/NANOAOD": {
+  "bytes": 10648882240,
+  "files": 56,
+  "events": 7347779
+ },
+ "/Muon1/Run2026A-PromptReco-v1/NANOAOD": {
+  "bytes": 10637476662,
+  "files": 54,
+  "events": 7344116
+ },
+ "/Muon2/Run2026A-PromptReco-v1/NANOAOD": {
+  "bytes": 10638728958,
+  "files": 52,
+  "events": 7347312
+ },
+ "/Muon3/Run2026A-PromptReco-v1/NANOAOD": {
+  "bytes": 10625198715,
+  "files": 51,
+  "events": 7345253
+ },
+ "/SingleElectron/Run2016B-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 1879222702,
+  "files": 2,
+  "events": 1422819
+ },
+ "/SingleElectron/Run2016B-HIPM_UL2016_NanoAODv15_v2-v1/NANOAOD": {
+  "bytes": 328465801228,
+  "files": 201,
+  "events": 246440440
+ },
+ "/SingleElectron/Run2017B-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 74024002790,
+  "files": 49,
+  "events": 60537490
+ },
+ "/Muon0/Run2025B-PromptReco-v1/NANOAOD": {
+  "bytes": 6930324207,
+  "files": 77,
+  "events": 5602078
+ },
+ "/Muon1/Run2025B-PromptReco-v1/NANOAOD": {
+  "bytes": 6926558701,
+  "files": 77,
+  "events": 5598676
+ },
+ "/Muon0/Run2026B-PromptReco-v1/NANOAOD": {
+  "bytes": 232558411472,
+  "files": 448,
+  "events": 155034715
+ },
+ "/Muon1/Run2026B-PromptReco-v1/NANOAOD": {
+  "bytes": 232622291679,
+  "files": 443,
+  "events": 155028140
+ },
+ "/Muon2/Run2026B-PromptReco-v1/NANOAOD": {
+  "bytes": 232566531828,
+  "files": 448,
+  "events": 155029788
+ },
+ "/Muon3/Run2026B-PromptReco-v1/NANOAOD": {
+  "bytes": 232553750206,
+  "files": 443,
+  "events": 155025135
+ },
+ "/SingleElectron/Run2016C-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 135516718301,
+  "files": 97,
+  "events": 97180676
+ },
+ "/SingleElectron/Run2017C-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 189332258038,
+  "files": 103,
+  "events": 136637888
+ },
+ "/Muon/Run2022C-22Sep2023-v1/NANOAOD": {
+  "bytes": 113705223219,
+  "files": 124,
+  "events": 138427345
+ },
+ "/Muon0/Run2023C-22Sep2023_v1-v1/NANOAOD": {
+  "bytes": 44359555364,
+  "files": 90,
+  "events": 54715896
+ },
+ "/Muon0/Run2023C-22Sep2023_v2-v1/NANOAOD": {
+  "bytes": 13779255414,
+  "files": 31,
+  "events": 17063451
+ },
+ "/Muon0/Run2023C-22Sep2023_v3-v1/NANOAOD": {
+  "bytes": 16407008367,
+  "files": 42,
+  "events": 20015377
+ },
+ "/Muon0/Run2023C-22Sep2023_v4-v1/NANOAOD": {
+  "bytes": 118040375245,
+  "files": 165,
+  "events": 138943783
+ },
+ "/Muon1/Run2023C-22Sep2023_v1-v1/NANOAOD": {
+  "bytes": 44258448094,
+  "files": 73,
+  "events": 54698315
+ },
+ "/Muon1/Run2023C-22Sep2023_v2-v1/NANOAOD": {
+  "bytes": 13838491248,
+  "files": 33,
+  "events": 17059895
+ },
+ "/Muon1/Run2023C-22Sep2023_v3-v1/NANOAOD": {
+  "bytes": 16380526417,
+  "files": 30,
+  "events": 20010429
+ },
+ "/Muon1/Run2023C-22Sep2023_v4-v2/NANOAOD": {
+  "bytes": 117844008529,
+  "files": 108,
+  "events": 138912262
+ },
+ "/Muon0/Run2024C-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 134776924585,
+  "files": 103,
+  "events": 97505587
+ },
+ "/Muon1/Run2024C-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 134790070936,
+  "files": 94,
+  "events": 97531998
+ },
+ "/Muon0/Run2025C-PromptReco-v1/NANOAOD": {
+  "bytes": 357757980267,
+  "files": 638,
+  "events": 250835953
+ },
+ "/Muon1/Run2025C-PromptReco-v1/NANOAOD": {
+  "bytes": 357830422448,
+  "files": 644,
+  "events": 250819768
+ },
+ "/Muon0/Run2025C-PromptReco-v2/NANOAOD": {
+  "bytes": 212571285132,
+  "files": 356,
+  "events": 148575745
+ },
+ "/Muon1/Run2025C-PromptReco-v2/NANOAOD": {
+  "bytes": 212539291128,
+  "files": 350,
+  "events": 148565659
+ },
+ "/Muon0/Run2026C-PromptReco-v1/NANOAOD": {
+  "bytes": 640153010167,
+  "files": 813,
+  "events": 779902163
+ },
+ "/Muon1/Run2026C-PromptReco-v1/NANOAOD": {
+  "bytes": 639346240302,
+  "files": 778,
+  "events": 779231920
+ },
+ "/Muon2/Run2026C-PromptReco-v1/NANOAOD": {
+  "bytes": 639428864801,
+  "files": 784,
+  "events": 779164947
+ },
+ "/Muon3/Run2026C-PromptReco-v1/NANOAOD": {
+  "bytes": 639161509565,
+  "files": 777,
+  "events": 779192881
+ },
+ "/SingleElectron/Run2016D-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 202026467107,
+  "files": 123,
+  "events": 148167727
+ },
+ "/SingleElectron/Run2017D-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 70133463365,
+  "files": 64,
+  "events": 51526521
+ },
+ "/Muon/Run2022D-22Sep2023-v1/NANOAOD": {
+  "bytes": 61753191845,
+  "files": 82,
+  "events": 75468381
+ },
+ "/Muon0/Run2023D-22Sep2023_v1-v1/NANOAOD": {
+  "bytes": 83921898090,
+  "files": 125,
+  "events": 100291308
+ },
+ "/Muon0/Run2023D-22Sep2023_v2-v1/NANOAOD": {
+  "bytes": 18064672092,
+  "files": 32,
+  "events": 21462916
+ },
+ "/Muon1/Run2023D-22Sep2023_v1-v1/NANOAOD": {
+  "bytes": 83689095709,
+  "files": 100,
+  "events": 100281976
+ },
+ "/Muon1/Run2023D-22Sep2023_v2-v1/NANOAOD": {
+  "bytes": 17986756472,
+  "files": 30,
+  "events": 21463645
+ },
+ "/Muon0/Run2024D-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 164485932770,
+  "files": 180,
+  "events": 120787065
+ },
+ "/Muon1/Run2024D-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 164032354112,
+  "files": 168,
+  "events": 120467371
+ },
+ "/Muon0/Run2025D-PromptReco-v1/NANOAOD": {
+  "bytes": 697934031994,
+  "files": 1166,
+  "events": 479676562
+ },
+ "/Muon1/Run2025D-PromptReco-v1/NANOAOD": {
+  "bytes": 697904513043,
+  "files": 1159,
+  "events": 479642866
+ },
+ "/Muon0/Run2026D-PromptReco-v1/NANOAOD": {
+  "bytes": 171186145545,
+  "files": 321,
+  "events": 112288744
+ },
+ "/Muon1/Run2026D-PromptReco-v1/NANOAOD": {
+  "bytes": 171172949287,
+  "files": 317,
+  "events": 112284014
+ },
+ "/Muon2/Run2026D-PromptReco-v1/NANOAOD": {
+  "bytes": 171174950499,
+  "files": 313,
+  "events": 112290907
+ },
+ "/Muon3/Run2026D-PromptReco-v1/NANOAOD": {
+  "bytes": 171184977706,
+  "files": 321,
+  "events": 112282726
+ },
+ "/SingleElectron/Run2016E-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 165866165848,
+  "files": 105,
+  "events": 117269446
+ },
+ "/SingleElectron/Run2017E-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 144313577917,
+  "files": 96,
+  "events": 102122055
+ },
+ "/Muon/Run2022E-22Sep2023-v1/NANOAOD": {
+  "bytes": 115562746945,
+  "files": 147,
+  "events": 141460608
+ },
+ "/Muon0/Run2024E-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 234604200578,
+  "files": 255,
+  "events": 169640946
+ },
+ "/Muon1/Run2024E-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 238791981906,
+  "files": 171,
+  "events": 172848674
+ },
+ "/Muon0/Run2025E-PromptReco-v1/NANOAOD": {
+  "bytes": 388290135827,
+  "files": 606,
+  "events": 265645863
+ },
+ "/Muon1/Run2025E-PromptReco-v1/NANOAOD": {
+  "bytes": 388225843829,
+  "files": 611,
+  "events": 265630211
+ },
+ "/SingleElectron/Run2016F-HIPM_UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 85929313356,
+  "files": 64,
+  "events": 61735326
+ },
+ "/SingleElectron/Run2017F-UL2017_NanoAODv15-v1/NANOAOD": {
+  "bytes": 186892554581,
+  "files": 117,
+  "events": 128467223
+ },
+ "/Muon/Run2022F-22Sep2023-v2/NANOAOD": {
+  "bytes": 376252222086,
+  "files": 359,
+  "events": 449887248
+ },
+ "/Muon0/Run2024F-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 615054396443,
+  "files": 594,
+  "events": 442432787
+ },
+ "/Muon1/Run2024F-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 614702799116,
+  "files": 538,
+  "events": 442360423
+ },
+ "/Muon0/Run2025F-PromptReco-v1/NANOAOD": {
+  "bytes": 543565493187,
+  "files": 884,
+  "events": 377119912
+ },
+ "/Muon1/Run2025F-PromptReco-v1/NANOAOD": {
+  "bytes": 543561119651,
+  "files": 891,
+  "events": 377092035
+ },
+ "/Muon0/Run2025F-PromptReco-v2/NANOAOD": {
+  "bytes": 207795737715,
+  "files": 344,
+  "events": 143519758
+ },
+ "/Muon1/Run2025F-PromptReco-v2/NANOAOD": {
+  "bytes": 207840786026,
+  "files": 345,
+  "events": 143511119
+ },
+ "/SingleElectron/Run2016F-UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 12084042971,
+  "files": 11,
+  "events": 8858206
+ },
+ "/Muon/Run2022G-22Sep2023-v1/NANOAOD": {
+  "bytes": 64269746338,
+  "files": 88,
+  "events": 76689396
+ },
+ "/Muon0/Run2024G-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 888358140704,
+  "files": 948,
+  "events": 642028803
+ },
+ "/Muon1/Run2024G-MINIv6NANOv15-v2/NANOAOD": {
+  "bytes": 886152452339,
+  "files": 565,
+  "events": 641959643
+ },
+ "/Muon0/Run2025G-PromptReco-v1/NANOAOD": {
+  "bytes": 629337404394,
+  "files": 1009,
+  "events": 442329683
+ },
+ "/Muon1/Run2025G-PromptReco-v1/NANOAOD": {
+  "bytes": 629559066581,
+  "files": 1003,
+  "events": 442232031
+ },
+ "/SingleElectron/Run2016G-UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 212272508884,
+  "files": 128,
+  "events": 153363109
+ },
+ "/Muon0/Run2024H-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 129634845343,
+  "files": 152,
+  "events": 93983627
+ },
+ "/Muon1/Run2024H-MINIv6NANOv15-v2/NANOAOD": {
+  "bytes": 129329625386,
+  "files": 93,
+  "events": 93981102
+ },
+ "/SingleElectron/Run2016H-UL2016_NanoAODv15-v1/NANOAOD": {
+  "bytes": 183748427482,
+  "files": 123,
+  "events": 129021893
+ },
+ "/Muon0/Run2024I-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 131947994374,
+  "files": 173,
+  "events": 97634104
+ },
+ "/Muon1/Run2024I-MINIv6NANOv15-v1/NANOAOD": {
+  "bytes": 131571503162,
+  "files": 94,
+  "events": 97630010
+ },
+ "/Muon0/Run2024I-MINIv6NANOv15_v2-v1/NANOAOD": {
+  "bytes": 139264307671,
+  "files": 174,
+  "events": 105194627
+ },
+ "/Muon1/Run2024I-MINIv6NANOv15_v2-v1/NANOAOD": {
+  "bytes": 139106942155,
+  "files": 133,
+  "events": 105189040
+ }
+}
