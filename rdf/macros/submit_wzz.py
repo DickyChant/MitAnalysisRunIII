@@ -7,7 +7,8 @@ Run in rdf/macros/ after make_filelists.py.
 
 Without --submit only the work area is prepared (tarball, wrapper, jobs.txt, submit file) and
 the job count is printed. Work area: <base>/<tag>/ with output/ (fillhisto files, per-job
-normalised: harvest with wvz wzz/harvest.py), logs/. Re-running with --missing-only writes a
+normalised: harvest with wvz wzz/harvest.py), logs/. +REQUIRED_OS = "rhel9": the CMS Connect
+schedd otherwise defaults to rhel7, for which (2026) no glideins match, and CMSSW_14_1_4 is el9. Re-running with --missing-only writes a
 jobs.txt with only the jobs whose output is absent (top-up; the harvest's per-job
 normalisation makes partial and late jobs safe).
 """
@@ -49,6 +50,7 @@ transfer_output_remaps = "fillhisto_wzzAnalysis_sample$(sample)_year$(year)_job$
 log = {area}/logs/$(sample)_$(year)_$(job).log
 output = {area}/logs/$(sample)_$(year)_$(job).out
 error = {area}/logs/$(sample)_$(year)_$(job).err
++REQUIRED_OS = "rhel9"
 use_x509userproxy = True
 x509userproxy = {proxy}
 max_retries = 2
