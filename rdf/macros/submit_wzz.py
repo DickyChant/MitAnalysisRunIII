@@ -54,7 +54,7 @@ error = {area}/logs/$(sample)_$(year)_$(job).err
 use_x509userproxy = True
 x509userproxy = {proxy}
 max_retries = 2
-queue sample, year, job, group from {area}/jobs.txt
+queue sample, year, job, group from {jobs}
 """
 # every local header (functions.h -> mysf.h -> muonCrystalBall.h, ...): a missing one only shows up on
 # the worker nodes (the pilot failed on muonCrystalBall.h); utils*.py are the only local Python modules
@@ -76,6 +76,7 @@ def main():
     ap.add_argument("--only-years", nargs="*", type=int)
     ap.add_argument("--only-samples", nargs="*", type=int)
     ap.add_argument("--missing-only", action="store_true")
+    ap.add_argument("--kind", choices=("all", "mc", "data"), default="all")
     ap.add_argument("--submit", action="store_true")
     ap.add_argument("--proxy", default="~/.wzz/x509_proxy",
                     help="grid proxy shipped with the jobs (long-lived copy of the EOS proxy; mode 600)")
@@ -90,6 +91,8 @@ def main():
             continue
         s, y = int(m.group(1)), int(m.group(2))
         if (args.only_years and y not in args.only_years) or (args.only_samples and s not in args.only_samples):
+            continue
+        if (args.kind == "mc" and s >= 1000) or (args.kind == "data" and s < 1000):
             continue
         fl = "direct/filelists/{0}.txt".format(s) if s < 1000 else "direct/filelists/data_{0}_{1}.txt".format(s, y // 10)
         if not os.path.exists(fl):
@@ -106,7 +109,8 @@ def main():
             if args.missing_only and os.path.exists(out):
                 continue
             jobs.append((s, y, j, g))
-    with open(os.path.join(area, "jobs.txt"), "w") as f:
+    jobs_file = os.path.join(area, "jobs_{0}.txt".format(args.kind))
+    with open(jobs_file, "w") as f:
         for r in jobs:
             f.write("{0} {1} {2} {3}\n".format(*r))
     open(os.path.join(area, "wzz_condor.sh"), "w").write(WRAPPER)
@@ -114,7 +118,8 @@ def main():
     proxy = os.path.expanduser(args.proxy)
     if not os.path.exists(proxy):
         sys.exit("no grid proxy at {0}".format(proxy))
-    open(os.path.join(area, "submit.jdl"), "w").write(SUBMIT.format(area=area, proxy=proxy))
+    jdl = os.path.join(area, "submit_{0}.jdl".format(args.kind))
+    open(jdl, "w").write(SUBMIT.format(area=area, proxy=proxy, jobs=jobs_file))
     if not args.missing_only or not os.path.exists(os.path.join(area, "wzzAnalysis.tgz")):
         items = " ".join(TAR_ITEMS)
         subprocess.run("tar czf {0}/wzzAnalysis.tgz {1}".format(area, items), shell=True, check=True)
@@ -123,7 +128,7 @@ def main():
         len(per), len(jobs), nmc, len(jobs) - nmc, sum(n for n, _ in per.values())))
     print("work area", area)
     if args.submit:
-        subprocess.run(["condor_submit", os.path.join(area, "submit.jdl")], check=True)
+        subprocess.run(["condor_submit", jdl], check=True)
     else:
         print("not submitted (add --submit)")
 
