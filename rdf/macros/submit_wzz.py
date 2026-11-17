@@ -56,8 +56,10 @@ x509userproxy = {proxy}
 max_retries = 2
 queue sample, year, job, group from {area}/jobs.txt
 """
-TAR_ITEMS = ["wzzAnalysis.py", "wzz_functions.h", "wzz_fill.h", "wzz_sf.h", "wzz_bdt.h", "functions.h", "mysf.h",
-             "utils*.py", "tmva_helper_xml.*", "data", "jsns", "config", "jsonpog-integration", "direct/filelists"]
+# every local header (functions.h -> mysf.h -> muonCrystalBall.h, ...): a missing one only shows up on
+# the worker nodes (the pilot failed on muonCrystalBall.h); utils*.py are the only local Python modules
+TAR_ITEMS = ["wzzAnalysis.py", "*.h", "utils*.py", "tmva_helper_xml.*", "data", "jsns", "config",
+             "jsonpog-integration", "direct/filelists"]
 
 
 def nfiles(path):
