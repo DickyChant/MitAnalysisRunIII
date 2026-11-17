@@ -68,9 +68,12 @@ inline float lepton_sf(int v, const RVec<float>& lep, int year, std::string ele_
                              corrSFs.eval_muonIDSF(eta, p, "stat"), t);
       double iso;
       if (v == 1 && tight_iso().ok) {
-        const double a = std::fabs(eta);
-        iso = vary(tight_iso().ref->evaluate({a, p, "nominal"}), tight_iso().ref->evaluate({a, p, "syst"}),
-                   tight_iso().ref->evaluate({a, p, "stat"}), t);
+        // the framework's clamping (mysf.h eval_muonISOSF): pT >= 15.001 (Z-based SFs start at 15 GeV
+        // before 2024), |eta| < 2.399, signed eta; above 200 GeV the high-pT SFs are not loaded here
+        const double ec = std::max(std::min(eta, 2.399), -2.399);
+        const double pc = std::min(std::max(pt, 15.001), 199.9);
+        iso = vary(tight_iso().ref->evaluate({ec, pc, std::string("nominal")}), tight_iso().ref->evaluate({ec, pc, std::string("syst")}),
+                   tight_iso().ref->evaluate({ec, pc, std::string("stat")}), t);
       } else {
         iso = vary(corrSFs.eval_muonISOSF(eta, p, "nominal"), corrSFs.eval_muonISOSF(eta, p, "syst"),
                    corrSFs.eval_muonISOSF(eta, p, "stat"), t);
