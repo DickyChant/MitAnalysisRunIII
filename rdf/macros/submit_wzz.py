@@ -39,6 +39,9 @@ echo "host $(hostname) site ${GLIDEIN_CMSSite:-unknown} cpu $(grep -m1 'model na
 out=fillhisto_wzzAnalysis_sample${S}_year${Y}_job${J}.root
 one=fillhisto_wzzAnalysis_sample${S}_year${Y}_job0.root
 status=0
+# every failure removes the outputs: condor then holds the job (no output to transfer, code 12) and
+# periodic_release retries it; a partial file must never reach output/ (the harvest would take it)
+fail() { echo "FAILED $*"; rm -f fillhisto_*.root chunk_*.root; exit 1; }
 if [ "${WZZ_COPY_INPUT:-1}" = 1 ]; then
   if [ $S -lt 1000 ]; then list=direct/filelists/$S.txt; kind=mc; else list=direct/filelists/data_${S}_$(( Y / 10 )).txt; kind=data; fi
   cp $list list.orig
@@ -48,8 +51,11 @@ if [ "${WZZ_COPY_INPUT:-1}" = 1 ]; then
   run_chunk() {
     (grep '^#' list.orig; cat local.txt) > $list
     local mb=$(du -sm input | cut -f1) t1=$(date +%s)
-    python3 wzzAnalysis.py --process=$S --year=$Y --whichJob=0 --group=1 < /dev/null
-    [ -f $one ] || { echo "FAILED chunk $nc: no output"; exit 1; }
+    python3 wzzAnalysis.py --process=$S --year=$Y --whichJob=0 --group=1 < /dev/null > chunk.log
+    local st=$?
+    cat chunk.log
+    # wzzAnalysis prints FAILED on an exception and may still leave an (empty) output file
+    if [ $st -ne 0 ] || grep -q "^FAILED" chunk.log || [ ! -s $one ]; then fail "chunk $nc: wzzAnalysis status $st"; fi
     mv $one chunk_$nc.root
     local ta=$(( $(date +%s) - t1 ))
     echo "chunk $nc: $(wc -l < local.txt) files, $mb MB, analysis $ta s"
@@ -65,11 +71,12 @@ if [ "${WZZ_COPY_INPUT:-1}" = 1 ]; then
     sz=$(timeout 120 xrdfs cmsxrootd.fnal.gov stat "$lfn" < /dev/null 2>/dev/null | awk '/Size:/ {print $2}')
     tmo=$(( 300 + ${sz:-4000000000} / 2000000 ))
     for src in "$f" "${f/cmsxrootd.fnal.gov/cms-xrd-global.cern.ch}" "$f" "${f/cmsxrootd.fnal.gov/cms-xrd-global.cern.ch}"; do
-      timeout $tmo xrdcp -s -f "$src" "$lf" < /dev/null && { ok=1; break; }
-      echo "copy attempt failed or slower than 2 MB/s (deadline $tmo s): $src"
+      t2=$(date +%s); timeout $tmo xrdcp -s -f "$src" "$lf" < /dev/null; xs=$?
+      [ $xs = 0 ] && { ok=1; break; }
+      echo "copy attempt failed: status $xs (124 = deadline $tmo s, i.e. < 2 MB/s) after $(( $(date +%s) - t2 )) s: $src"
       rm -f "$lf"; sleep 20
     done
-    [ $ok = 1 ] || { echo "FAILED copy $f"; exit 1; }
+    [ $ok = 1 ] || fail "copy $f"
     tcopy=$((tcopy + $(date +%s) - t1)); nfiles=$((nfiles + 1))
     echo "$lf" >> local.txt
     if [ $(du -sm input | cut -f1) -ge ${WZZ_CHUNK_MB:-6000} ]; then run_chunk; fi
@@ -77,20 +84,22 @@ if [ "${WZZ_COPY_INPUT:-1}" = 1 ]; then
   if [ -s local.txt ]; then run_chunk; fi
   echo "copied $nfiles files, $mbtot MB in $tcopy s"
   echo "analysis $tana s in $nc chunks"
-  if [ $nc = 0 ]; then echo "FAILED no files for job $J of $G"; exit 1; fi
+  if [ $nc = 0 ]; then fail "no files for job $J of $G"; fi
   if [ $nc = 1 ]; then mv chunk_0.root $out
-  else python3 wzz_merge_chunks.py $out $kind chunk_*.root < /dev/null || { echo "FAILED merge"; exit 1; }
+  else python3 wzz_merge_chunks.py $out $kind chunk_*.root < /dev/null || fail "merge"
   fi
   rm -rf input chunk_*.root
 else
   t1=$(date +%s)
-  python3 wzzAnalysis.py --process=$S --year=$Y --whichJob=$J --group=$G
+  python3 wzzAnalysis.py --process=$S --year=$Y --whichJob=$J --group=$G < /dev/null > run.log
   status=$?
+  cat run.log
+  if grep -q "^FAILED" run.log; then status=1; fi
   echo "analysis $(( $(date +%s) - t1 )) s"
 fi
 times > times.txt   # (not in a pipe: a subshell would report its own, empty, child times)
 echo "cpu (user sys) of the payload: $(tail -n 1 times.txt)"
-if [ $status -ne 0 ] || [ ! -f $out ]; then echo "FAILED status=$status"; exit 1; fi
+if [ $status -ne 0 ] || [ ! -s $out ]; then fail "status=$status"; fi
 echo DONE
 """
 SUBMIT = """universe = vanilla
@@ -114,8 +123,9 @@ use_x509userproxy = True
 x509userproxy = {proxy}
 max_retries = 2
 # a failed payload leaves no output: condor then holds the job (output transfer, code 12) before
-# max_retries applies; release such holds up to 3 starts, later ones stay held for inspection
-periodic_release = (HoldReasonCode == 12 || HoldReasonCode == 13) && (NumJobStarts < 3)
+# max_retries applies; 26: site policy (v2: CPU usage above the request with implicit MT, now off).
+# Release such holds up to 3 starts, later ones stay held for inspection
+periodic_release = (HoldReasonCode == 12 || HoldReasonCode == 13 || HoldReasonCode == 26) && (NumJobStarts < 3)
 queue sample, year, job, group from {jobs}
 """
 # every local header (functions.h -> mysf.h -> muonCrystalBall.h, ...): a missing one only shows up on
@@ -147,6 +157,7 @@ def main():
     ap.add_argument("--chunk-mb", type=int, default=6000, help="copy mode: inputs held on the worker per chunk (MiB)")
     ap.add_argument("--disk", type=int, default=12, help="request_disk in GB (copy mode: chunk + largest file + 3)")
     ap.add_argument("--jobs-list", help="explicit 'sample year job group' rows (benchmarks), instead of the config")
+    ap.add_argument("--name", help="label of the jobs_<name>.txt / submit_<name>.jdl files (default: --kind)")
     ap.add_argument("--submit", action="store_true")
     ap.add_argument("--proxy", default="~/.wzz/x509_proxy",
                     help="grid proxy shipped with the jobs (long-lived copy of the EOS proxy; mode 600)")
@@ -196,21 +207,26 @@ def main():
             if args.missing_only and os.path.exists(out):
                 continue
             jobs.append((s, y, j, g))
-    jobs_file = os.path.join(area, "jobs_{0}.txt".format(args.kind))
+    name = args.name or args.kind
+    jobs_file = os.path.join(area, "jobs_{0}.txt".format(name))
     with open(jobs_file, "w") as f:
         for r in jobs:
             f.write("{0} {1} {2} {3}\n".format(*r))
-    open(os.path.join(area, "wzz_condor.sh"), "w").write(WRAPPER)
-    os.chmod(os.path.join(area, "wzz_condor.sh"), 0o755)
+    # written aside and renamed: queued jobs of running clusters read the wrapper / tarball at start
+    tmp = os.path.join(area, ".wzz_condor.sh.new")
+    open(tmp, "w").write(WRAPPER)
+    os.chmod(tmp, 0o755)
+    os.replace(tmp, os.path.join(area, "wzz_condor.sh"))
     proxy = os.path.expanduser(args.proxy)
     if not os.path.exists(proxy):
         sys.exit("no grid proxy at {0}".format(proxy))
-    jdl = os.path.join(area, "submit_{0}.jdl".format(args.kind))
+    jdl = os.path.join(area, "submit_{0}.jdl".format(name))
     open(jdl, "w").write(SUBMIT.format(area=area, proxy=proxy, jobs=jobs_file, maxwall=args.max_wall,
                                          disk=args.disk, copy=0 if args.stream else 1, chunk_mb=args.chunk_mb))
     if not args.no_tarball and (not args.missing_only or not os.path.exists(os.path.join(area, "wzzAnalysis.tgz"))):
         items = " ".join(TAR_ITEMS)
-        subprocess.run("tar czf {0}/wzzAnalysis.tgz {1}".format(area, items), shell=True, check=True)
+        subprocess.run("tar czf {0}/.wzzAnalysis.tgz.new {1} && gzip -t {0}/.wzzAnalysis.tgz.new && "
+                       "mv {0}/.wzzAnalysis.tgz.new {0}/wzzAnalysis.tgz".format(area, items), shell=True, check=True)
     nmc = sum(1 for r in jobs if r[0] < 1000)
     print("samples {0}  jobs {1} (MC {2}, data {3})  files {4}".format(
         len(per), len(jobs), nmc, len(jobs) - nmc, sum(n for n, _ in per.values())))

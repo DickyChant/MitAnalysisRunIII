@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Per-dataset splitting table of a submitted production: the bookkeeping kept next to the file lists.
 
-    python3 splitting_table.py <area>/splitting.json <area> > direct/splitting_<tag>.tsv
+    python3 splitting_table.py <area>/splitting.json <area> [<removed rows file>] > direct/splitting_<tag>.tsv
 
-One row per (file list, year) of the work area's jobs_{mc,data}.txt: files, DAS GB, njobs, GB per job,
-analysis rate (min/GB) and its source, planned minutes (plan_splitting.job_minutes), the DAS datasets.
+One row per (file list, year) of the work area's jobs_*.txt (every submission, e.g. jobs_data_fix1.txt),
+minus the (sample, year) rows of the optional removed-rows file (v2: wrong_rows.txt): files, DAS GB,
+njobs, GB per job, analysis rate (min/GB) and its source, planned minutes (plan_splitting.job_minutes),
+the DAS datasets.
 """
+import glob
 import json
 import os
 import re
@@ -14,14 +17,15 @@ import sys
 from plan_splitting import job_minutes, rate_for
 
 
-def main(splitting, area):
+def main(splitting, area, removed=None):
     sp = json.load(open(splitting))
+    drop = {tuple(int(x) for x in line.split()[:2]) for line in (open(removed) if removed else []) if line.strip()}
     rows = {}
-    for k in ("mc", "data"):
-        path = os.path.join(area, "jobs_{0}.txt".format(k))
-        for line in (open(path) if os.path.exists(path) else []):
+    for path in sorted(glob.glob(os.path.join(area, "jobs_*.txt"))):
+        for line in open(path):
             s, y, j, g = (int(x) for x in line.split())
-            rows[(s, y)] = g
+            if (s, y) not in drop:
+                rows[(s, y)] = g
     print("# list\tsample\tyear\tfiles\tGB\tnjobs\tGB_per_job\tanalysis_min_per_GB\trate_source\tplanned_min\tDAS")
     for (s, y), g in sorted(rows.items()):
         name = "{0}.txt".format(s) if s < 1000 else "data_{0}_{1}.txt".format(s, y // 10)
@@ -34,4 +38,4 @@ def main(splitting, area):
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:3])
+    main(*sys.argv[1:4])

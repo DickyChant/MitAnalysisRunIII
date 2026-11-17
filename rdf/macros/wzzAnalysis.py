@@ -27,7 +27,10 @@ import json
 import os
 import sys
 
-ROOT.ROOT.EnableImplicitMT(4)
+# WZZ_NTHREADS (default 1: no implicit MT). The condor jobs request one CPU, and some sites hold jobs
+# whose CPU usage exceeds the request (v2, 2026-11-17: 1.5-1.7 cores with EnableImplicitMT(4)).
+if int(os.environ.get("WZZ_NTHREADS", "1")) > 1:
+    ROOT.ROOT.EnableImplicitMT(int(os.environ["WZZ_NTHREADS"]))
 from utilsAna import getMClist, getMCnormList, getDATAlist, readRunsSums  # noqa: E402
 from utilsAna import SwitchSample, groupFiles, getTriggerFromJson, getLeptomSelFromJson, getLumi  # noqa: E402
 from utilsSelection import selectionTrigger2L, selectionElMu, selectionJetMet, selectionTheoryWeigths, getBTagCut  # noqa: E402

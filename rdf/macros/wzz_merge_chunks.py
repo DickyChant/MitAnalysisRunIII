@@ -21,9 +21,12 @@ def merge(out, kind, paths):
     if any(not f or f.IsZombie() for f in files):
         raise SystemExit("cannot open a chunk among {0}".format(paths))
     invs = []
-    for f in files:
+    for p, f in zip(paths, files):
         h = f.Get("hJobNorm")
-        invs.append(h.GetBinContent(1) if h else float("nan"))
+        # a chunk whose wzzAnalysis run failed can leave an empty file: never merge it
+        if not h or f.GetListOfKeys().GetSize() < 2:
+            raise SystemExit("chunk without hJobNorm or histograms: {0}".format(p))
+        invs.append(h.GetBinContent(1))
     if kind == "mc":
         tot = sum(invs)
         if not all(i > 0 for i in invs):
