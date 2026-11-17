@@ -19,9 +19,10 @@ but at least --copy-floor (the copy speed depends on the site pair, not on the s
 (--history): rate = (wall - overhead) / bytes of the job's files, the job's bytes being its file
 share of the list's DAS total (stride grouping: representative files).
 The njobs per (list, year) are resolved at submission (njobs()); the JSON is the bookkeeping kept
-next to the file lists (direct/splitting.json). A Summer24 MC job run for 20240 and 20250 in one pass
-(job config "+20250") is planned with the sum of the two years' analysis rates and one copy; its log
-times the second year on an "analysis[<year>] <s> s" line, read as that year's rate.
+next to the file lists (direct/splitting.json). A Summer24 MC job run for 20240 and 20250 in one event
+loop (job config "+20250", wzzAnalysis --also) is planned with its measured one-pass rate ("analysis <s>
+s in <n> chunks (one pass with <year>)", kept as "<list>:<year>+<also>", outside the kind/year maxima)
+or else the sum of the two years' rates, and one copy.
 """
 import argparse
 import glob
@@ -62,11 +63,14 @@ def main():
     summary = json.load(open(args.summary))
     rates, meas, copy_rates = {}, {}, []
 
-    def add(s, y, rate, **extra):
+    def add(s, y, rate, also=None, **extra):
         kind = "mc" if s < 1000 else "data"
-        meas["{0}:{1}".format(list_name(s, y), y)] = dict(sample=s, year=y, list=list_name(s, y),
-                                                         min_per_gb=round(rate, 3), **extra)
-        rates[(kind, y)] = max(rates.get((kind, y), 0), rate)
+        key = "{0}:{1}".format(list_name(s, y), y) + ("+{0}".format(also) if also else "")
+        meas[key] = dict(sample=s, year=y, list=list_name(s, y), min_per_gb=round(rate, 3), **extra)
+        if also:
+            meas[key]["one_pass_with"] = also      # both years' analysis: not a one-year rate
+        else:
+            rates[(kind, y)] = max(rates.get((kind, y), 0), rate)
 
     for line in (open(args.history) if args.history else []):
         p = line.split()
@@ -83,7 +87,7 @@ def main():
         txt = open(path).read()
         a = re.search(r"args (\d+) (\d+) (-?\d+) (\d+)", txt)
         c = re.search(r"^copied (\d+) files, (\d+) MB in (\d+) s", txt, re.M)
-        t = re.search(r"^analysis (\d+) s", txt, re.M)
+        t = re.search(r"^analysis (\d+) s(?: in \d+ chunks)?(?: \(one pass with (\d+)\))?", txt, re.M)
         if not (a and c and t and re.search(r"^DONE", txt, re.M)):
             print("skip (incomplete):", path)
             continue
@@ -93,13 +97,9 @@ def main():
         copy_rates.append(copy_s / 60.0 / gb)
         site = re.search(r"site (\S+)", txt)
         # analysis rate floor: 1 min per job (a tiny job is all JIT)
-        add(s, y, max(ana_s / 60.0, 1.0) / gb, copy_min_per_gb=round(copy_s / 60.0 / gb, 3),
-            analysis_min=round(ana_s / 60, 1), copy_min=round(copy_s / 60, 1), job_gb=round(gb, 2),
-            site=site.group(1) if site else None)
-        # a two-year job (wrapper $5) also times the second year on the same copy: its own rate
-        for y2, ana2 in re.findall(r"^analysis\[(\d+)\] (\d+) s", txt, re.M):
-            add(s, int(y2), max(int(ana2) / 60.0, 1.0) / gb, analysis_min=round(int(ana2) / 60, 1),
-                job_gb=round(gb, 2), site=site.group(1) if site else None, one_pass_with=y)
+        add(s, y, max(ana_s / 60.0, 1.0) / gb, also=int(t.group(2)) if t.group(2) else None,
+            copy_min_per_gb=round(copy_s / 60.0 / gb, 3), analysis_min=round(ana_s / 60, 1),
+            copy_min=round(copy_s / 60, 1), job_gb=round(gb, 2), site=site.group(1) if site else None)
     split = {}
     for name in sorted(os.listdir(args.filelists)):
         m = re.match(r"(data_(\d+)_(\d{4})|(\d+))\.txt$", name)
@@ -151,14 +151,15 @@ def job_minutes(splitting, gb, rate):
 
 def njobs(splitting, name, sample, year, also=None):
     """Jobs for one (list, year) from a splitting.json: the fewest with every job <= plan minutes.
-    also: second year analysed from the same copy (submit_wzz "+<year>" rows): the analysis rates
-    add up, the copy is paid once."""
+    also: second year in the same event loop (submit_wzz "+<year>" rows): the list's measured one-pass
+    rate, else the sum of the two years' rates (an upper bound); the copy is paid once."""
     e = splitting["lists"].get(name)
     if not e:
         return None
     rate = rate_for(splitting, name, sample, year)
     if also is not None:
-        rate += rate_for(splitting, name, sample, also)
+        m = splitting.get("measured", {}).get("{0}:{1}+{2}".format(name, year, also))
+        rate = m["min_per_gb"] if m else rate + rate_for(splitting, name, sample, also)
     n = max(1, math.ceil(e["files"] / splitting.get("max_files_per_job", 150)))
     while n < e["files"] and job_minutes(splitting, e["gb"] / n, rate) > splitting["plan_min"]:
         n += 1

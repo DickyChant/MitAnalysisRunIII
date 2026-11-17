@@ -6,8 +6,9 @@ Run in rdf/macros/ after make_filelists.py.
         [--chunk-mb 5000] [--disk 12] [--no-tarball] [--only-years 20240 ...] [--only-samples 516 ...] [--submit]
 
 Job config rows "<sample> <year>"; "<sample> 20240 +20250" (Summer24 MC) is one job per file group that
-copies the files once and runs wzzAnalysis for 2024 and for 2025 (each with its own calibrations),
-delivering both outputs (jobs_<name>_dual.txt, second queue block of the submit file). v2 and earlier
+copies the files once and runs wzzAnalysis --also=20250: 2024 and 2025 in one event loop, each year's
+branch with its own calibrations, delivering both outputs (jobs_<name>_dual.txt, second queue block of
+the submit file). v2 and earlier
 ran them as separate jobs: top-ups of those areas use their own config (direct/v2_jobs.cfg), since the
 job split differs.
 
@@ -36,10 +37,10 @@ WRAPPER = r"""#!/bin/bash
 # ~3% CPU efficiency; the same jobs copied first ran 25-40x faster with identical histograms).
 # WZZ_COPY_INPUT=0: stream with xrootd.
 # $5 (optional) a second year code for the same MC files, e.g. 20250 for the Summer24 samples run as
-# 20240: each chunk is analysed for both years on the local copy (the input is copied once) and the
-# job delivers two outputs. The two years differ in calibrations (JEC/JER, veto maps, PU, SFs: one
-# year's corrections per process in the framework), hence one wzzAnalysis run per year.
+# 20240: wzzAnalysis --also runs both years in one event loop (one RDataFrame graph forked per year,
+# each branch with its year's calibrations) and writes both outputs; the job delivers both.
 S=$1; Y=$2; J=$3; G=$4; ALSO=${5:-}
+alsoarg=${ALSO:+--also=$ALSO}
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 export SCRAM_ARCH=el9_amd64_gcc12
 scramv1 project CMSSW CMSSW_14_1_4 > /dev/null 2>&1
@@ -96,27 +97,26 @@ if [ "${WZZ_COPY_INPUT:-1}" = 1 ]; then
   cp $list list.orig
   # the job's files: groupFiles stride (files[job::group])
   grep -v '^#' list.orig | awk -v j=$J -v g=$G 'NF { if (n % g == j) print; n++ }' > job_files.txt
-  nc=0; nfiles=0; nstream=0; mbtot=0; tcopy=0; declare -A tana
+  nc=0; nfiles=0; nstream=0; mbtot=0; tcopy=0; tana=0
   run_chunk() {
     python3 wzz_check_inputs.py $kind local.txt < /dev/null > keep.txt || fail "input check (chunk $nc)"
     local nd=$(( $(wc -l < local.txt) - $(wc -l < keep.txt) ))
     if [ $nd -gt 0 ]; then echo "chunk $nc: dropped $nd empty or unreadable input(s) (see stderr)"; fi
     if [ ! -s keep.txt ]; then echo "chunk $nc: only empty files, skipped"; rm -rf input; mkdir -p input; : > local.txt; return 0; fi
     (grep '^#' list.orig; cat keep.txt) > $list
-    local mb=$(du -sm input | cut -f1) yr tlog=""
+    local mb=$(du -sm input | cut -f1) yr t1=$(date +%s)
+    python3 wzzAnalysis.py --process=$S --year=$Y $alsoarg --whichJob=0 --group=1 < /dev/null > chunk.log
+    local st=$?
+    cat chunk.log
+    # wzzAnalysis prints FAILED on an exception and may still leave an (empty) output file
+    if [ $st -ne 0 ] || grep -q "^FAILED" chunk.log; then fail "chunk $nc: wzzAnalysis status $st"; fi
     for yr in $years; do
-      local t1=$(date +%s) one=$(outof $yr 0)
-      python3 wzzAnalysis.py --process=$S --year=$yr --whichJob=0 --group=1 < /dev/null > chunk.log
-      local st=$?
-      cat chunk.log
-      # wzzAnalysis prints FAILED on an exception and may still leave an (empty) output file
-      if [ $st -ne 0 ] || grep -q "^FAILED" chunk.log || [ ! -s $one ]; then fail "chunk $nc year $yr: wzzAnalysis status $st"; fi
-      mv $one chunk_${yr}_$nc.root
-      local ta=$(( $(date +%s) - t1 ))
-      tana[$yr]=$(( ${tana[$yr]:-0} + ta )); tlog="$tlog, analysis $ta s ($yr)"
+      [ -s $(outof $yr 0) ] || fail "chunk $nc: no output for year $yr"
+      mv $(outof $yr 0) chunk_${yr}_$nc.root
     done
-    echo "chunk $nc: $(wc -l < local.txt) files, $mb MB$tlog"
-    mbtot=$((mbtot + mb)); nc=$((nc + 1))
+    local ta=$(( $(date +%s) - t1 ))
+    echo "chunk $nc: $(wc -l < local.txt) files, $mb MB, analysis $ta s"
+    tana=$((tana + ta)); mbtot=$((mbtot + mb)); nc=$((nc + 1))
     rm -rf input; mkdir -p input; : > local.txt
   }
   mkdir -p input; : > local.txt
@@ -141,10 +141,8 @@ if [ "${WZZ_COPY_INPUT:-1}" = 1 ]; then
   done
   if [ -s local.txt ]; then run_chunk; fi
   echo "copied $nfiles files, $mbtot MB in $tcopy s ($nstream streamed)"
-  # one line per year: "analysis <s> s in <n> chunks" for $Y (plan_splitting.py reads the first),
-  # "analysis[<year>] <s> s ..." for the second year
-  echo "analysis ${tana[$Y]:-0} s in $nc chunks"
-  if [ -n "$ALSO" ]; then echo "analysis[$ALSO] ${tana[$ALSO]:-0} s in $nc chunks"; fi
+  # plan_splitting.py reads this line; "(one pass with <year>)": the time covers both years
+  echo "analysis $tana s in $nc chunks${ALSO:+ (one pass with $ALSO)}"
   if [ $nc = 0 ]; then fail "no non-empty files for job $J of $G ($nfiles copied)"; fi
   for yr in $years; do
     if [ $nc = 1 ]; then mv chunk_${yr}_0.root $(outof $yr $J)
@@ -153,14 +151,12 @@ if [ "${WZZ_COPY_INPUT:-1}" = 1 ]; then
   done
   rm -rf input chunk_*.root
 else
-  for yr in $years; do
-    t1=$(date +%s)
-    python3 wzzAnalysis.py --process=$S --year=$yr --whichJob=$J --group=$G < /dev/null > run.log
-    st=$?
-    cat run.log
-    if [ $st -ne 0 ] || grep -q "^FAILED" run.log; then status=1; fi
-    if [ $yr = $Y ]; then echo "analysis $(( $(date +%s) - t1 )) s"; else echo "analysis[$yr] $(( $(date +%s) - t1 )) s"; fi
-  done
+  t1=$(date +%s)
+  python3 wzzAnalysis.py --process=$S --year=$Y $alsoarg --whichJob=$J --group=$G < /dev/null > run.log
+  st=$?
+  cat run.log
+  if [ $st -ne 0 ] || grep -q "^FAILED" run.log; then status=1; fi
+  echo "analysis $(( $(date +%s) - t1 )) s${ALSO:+ (one pass with $ALSO)}"
 fi
 times > times.txt   # (not in a pipe: a subshell would report its own, empty, child times)
 echo "cpu (user sys) of the payload: $(tail -n 1 times.txt)"

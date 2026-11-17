@@ -1,5 +1,5 @@
-// Per-variant lepton scale factors for wzzAnalysis (needs the framework: functions.h / mysf.h
-// with corrSFs = MyCorrections(year) initialised by initJSONSFs(year)).
+// Per-variant lepton scale factors for wzzAnalysis (needs the framework: functions.h / mysf.h; corrSFs is
+// the corrections of the year selected by setJSONSFsYear, else initJSONSFs(year)).
 //
 //   muons      V0, V2, V3: POG MediumPromptID x LoosePFIso (DEN MediumPrompt) = corrSFs
 //              V1:         POG MediumPromptID x TightPFIso (loaded here from the same muon_Z.json)
@@ -9,6 +9,7 @@
 //              placeholder (flagged; HZZ group or own T&P needed); V0 wp80iso (approximation)
 //   type: 0 nominal, +1 / -1: up / down (syst and stat in quadrature, as compute_JSON_*_SFs)
 #pragma once
+#include <map>
 #include <memory>
 #include <string>
 #include "wzz_functions.h"
@@ -36,14 +37,20 @@ struct TightIso {
   correction::Correction::Ref ref;
   bool ok = false;
 };
-inline TightIso& tight_iso() { static TightIso t; return t; }
+// per year: one wzzAnalysis process can serve several years (Summer24 MC as 2024 and 2025)
+inline std::map<int, TightIso>& tight_iso_by_year() { static std::map<int, TightIso> m; return m; }
+inline const TightIso& tight_iso(int year) {
+  static const TightIso none;
+  auto it = tight_iso_by_year().find(year);
+  return it == tight_iso_by_year().end() ? none : it->second;
+}
 
 inline void init_wzz_sf(int year) {
   const std::string name = year <= 20180 ? "NUM_TightRelIso_DEN_MediumPromptID" : "NUM_TightPFIso_DEN_MediumPromptID";
   try {
     auto cset = correction::CorrectionSet::from_file("jsonpog-integration/POG/MUO/" + pog_subdir(year) + "muon_Z.json.gz");
-    tight_iso().ref = cset->at(name);
-    tight_iso().ok = true;
+    tight_iso_by_year()[year].ref = cset->at(name);
+    tight_iso_by_year()[year].ok = true;
   } catch (std::exception& e) {
     std::cout << "wzz_sf: no " << name << " for " << year << " (" << e.what() << "): V1 uses LooseIso SFs" << std::endl;
   }
@@ -67,13 +74,14 @@ inline float lepton_sf(int v, const RVec<float>& lep, int year, std::string ele_
       const double id = vary(corrSFs.eval_muonIDSF(eta, p, "nominal"), corrSFs.eval_muonIDSF(eta, p, "syst"),
                              corrSFs.eval_muonIDSF(eta, p, "stat"), t);
       double iso;
-      if (v == 1 && tight_iso().ok) {
+      if (v == 1 && tight_iso(year).ok) {
         // the framework's clamping (mysf.h eval_muonISOSF): pT >= 15.001 (Z-based SFs start at 15 GeV
         // before 2024), |eta| < 2.399, signed eta; above 200 GeV the high-pT SFs are not loaded here
         const double ec = std::max(std::min(eta, 2.399), -2.399);
         const double pc = std::min(std::max(pt, 15.001), 199.9);
-        iso = vary(tight_iso().ref->evaluate({ec, pc, std::string("nominal")}), tight_iso().ref->evaluate({ec, pc, std::string("syst")}),
-                   tight_iso().ref->evaluate({ec, pc, std::string("stat")}), t);
+        const auto& ti = tight_iso(year);
+        iso = vary(ti.ref->evaluate({ec, pc, std::string("nominal")}), ti.ref->evaluate({ec, pc, std::string("syst")}),
+                   ti.ref->evaluate({ec, pc, std::string("stat")}), t);
       } else {
         iso = vary(corrSFs.eval_muonISOSF(eta, p, "nominal"), corrSFs.eval_muonISOSF(eta, p, "syst"),
                    corrSFs.eval_muonISOSF(eta, p, "stat"), t);

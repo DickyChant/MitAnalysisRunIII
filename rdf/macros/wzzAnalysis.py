@@ -1,6 +1,13 @@
-"""WZZ analysis for MitAnalysisRunIII: histograms only (one ROOT file per job).
+"""WZZ analysis for MitAnalysisRunIII: histograms only (one ROOT file per job and year).
 
     python3 wzzAnalysis.py --process=516 --year=20240 --whichJob=0   (from rdf/macros/)
+    python3 wzzAnalysis.py --process=516 --year=20240 --also=20250 ...   # Summer24 MC as 2024 and 2025
+
+--also: the same MC files serve a second year in the same event loop. The graph forks at the input
+into one branch per year (YearNode): each branch's expressions select their year's calibrations
+(framework setJSONSFsYear: JEC/JER, veto maps, PU, lepton / b-tag SFs) and its normalisation, and
+write their own output file. MC smearing (gRandom) is reseeded per event and column (wzz_onepass.h),
+so a year's histograms are the same whether it runs alone or with another year.
 
 Source of truth: the wvz repository (framework/). The selection is the C++ port
 wzz_functions.h of the reference Python package (event-by-event closure in
@@ -25,7 +32,9 @@ import ROOT
 import getopt
 import json
 import os
+import re
 import sys
+import zlib
 
 # WZZ_NTHREADS (default 1: no implicit MT). The condor jobs request one CPU, and some sites hold jobs
 # whose CPU usage exceeds the request (v2, 2026-11-17: 1.5-1.7 cores with EnableImplicitMT(4)).
@@ -36,9 +45,60 @@ from utilsAna import SwitchSample, groupFiles, getTriggerFromJson, getLeptomSelF
 from utilsSelection import selectionTrigger2L, selectionElMu, selectionJetMet, selectionTheoryWeigths, getBTagCut  # noqa: E402
 from utilsNanoAOD import prepareWZNanoAOD, hasLegacyLeptonMVA, pruneWZTrigger, setTriggerFiles  # noqa: E402
 
-for h in ("wzz_functions.h", "wzz_bdt.h", "wzz_fill.h", "wzz_sf.h"):
+for h in ("wzz_functions.h", "wzz_bdt.h", "wzz_fill.h", "wzz_sf.h", "wzz_onepass.h"):
     if not ROOT.gInterpreter.Declare('#include "{0}"'.format(h)):
         raise RuntimeError("cannot declare " + h)
+
+# framework functions drawing from gRandom (MC smearing): their expressions reseed it per event
+# (WZZ_RESEED=0: off, i.e. the framework's single gRandom sequence; for validation only)
+SMEARING = (("compute_JSON_JER_Unc", "compute_MUOPT_Unc", "compute_ELEPT_Unc")
+            if os.environ.get("WZZ_RESEED", "1") != "0" else ())
+
+
+def _is_node(x):
+    return type(x).__name__.startswith("RInterface")
+
+
+class YearNode:
+    """An RDataFrame node of one year's branch. Every string expression (Define, Redefine, Filter, also
+    those built by the framework's selection functions) first selects the year's corrections
+    (setJSONSFsYear) and, when it smears, reseeds gRandom from (run, lumi, event, column); the
+    expression runs as is after that. Other calls go to the node; nodes they return stay wrapped."""
+
+    def __init__(self, node, year):
+        self._node, self._year = node, year
+
+    def _wrap(self, expr, salt):
+        body = expr if re.search(r"\breturn\b", expr) else "return {0};".format(expr)
+        pre = "setJSONSFsYear({0});".format(self._year)
+        if any(f in expr for f in SMEARING):
+            pre += " wzz::reseed(run, luminosityBlock, event, {0}u);".format(zlib.crc32(salt.encode()))
+        return pre + " " + body
+
+    def Define(self, name, expr, *rest):
+        if isinstance(expr, str) and not rest:
+            expr = self._wrap(expr, name)
+        return YearNode(self._node.Define(name, expr, *rest), self._year)
+
+    def Redefine(self, name, expr, *rest):
+        if isinstance(expr, str) and not rest:
+            expr = self._wrap(expr, name)
+        return YearNode(self._node.Redefine(name, expr, *rest), self._year)
+
+    def Filter(self, expr, *rest):
+        if isinstance(expr, str):
+            expr = self._wrap(expr, expr)
+        return YearNode(self._node.Filter(expr, *rest), self._year)
+
+    def __getattr__(self, name):
+        attr = getattr(self._node, name)
+        if not callable(attr):
+            return attr
+
+        def call(*a, **k):
+            r = attr(*a, **k)
+            return YearNode(r, self._year) if _is_node(r) else r
+        return call
 
 VARIANTS = [0, 1, 2, 3]
 _keep = []                     # ROOT objects that must outlive analysis()
@@ -170,18 +230,45 @@ WVARS = (["PUUp", "PUDown", "BtagBCUp", "BtagBCDown", "BtagLFUp", "BtagLFDown", 
          + ["QCDScale{0}".format(i) for i in range(6)] + ["PS{0}".format(i) for i in range(4)])
 
 
-def analysis(df, sample, weight, year, PDType, isData, whichJob, nTheoryReplicas, lheRenorm, psRenorm):
-    print("wzzAnalysis: sample {0} year {1} job {2} data {3}".format(sample, year, whichJob, isData))
-    ROOT.initJSONSFs(year)
-    ROOT.wzz.init_wzz_sf(year)
-    if isData == "false":       # b-tag efficiencies for compute_JSON_BTV_SF (histo2D slots 20-22)
-        fb = ROOT.TFile("data/histoBtagEffSelEtaPt_{0}.root".format(year))
+def setup_years(years, isData):
+    """Per-year state before booking: the framework corrections of every year (addJSONSFs; each
+    branch's expressions select theirs), the wzz lepton SFs, and the b-tag efficiencies of
+    compute_JSON_BTV_SF (histo2D slots 20-22: one set per process, so the years must share it)."""
+    ROOT.initJSONSFs(years[0])
+    for y in years:
+        ROOT.addJSONSFs(y)
+        ROOT.wzz.init_wzz_sf(y)
+    if isData == "false":
+        paths = ["data/histoBtagEffSelEtaPt_{0}.root".format(y) for y in years]
+        with open(paths[0], "rb") as f0:
+            ref = f0.read()
+        for p in paths[1:]:
+            with open(p, "rb") as f:
+                if f.read() != ref:
+                    raise RuntimeError("b-tag efficiency maps differ between {0}: not in one pass".format(years))
+        fb = ROOT.TFile(paths[0])
         for slot, k in ((20, 0), (21, 1), (22, 2)):
             hb = fb.Get("histoBtagEffSelEtaPt_{0}".format(k + 3 * BTAGSEL))
             hb.SetDirectory(0)
             ROOT.initHisto2D(hb, slot)
             _keep.append(hb)
         fb.Close()
+
+
+def analysis(df, sample, weights, PDType, isData, whichJob, nTheoryReplicas, lheRenorm, psRenorm):
+    """weights: {year: normalisation}. One branch per year from the same input node; the first
+    GetValue runs the single event loop for all of them."""
+    years = list(weights)
+    print("wzzAnalysis: sample {0} years {1} job {2} data {3}".format(sample, years, whichJob, isData))
+    setup_years(years, isData)
+    booked = {y: book(df, sample, weights[y], y, PDType, isData, nTheoryReplicas, lheRenorm, psRenorm) for y in years}
+    for y in years:
+        write(booked[y], sample, weights[y], y, whichJob)
+
+
+def book(df, sample, weight, year, PDType, isData, nTheoryReplicas, lheRenorm, psRenorm):
+    """The histograms of one year (lazy RDataFrame results)."""
+    df = YearNode(df, year)
     df = prepareWZNanoAOD(df, year)
     trig = SELJSON["triggers"]
     T = {k: pruneWZTrigger(df, getTriggerFromJson(trig, k, year)) for k in ("TRIGGERMUEG", "TRIGGERDMU", "TRIGGERSMU", "TRIGGERDEL", "TRIGGERSEL")}
@@ -275,6 +362,10 @@ def analysis(df, sample, weight, year, PDType, isData, whichJob, nTheoryReplicas
             args = (idx, wcol) if wcol else (idx,)
             h.append(num.Histo1D(("fr_{0}_num{1}".format(tag, mp), "", nfr, 0, nfr), *args))
             h.append(den.Histo1D(("fr_{0}_den{1}".format(tag, mp), "", nfr, 0, nfr), *args))
+    return h
+
+
+def write(h, sample, weight, year, whichJob):
     out = ROOT.TFile("fillhisto_wzzAnalysis_sample{0}_year{1}_job{2}.root".format(sample, year, whichJob), "RECREATE")
     for x in h:
         o = x.GetValue()
@@ -287,7 +378,7 @@ def analysis(df, sample, weight, year, PDType, isData, whichJob, nTheoryReplicas
     out.Close()
 
 
-def run_mc(sample, year, whichJob, group):
+def run_mc(sample, year, whichJob, group, also=None):
     files = getMClist(sample, "3l")
     # per-job normalisation: split first, then normalise to THIS job's files (getMCnormList returns
     # its argument unless NORM_FILELIST is set); the harvest combines jobs by their sum(genWeight)
@@ -306,11 +397,11 @@ def run_mc(sample, year, whichJob, group):
         psRenorm = [ps[i] / ps[4] for i in range(4)]
     if os.environ.get("NORM_FILELIST"):
         raise RuntimeError("NORM_FILELIST set: wzzAnalysis uses per-job normalisation only (harvest)")
-    weight = SwitchSample(sample, "3l")[1] / sumw * getLumi(year)
+    weights = {y: SwitchSample(sample, "3l")[1] / sumw * getLumi(y) for y in [year] + ([also] if also else [])}
     setTriggerFiles(files)
     df = ROOT.RDataFrame("Events", files)
     PDType = os.path.basename(SwitchSample(sample, "3l")[0]).split('+')[0]
-    analysis(df, sample, weight, year, PDType, "false", whichJob, nTheoryReplicas, lheRenorm, psRenorm)
+    analysis(df, sample, weights, PDType, "false", whichJob, nTheoryReplicas, lheRenorm, psRenorm)
 
 
 def run_data(sample, year, whichJob, group):
@@ -328,21 +419,24 @@ def run_data(sample, year, whichJob, group):
             return
     setTriggerFiles(files)
     df = ROOT.RDataFrame("Events", files)
-    analysis(df, sample, 1.0, year, PDType, "true", whichJob, [0, 0, 0], [1] * 6, [1] * 4)
+    analysis(df, sample, {year: 1.0}, PDType, "true", whichJob, [0, 0, 0], [1] * 6, [1] * 4)
 
 
 if __name__ == "__main__":
-    group, year, process, whichJob = 2, 2024, -1, -1
-    opts, _ = getopt.getopt(sys.argv[1:], "", ["year=", "process=", "whichJob=", "group="])
+    group, year, process, whichJob, also = 2, 2024, -1, -1, None
+    opts, _ = getopt.getopt(sys.argv[1:], "", ["year=", "process=", "whichJob=", "group=", "also="])
     for o, a in opts:
         if o == "--year": year = int(a)
         elif o == "--process": process = int(a)
         elif o == "--whichJob": whichJob = int(a)
         elif o == "--group": group = int(a)
+        elif o == "--also": also = int(a)
     try:
         if 0 <= process < 1000:
-            run_mc(process, year, whichJob, group)
+            run_mc(process, year, whichJob, group, also)
         elif process >= 1000:
+            if also:
+                raise RuntimeError("--also is for MC only")
             run_data(process, year, whichJob, group)
     except Exception as e:
         print("FAILED {0}".format(e))

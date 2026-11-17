@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <limits>
 #include <map>
+#include <memory>
 
 #include <ROOT/RVec.hxx>
 #include <ROOT/RDataFrame.hxx>
@@ -85,7 +86,16 @@ TH2D histoTriggerDAEtaPt[10];
 TH2D histoTriggerMCEtaPt[10];
 TH1D hVV_KF_EWK[2]; // 0 (WW), 1 (WZ)
 TH1D hVV_KF_EWK_unc[2]; // 0 (WW), 1 (WZ)
-auto corrSFs = MyCorrections(2018);
+auto corrSFs_default = MyCorrections(2018);
+// Corrections per year. corrSFs is the instance of the year selected on this thread (setJSONSFsYear,
+// for a year registered with addJSONSFs) or else the default one (initJSONSFs). One RDataFrame graph
+// can so evaluate several years' calibrations (wzzAnalysis: Summer24 MC as 2024 and 2025 in one event
+// loop, each branch selecting its year before every expression). Without addJSONSFs / setJSONSFsYear
+// nothing changes: corrSFs is the default instance, as before.
+std::map<int, std::unique_ptr<MyCorrections>> corrSFs_byYear;
+thread_local MyCorrections* corrSFs_current = nullptr;
+inline MyCorrections& corrSFs_get() { return corrSFs_current ? *corrSFs_current : corrSFs_default; }
+#define corrSFs corrSFs_get()
 
 void initHisto2D(TH2D h, int nsel){
   if     (nsel ==  0) histoFakeEtaPt_mu[0] = h;
@@ -207,7 +217,19 @@ float getValFromTH2(const TH2& h, const float& x, const float& y, const float& s
 }
 
 void initJSONSFs(int year){
-  corrSFs = MyCorrections(year);
+  corrSFs_default = MyCorrections(year);
+}
+
+void addJSONSFs(int year){
+  if (corrSFs_byYear.find(year) == corrSFs_byYear.end()) corrSFs_byYear[year] = std::make_unique<MyCorrections>(year);
+}
+
+// selects a registered year's corrections on this thread (an unregistered year: the default); returns 0
+// so that it can open an RDataFrame expression
+inline int setJSONSFsYear(int year){
+  auto it = corrSFs_byYear.find(year);
+  corrSFs_current = it == corrSFs_byYear.end() ? nullptr : it->second.get();
+  return 0;
 }
 
 // PUJetID SFs
