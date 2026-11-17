@@ -77,6 +77,8 @@ def main():
     ap.add_argument("--only-samples", nargs="*", type=int)
     ap.add_argument("--missing-only", action="store_true")
     ap.add_argument("--kind", choices=("all", "mc", "data"), default="all")
+    ap.add_argument("--max-jobs-per-sample", type=int, help="test submissions: only the first N jobs of each sample")
+    ap.add_argument("--no-tarball", action="store_true", help="keep the work area's tarball as it is")
     ap.add_argument("--submit", action="store_true")
     ap.add_argument("--proxy", default="~/.wzz/x509_proxy",
                     help="grid proxy shipped with the jobs (long-lived copy of the EOS proxy; mode 600)")
@@ -104,7 +106,7 @@ def main():
         fpj = args.mc_files_per_job if s < 1000 else args.data_files_per_job
         g = max(1, math.ceil(n / fpj))
         per[(s, y)] = (n, g)
-        for j in range(g):
+        for j in range(min(g, args.max_jobs_per_sample) if args.max_jobs_per_sample else g):
             out = os.path.join(area, "output", "fillhisto_wzzAnalysis_sample{0}_year{1}_job{2}.root".format(s, y, j))
             if args.missing_only and os.path.exists(out):
                 continue
@@ -120,7 +122,7 @@ def main():
         sys.exit("no grid proxy at {0}".format(proxy))
     jdl = os.path.join(area, "submit_{0}.jdl".format(args.kind))
     open(jdl, "w").write(SUBMIT.format(area=area, proxy=proxy, jobs=jobs_file))
-    if not args.missing_only or not os.path.exists(os.path.join(area, "wzzAnalysis.tgz")):
+    if not args.no_tarball and (not args.missing_only or not os.path.exists(os.path.join(area, "wzzAnalysis.tgz"))):
         items = " ".join(TAR_ITEMS)
         subprocess.run("tar czf {0}/wzzAnalysis.tgz {1}".format(area, items), shell=True, check=True)
     nmc = sum(1 for r in jobs if r[0] < 1000)

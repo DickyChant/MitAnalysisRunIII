@@ -120,7 +120,9 @@ def define_inputs(df, year, isData):
             .Define("wzz_fj_pt", "ROOT::RVec<float>(FatJet_pt[wzz_fj])").Define("wzz_fj_eta", "ROOT::RVec<float>(FatJet_eta[wzz_fj])")
             .Define("wzz_fj_phi", "ROOT::RVec<float>(FatJet_phi[wzz_fj])").Define("wzz_fj_msd", "ROOT::RVec<float>(FatJet_msoftdrop[wzz_fj])")
             .Define("wzz_fj_vtag", "wzz::vmax(FatJet_{0}WvsQCD[wzz_fj], FatJet_{0}ZvsQCD[wzz_fj])".format(fj))
-            .Define("wzz_metsig", "(float)PuppiMET_significance"))
+            # NanoAOD v12 has no PuppiMET_significance: 0, exactly as in the BDT training inputs
+            # (nano.py falls back to 0 too); retrain without this input to drop the asymmetry
+            .Define("wzz_metsig", "(float)PuppiMET_significance" if df.HasColumn("PuppiMET_significance") else "0.f"))
     srcs = ", ".join("clean_Jet_ptJes{0:02d}Up".format(k) for k in range(28))
     # MET with the total-JES jets: the framework's propagation (makeJES: reference ptDef -> varied)
     met_unc = ("(float)compute_JSON_MET_Unc(PuppiMET_pt,PuppiMET_phi,RawPuppiMET_pt,RawPuppiMET_phi,clean_Jet_chEmEF,"
