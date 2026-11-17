@@ -42,6 +42,33 @@ status=0
 # every failure removes the outputs: condor then holds the job (no output to transfer, code 12) and
 # periodic_release retries it; a partial file must never reach output/ (the harvest would take it)
 fail() { echo "FAILED $*"; rm -f fillhisto_*.root chunk_*.root; exit 1; }
+# input check per chunk: an empty NanoAOD file (0 events) keeps only ~16 branches and breaks the TChain
+# switch in RDF (TChain::LoadTree -6, 2022 MuonEG); data lose nothing by dropping it, MC files only if
+# their Runs genEventSumw is 0 too (the normalisation is unchanged). An unreadable copy fails the job.
+cat > wzz_check_inputs.py <<'PY'
+import sys
+import ROOT
+ROOT.gErrorIgnoreLevel = ROOT.kError
+kind, lst = sys.argv[1], sys.argv[2]
+for p in [l.strip() for l in open(lst) if l.strip()]:
+    f = ROOT.TFile.Open(p)
+    ev = f.Get("Events") if f and not f.IsZombie() else None
+    if not ev:
+        sys.exit("unreadable input " + p)
+    drop = False
+    if ev.GetEntries() == 0:
+        sumw = 0.0
+        runs = f.Get("Runs")
+        if kind == "mc" and runs:
+            for r in runs:
+                sumw += getattr(r, "genEventSumw", 0.0)
+        drop = sumw == 0.0
+    if drop:
+        sys.stderr.write("dropping empty input " + p + "\n")
+    else:
+        print(p)
+    f.Close()
+PY
 if [ "${WZZ_COPY_INPUT:-1}" = 1 ]; then
   if [ $S -lt 1000 ]; then list=direct/filelists/$S.txt; kind=mc; else list=direct/filelists/data_${S}_$(( Y / 10 )).txt; kind=data; fi
   cp $list list.orig
@@ -49,7 +76,9 @@ if [ "${WZZ_COPY_INPUT:-1}" = 1 ]; then
   grep -v '^#' list.orig | awk -v j=$J -v g=$G 'NF { if (n % g == j) print; n++ }' > job_files.txt
   nc=0; nfiles=0; mbtot=0; tcopy=0; tana=0
   run_chunk() {
-    (grep '^#' list.orig; cat local.txt) > $list
+    python3 wzz_check_inputs.py $kind local.txt < /dev/null > keep.txt || fail "input check (chunk $nc)"
+    if [ ! -s keep.txt ]; then echo "chunk $nc: only empty files, skipped"; rm -rf input; mkdir -p input; : > local.txt; return 0; fi
+    (grep '^#' list.orig; cat keep.txt) > $list
     local mb=$(du -sm input | cut -f1) t1=$(date +%s)
     python3 wzzAnalysis.py --process=$S --year=$Y --whichJob=0 --group=1 < /dev/null > chunk.log
     local st=$?
@@ -84,7 +113,7 @@ if [ "${WZZ_COPY_INPUT:-1}" = 1 ]; then
   if [ -s local.txt ]; then run_chunk; fi
   echo "copied $nfiles files, $mbtot MB in $tcopy s"
   echo "analysis $tana s in $nc chunks"
-  if [ $nc = 0 ]; then fail "no files for job $J of $G"; fi
+  if [ $nc = 0 ]; then fail "no non-empty files for job $J of $G ($nfiles copied)"; fi
   if [ $nc = 1 ]; then mv chunk_0.root $out
   else python3 wzz_merge_chunks.py $out $kind chunk_*.root < /dev/null || fail "merge"
   fi
