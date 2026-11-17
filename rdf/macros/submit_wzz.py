@@ -57,16 +57,25 @@ status=0
 fail() { echo "FAILED $*"; rm -f fillhisto_*.root chunk_*.root; exit 1; }
 # input check per chunk: an empty NanoAOD file (0 events) keeps only ~16 branches and breaks the TChain
 # switch in RDF (TChain::LoadTree -6, 2022 MuonEG); data lose nothing by dropping it, MC files only if
-# their Runs genEventSumw is 0 too (the normalisation is unchanged). An unreadable copy fails the job.
+# their Runs genEventSumw is 0 too (the normalisation is unchanged). An unreadable file (not copied and
+# not streamable, or a broken copy) is dropped for MC (the job normalises to the genEventSumw of the
+# files it reads: only statistics are lost; v2c: a DYG file with no replica online) and fails a data job
+# (its luminosity would be lost silently).
 cat > wzz_check_inputs.py <<'PY'
 import sys
 import ROOT
 ROOT.gErrorIgnoreLevel = ROOT.kError
 kind, lst = sys.argv[1], sys.argv[2]
 for p in [l.strip() for l in open(lst) if l.strip()]:
-    f = ROOT.TFile.Open(p)
+    try:
+        f = ROOT.TFile.Open(p)
+    except OSError:                   # recent PyROOT raises instead of returning a null file
+        f = None
     ev = f.Get("Events") if f and not f.IsZombie() else None
     if not ev:
+        if kind == "mc":
+            sys.stderr.write("dropping unreadable MC input " + p + "\n")
+            continue
         sys.exit("unreadable input " + p)
     drop = False
     if ev.GetEntries() == 0:
@@ -90,6 +99,8 @@ if [ "${WZZ_COPY_INPUT:-1}" = 1 ]; then
   nc=0; nfiles=0; nstream=0; mbtot=0; tcopy=0; declare -A tana
   run_chunk() {
     python3 wzz_check_inputs.py $kind local.txt < /dev/null > keep.txt || fail "input check (chunk $nc)"
+    local nd=$(( $(wc -l < local.txt) - $(wc -l < keep.txt) ))
+    if [ $nd -gt 0 ]; then echo "chunk $nc: dropped $nd empty or unreadable input(s) (see stderr)"; fi
     if [ ! -s keep.txt ]; then echo "chunk $nc: only empty files, skipped"; rm -rf input; mkdir -p input; : > local.txt; return 0; fi
     (grep '^#' list.orig; cat keep.txt) > $list
     local mb=$(du -sm input | cut -f1) yr tlog=""
