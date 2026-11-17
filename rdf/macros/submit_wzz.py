@@ -50,6 +50,7 @@ log = {area}/logs/$(sample)_$(year)_$(job).log
 output = {area}/logs/$(sample)_$(year)_$(job).out
 error = {area}/logs/$(sample)_$(year)_$(job).err
 use_x509userproxy = True
+x509userproxy = {proxy}
 max_retries = 2
 queue sample, year, job, group from {area}/jobs.txt
 """
@@ -72,6 +73,8 @@ def main():
     ap.add_argument("--only-samples", nargs="*", type=int)
     ap.add_argument("--missing-only", action="store_true")
     ap.add_argument("--submit", action="store_true")
+    ap.add_argument("--proxy", default="~/.wzz/x509_proxy",
+                    help="grid proxy shipped with the jobs (long-lived copy of the EOS proxy; mode 600)")
     args = ap.parse_args()
     area = os.path.join(args.base, args.tag)
     for d in ("output", "logs"):
@@ -104,7 +107,10 @@ def main():
             f.write("{0} {1} {2} {3}\n".format(*r))
     open(os.path.join(area, "wzz_condor.sh"), "w").write(WRAPPER)
     os.chmod(os.path.join(area, "wzz_condor.sh"), 0o755)
-    open(os.path.join(area, "submit.jdl"), "w").write(SUBMIT.format(area=area))
+    proxy = os.path.expanduser(args.proxy)
+    if not os.path.exists(proxy):
+        sys.exit("no grid proxy at {0}".format(proxy))
+    open(os.path.join(area, "submit.jdl"), "w").write(SUBMIT.format(area=area, proxy=proxy))
     if not args.missing_only or not os.path.exists(os.path.join(area, "wzzAnalysis.tgz")):
         items = " ".join(TAR_ITEMS)
         subprocess.run("tar czf {0}/wzzAnalysis.tgz {1}".format(area, items), shell=True, check=True)
