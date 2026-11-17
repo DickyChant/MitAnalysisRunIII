@@ -74,7 +74,7 @@ if [ "${WZZ_COPY_INPUT:-1}" = 1 ]; then
   cp $list list.orig
   # the job's files: groupFiles stride (files[job::group])
   grep -v '^#' list.orig | awk -v j=$J -v g=$G 'NF { if (n % g == j) print; n++ }' > job_files.txt
-  nc=0; nfiles=0; mbtot=0; tcopy=0; tana=0
+  nc=0; nfiles=0; nstream=0; mbtot=0; tcopy=0; tana=0
   run_chunk() {
     python3 wzz_check_inputs.py $kind local.txt < /dev/null > keep.txt || fail "input check (chunk $nc)"
     if [ ! -s keep.txt ]; then echo "chunk $nc: only empty files, skipped"; rm -rf input; mkdir -p input; : > local.txt; return 0; fi
@@ -99,19 +99,20 @@ if [ "${WZZ_COPY_INPUT:-1}" = 1 ]; then
     lfn="/store/${f#*/store/}"
     sz=$(timeout 120 xrdfs cmsxrootd.fnal.gov stat "$lfn" < /dev/null 2>/dev/null | awk '/Size:/ {print $2}')
     tmo=$(( 300 + ${sz:-4000000000} / 2000000 ))
-    for src in "$f" "${f/cmsxrootd.fnal.gov/cms-xrd-global.cern.ch}" "$f" "${f/cmsxrootd.fnal.gov/cms-xrd-global.cern.ch}"; do
+    for src in "$f" "${f/cmsxrootd.fnal.gov/cms-xrd-global.cern.ch}"; do
       t2=$(date +%s); timeout $tmo xrdcp -s -f "$src" "$lf" < /dev/null; xs=$?
       [ $xs = 0 ] && { ok=1; break; }
       echo "copy attempt failed: status $xs (124 = deadline $tmo s, i.e. < 2 MB/s) after $(( $(date +%s) - t2 )) s: $src"
       rm -f "$lf"; sleep 20
     done
-    [ $ok = 1 ] || fail "copy $f"
     tcopy=$((tcopy + $(date +%s) - t1)); nfiles=$((nfiles + 1))
-    echo "$lf" >> local.txt
+    # a file that cannot be copied is streamed by its chunk instead of failing the job (v2: 5-6 h jobs
+    # lost to one file on their last copy); an unreadable stream still fails (input check, wzzAnalysis)
+    if [ $ok = 1 ]; then echo "$lf" >> local.txt; else echo "streaming instead: $f"; echo "$f" >> local.txt; nstream=$((nstream + 1)); fi
     if [ $(du -sm input | cut -f1) -ge ${WZZ_CHUNK_MB:-6000} ]; then run_chunk; fi
   done
   if [ -s local.txt ]; then run_chunk; fi
-  echo "copied $nfiles files, $mbtot MB in $tcopy s"
+  echo "copied $nfiles files, $mbtot MB in $tcopy s ($nstream streamed)"
   echo "analysis $tana s in $nc chunks"
   if [ $nc = 0 ]; then fail "no non-empty files for job $J of $G ($nfiles copied)"; fi
   if [ $nc = 1 ]; then mv chunk_0.root $out
@@ -148,7 +149,7 @@ log = {area}/logs/$(sample)_$(year)_$(job).log
 output = {area}/logs/$(sample)_$(year)_$(job).out
 error = {area}/logs/$(sample)_$(year)_$(job).err
 +REQUIRED_OS = "rhel9"
-use_x509userproxy = True
+{sites}use_x509userproxy = True
 x509userproxy = {proxy}
 max_retries = 2
 # a failed payload leaves no output: condor then holds the job (output transfer, code 12) before
@@ -185,6 +186,8 @@ def main():
     ap.add_argument("--stream", action="store_true", help="stream the inputs with xrootd instead of copying them")
     ap.add_argument("--chunk-mb", type=int, default=6000, help="copy mode: inputs held on the worker per chunk (MiB)")
     ap.add_argument("--disk", type=int, default=12, help="request_disk in GB (copy mode: chunk + largest file + 3)")
+    ap.add_argument("--sites", help="comma-separated +DESIRED_Sites (default: CMS Connect's, all sites). v2: copies ran at "
+                                    "30-55 MB/s at the US T1/T2s vs 11-17 at JINR/CNAF, where the slowest jobs ran")
     ap.add_argument("--jobs-list", help="explicit 'sample year job group' rows (benchmarks), instead of the config")
     ap.add_argument("--name", help="label of the jobs_<name>.txt / submit_<name>.jdl files (default: --kind)")
     ap.add_argument("--submit", action="store_true")
@@ -251,7 +254,8 @@ def main():
         sys.exit("no grid proxy at {0}".format(proxy))
     jdl = os.path.join(area, "submit_{0}.jdl".format(name))
     open(jdl, "w").write(SUBMIT.format(area=area, proxy=proxy, jobs=jobs_file, maxwall=args.max_wall,
-                                         disk=args.disk, copy=0 if args.stream else 1, chunk_mb=args.chunk_mb))
+                                         disk=args.disk, copy=0 if args.stream else 1, chunk_mb=args.chunk_mb,
+                                         sites='+DESIRED_Sites = "{0}"\n'.format(args.sites) if args.sites else ""))
     if not args.no_tarball and (not args.missing_only or not os.path.exists(os.path.join(area, "wzzAnalysis.tgz"))):
         items = " ".join(TAR_ITEMS)
         subprocess.run("tar czf {0}/.wzzAnalysis.tgz.new {1} && gzip -t {0}/.wzzAnalysis.tgz.new && "
