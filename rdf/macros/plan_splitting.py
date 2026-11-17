@@ -19,7 +19,9 @@ but at least --copy-floor (the copy speed depends on the site pair, not on the s
 (--history): rate = (wall - overhead) / bytes of the job's files, the job's bytes being its file
 share of the list's DAS total (stride grouping: representative files).
 The njobs per (list, year) are resolved at submission (njobs()); the JSON is the bookkeeping kept
-next to the file lists (direct/splitting.json).
+next to the file lists (direct/splitting.json). A Summer24 MC job run for 20240 and 20250 in one pass
+(job config "+20250") is planned with the sum of the two years' analysis rates and one copy; its log
+times the second year on an "analysis[<year>] <s> s" line, read as that year's rate.
 """
 import argparse
 import glob
@@ -94,6 +96,10 @@ def main():
         add(s, y, max(ana_s / 60.0, 1.0) / gb, copy_min_per_gb=round(copy_s / 60.0 / gb, 3),
             analysis_min=round(ana_s / 60, 1), copy_min=round(copy_s / 60, 1), job_gb=round(gb, 2),
             site=site.group(1) if site else None)
+        # a two-year job (wrapper $5) also times the second year on the same copy: its own rate
+        for y2, ana2 in re.findall(r"^analysis\[(\d+)\] (\d+) s", txt, re.M):
+            add(s, int(y2), max(int(ana2) / 60.0, 1.0) / gb, analysis_min=round(int(ana2) / 60, 1),
+                job_gb=round(gb, 2), site=site.group(1) if site else None, one_pass_with=y)
     split = {}
     for name in sorted(os.listdir(args.filelists)):
         m = re.match(r"(data_(\d+)_(\d{4})|(\d+))\.txt$", name)
@@ -143,12 +149,16 @@ def job_minutes(splitting, gb, rate):
     return m
 
 
-def njobs(splitting, name, sample, year):
-    """Jobs for one (list, year) from a splitting.json: the fewest with every job <= plan minutes."""
+def njobs(splitting, name, sample, year, also=None):
+    """Jobs for one (list, year) from a splitting.json: the fewest with every job <= plan minutes.
+    also: second year analysed from the same copy (submit_wzz "+<year>" rows): the analysis rates
+    add up, the copy is paid once."""
     e = splitting["lists"].get(name)
     if not e:
         return None
     rate = rate_for(splitting, name, sample, year)
+    if also is not None:
+        rate += rate_for(splitting, name, sample, also)
     n = max(1, math.ceil(e["files"] / splitting.get("max_files_per_job", 150)))
     while n < e["files"] and job_minutes(splitting, e["gb"] / n, rate) > splitting["plan_min"]:
         n += 1

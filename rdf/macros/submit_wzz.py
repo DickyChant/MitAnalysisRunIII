@@ -5,6 +5,12 @@ Run in rdf/macros/ after make_filelists.py.
     python3 submit_wzz.py --tag <tag> --kind mc|data --splitting direct/splitting.json [--max-wall 480] \\
         [--chunk-mb 5000] [--disk 12] [--no-tarball] [--only-years 20240 ...] [--only-samples 516 ...] [--submit]
 
+Job config rows "<sample> <year>"; "<sample> 20240 +20250" (Summer24 MC) is one job per file group that
+copies the files once and runs wzzAnalysis for 2024 and for 2025 (each with its own calibrations),
+delivering both outputs (jobs_<name>_dual.txt, second queue block of the submit file). v2 and earlier
+ran them as separate jobs: top-ups of those areas use their own config (direct/v2_jobs.cfg), since the
+job split differs.
+
 Without --submit only the work area is prepared (tarball, wrapper, jobs.txt, submit file) and
 the job count is printed. Work area: <base>/<tag>/ with output/ (fillhisto files, per-job
 normalised: harvest with wvz wzz/harvest.py), logs/. +REQUIRED_OS = "rhel9": the CMS Connect
@@ -19,7 +25,9 @@ import re
 import subprocess
 import sys
 
-ROW = re.compile(r"^\s*(\d+)\s+(\d+)\s*(no)?\s*$")
+# job config row: "<sample> <year> [+<second year>] [no]"; "+20250" on a Summer24 MC row (year 20240) runs the
+# 2025 normalisation and calibrations on the same copy of the files (one job, two outputs)
+ROW = re.compile(r"^\s*(?P<sample>\d+)\s+(?P<year>\d+)(?:\s+\+(?P<also>\d+))?\s*(?P<no>no)?\s*$")
 WRAPPER = r"""#!/bin/bash
 # wzzAnalysis condor payload: $1 sample, $2 year, $3 job, $4 group (number of jobs of the sample)
 # WZZ_COPY_INPUT=1 (default): the job's files are xrdcp'd to the worker in chunks of >= WZZ_CHUNK_MB,
@@ -27,7 +35,11 @@ WRAPPER = r"""#!/bin/bash
 # merged with the harvest's weights (wzz_merge_chunks.py). Streamed jobs were read-bound (test3:
 # ~3% CPU efficiency; the same jobs copied first ran 25-40x faster with identical histograms).
 # WZZ_COPY_INPUT=0: stream with xrootd.
-S=$1; Y=$2; J=$3; G=$4
+# $5 (optional) a second year code for the same MC files, e.g. 20250 for the Summer24 samples run as
+# 20240: each chunk is analysed for both years on the local copy (the input is copied once) and the
+# job delivers two outputs. The two years differ in calibrations (JEC/JER, veto maps, PU, SFs: one
+# year's corrections per process in the framework), hence one wzzAnalysis run per year.
+S=$1; Y=$2; J=$3; G=$4; ALSO=${5:-}
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 export SCRAM_ARCH=el9_amd64_gcc12
 scramv1 project CMSSW CMSSW_14_1_4 > /dev/null 2>&1
@@ -36,8 +48,9 @@ tar xzf wzzAnalysis.tgz || { echo "FAILED untar"; exit 1; }
 export USE_DIRECT_NANOAOD=1 FILELIST_DIR=direct/filelists
 export XRD_NETWORKSTACK=IPv4 XRD_REQUESTTIMEOUT=600 XRD_REDIRECTLIMIT=255 XRD_CONNECTIONRETRY=4 XRD_STREAMTIMEOUT=120
 echo "host $(hostname) site ${GLIDEIN_CMSSite:-unknown} cpu $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2) args $@"
-out=fillhisto_wzzAnalysis_sample${S}_year${Y}_job${J}.root
-one=fillhisto_wzzAnalysis_sample${S}_year${Y}_job0.root
+years="$Y $ALSO"
+outof() { echo fillhisto_wzzAnalysis_sample${S}_year$1_job$2.root; }
+out=$(outof $Y $J)
 status=0
 # every failure removes the outputs: condor then holds the job (no output to transfer, code 12) and
 # periodic_release retries it; a partial file must never reach output/ (the harvest would take it)
@@ -74,21 +87,25 @@ if [ "${WZZ_COPY_INPUT:-1}" = 1 ]; then
   cp $list list.orig
   # the job's files: groupFiles stride (files[job::group])
   grep -v '^#' list.orig | awk -v j=$J -v g=$G 'NF { if (n % g == j) print; n++ }' > job_files.txt
-  nc=0; nfiles=0; nstream=0; mbtot=0; tcopy=0; tana=0
+  nc=0; nfiles=0; nstream=0; mbtot=0; tcopy=0; declare -A tana
   run_chunk() {
     python3 wzz_check_inputs.py $kind local.txt < /dev/null > keep.txt || fail "input check (chunk $nc)"
     if [ ! -s keep.txt ]; then echo "chunk $nc: only empty files, skipped"; rm -rf input; mkdir -p input; : > local.txt; return 0; fi
     (grep '^#' list.orig; cat keep.txt) > $list
-    local mb=$(du -sm input | cut -f1) t1=$(date +%s)
-    python3 wzzAnalysis.py --process=$S --year=$Y --whichJob=0 --group=1 < /dev/null > chunk.log
-    local st=$?
-    cat chunk.log
-    # wzzAnalysis prints FAILED on an exception and may still leave an (empty) output file
-    if [ $st -ne 0 ] || grep -q "^FAILED" chunk.log || [ ! -s $one ]; then fail "chunk $nc: wzzAnalysis status $st"; fi
-    mv $one chunk_$nc.root
-    local ta=$(( $(date +%s) - t1 ))
-    echo "chunk $nc: $(wc -l < local.txt) files, $mb MB, analysis $ta s"
-    tana=$((tana + ta)); mbtot=$((mbtot + mb)); nc=$((nc + 1))
+    local mb=$(du -sm input | cut -f1) yr tlog=""
+    for yr in $years; do
+      local t1=$(date +%s) one=$(outof $yr 0)
+      python3 wzzAnalysis.py --process=$S --year=$yr --whichJob=0 --group=1 < /dev/null > chunk.log
+      local st=$?
+      cat chunk.log
+      # wzzAnalysis prints FAILED on an exception and may still leave an (empty) output file
+      if [ $st -ne 0 ] || grep -q "^FAILED" chunk.log || [ ! -s $one ]; then fail "chunk $nc year $yr: wzzAnalysis status $st"; fi
+      mv $one chunk_${yr}_$nc.root
+      local ta=$(( $(date +%s) - t1 ))
+      tana[$yr]=$(( ${tana[$yr]:-0} + ta )); tlog="$tlog, analysis $ta s ($yr)"
+    done
+    echo "chunk $nc: $(wc -l < local.txt) files, $mb MB$tlog"
+    mbtot=$((mbtot + mb)); nc=$((nc + 1))
     rm -rf input; mkdir -p input; : > local.txt
   }
   mkdir -p input; : > local.txt
@@ -113,28 +130,35 @@ if [ "${WZZ_COPY_INPUT:-1}" = 1 ]; then
   done
   if [ -s local.txt ]; then run_chunk; fi
   echo "copied $nfiles files, $mbtot MB in $tcopy s ($nstream streamed)"
-  echo "analysis $tana s in $nc chunks"
+  # one line per year: "analysis <s> s in <n> chunks" for $Y (plan_splitting.py reads the first),
+  # "analysis[<year>] <s> s ..." for the second year
+  echo "analysis ${tana[$Y]:-0} s in $nc chunks"
+  if [ -n "$ALSO" ]; then echo "analysis[$ALSO] ${tana[$ALSO]:-0} s in $nc chunks"; fi
   if [ $nc = 0 ]; then fail "no non-empty files for job $J of $G ($nfiles copied)"; fi
-  if [ $nc = 1 ]; then mv chunk_0.root $out
-  else python3 wzz_merge_chunks.py $out $kind chunk_*.root < /dev/null || fail "merge"
-  fi
+  for yr in $years; do
+    if [ $nc = 1 ]; then mv chunk_${yr}_0.root $(outof $yr $J)
+    else python3 wzz_merge_chunks.py $(outof $yr $J) $kind chunk_${yr}_*.root < /dev/null || fail "merge $yr"
+    fi
+  done
   rm -rf input chunk_*.root
 else
-  t1=$(date +%s)
-  python3 wzzAnalysis.py --process=$S --year=$Y --whichJob=$J --group=$G < /dev/null > run.log
-  status=$?
-  cat run.log
-  if grep -q "^FAILED" run.log; then status=1; fi
-  echo "analysis $(( $(date +%s) - t1 )) s"
+  for yr in $years; do
+    t1=$(date +%s)
+    python3 wzzAnalysis.py --process=$S --year=$yr --whichJob=$J --group=$G < /dev/null > run.log
+    st=$?
+    cat run.log
+    if [ $st -ne 0 ] || grep -q "^FAILED" run.log; then status=1; fi
+    if [ $yr = $Y ]; then echo "analysis $(( $(date +%s) - t1 )) s"; else echo "analysis[$yr] $(( $(date +%s) - t1 )) s"; fi
+  done
 fi
 times > times.txt   # (not in a pipe: a subshell would report its own, empty, child times)
 echo "cpu (user sys) of the payload: $(tail -n 1 times.txt)"
-if [ $status -ne 0 ] || [ ! -s $out ]; then fail "status=$status"; fi
+if [ $status -ne 0 ]; then fail "status=$status"; fi
+for yr in $years; do [ -s $(outof $yr $J) ] || fail "no output for year $yr"; done
 echo DONE
 """
 SUBMIT = """universe = vanilla
 executable = {area}/wzz_condor.sh
-arguments = $(sample) $(year) $(job) $(group)
 request_memory = 4000
 +MaxWallTimeMins = {maxwall}
 request_cpus = 1
@@ -143,8 +167,6 @@ environment = "WZZ_COPY_INPUT={copy} WZZ_CHUNK_MB={chunk_mb}"
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 transfer_input_files = {area}/wzzAnalysis.tgz
-transfer_output_files = fillhisto_wzzAnalysis_sample$(sample)_year$(year)_job$(job).root
-transfer_output_remaps = "fillhisto_wzzAnalysis_sample$(sample)_year$(year)_job$(job).root = {area}/output/fillhisto_wzzAnalysis_sample$(sample)_year$(year)_job$(job).root"
 log = {area}/logs/$(sample)_$(year)_$(job).log
 output = {area}/logs/$(sample)_$(year)_$(job).out
 error = {area}/logs/$(sample)_$(year)_$(job).err
@@ -156,8 +178,19 @@ max_retries = 2
 # max_retries applies; 26: site policy (v2: CPU usage above the request with implicit MT, now off).
 # Release such holds up to 3 starts, later ones stay held for inspection
 periodic_release = (HoldReasonCode == 12 || HoldReasonCode == 13 || HoldReasonCode == 26) && (NumJobStarts < 3)
-queue sample, year, job, group from {jobs}
 """
+OUT = "fillhisto_wzzAnalysis_sample$(sample)_year$({year})_job$(job).root"
+QUEUE_SINGLE = """arguments = $(sample) $(year) $(job) $(group)
+transfer_output_files = {o}
+transfer_output_remaps = "{o} = {area}/output/{o}"
+queue sample, year, job, group from {jobs}
+""".format(o=OUT.format(year="year"), area="{area}", jobs="{jobs}")
+# one copy of the inputs, two years (wrapper $5): both outputs come back
+QUEUE_DUAL = """arguments = $(sample) $(year) $(job) $(group) $(also)
+transfer_output_files = {o},{o2}
+transfer_output_remaps = "{o} = {area}/output/{o}; {o2} = {area}/output/{o2}"
+queue sample, year, job, group, also from {jobs}
+""".format(o=OUT.format(year="year"), o2=OUT.format(year="also"), area="{area}", jobs="{jobs}")
 # every local header (functions.h -> mysf.h -> muonCrystalBall.h, ...): a missing one only shows up on
 # the worker nodes (the pilot failed on muonCrystalBall.h); utils*.py are the only local Python modules
 TAR_ITEMS = ["wzzAnalysis.py", "wzz_merge_chunks.py", "*.h", "utils*.py", "tmva_helper_xml.*", "data", "jsns", "config",
@@ -188,7 +221,8 @@ def main():
     ap.add_argument("--disk", type=int, default=12, help="request_disk in GB (copy mode: chunk + largest file + 3)")
     ap.add_argument("--sites", help="comma-separated +DESIRED_Sites (default: CMS Connect's, all sites). v2: copies ran at "
                                     "30-55 MB/s at the US T1/T2s vs 11-17 at JINR/CNAF, where the slowest jobs ran")
-    ap.add_argument("--jobs-list", help="explicit 'sample year job group' rows (benchmarks), instead of the config")
+    ap.add_argument("--jobs-list", help="explicit 'sample year job group [second year]' rows (benchmarks, duplicates), "
+                                        "instead of the config")
     ap.add_argument("--name", help="label of the jobs_<name>.txt / submit_<name>.jdl files (default: --kind)")
     ap.add_argument("--submit", action="store_true")
     ap.add_argument("--proxy", default="~/.wzz/x509_proxy",
@@ -202,19 +236,23 @@ def main():
         import json
         from plan_splitting import njobs as plan_njobs
         splitting = json.load(open(args.splitting))
-    jobs, per = [], {}
+    jobs, per = [], {}     # jobs: (sample, year, job, group, second year or None)
     if args.jobs_list:
         for line in open(args.jobs_list):
             if line.strip() and not line.startswith("#"):
-                s, y, j, g = (int(x) for x in line.split()[:4])
-                jobs.append((s, y, j, g))
-                per[(s, y)] = (0, g)
+                p = [int(x) for x in line.split()[:5]]
+                jobs.append(tuple(p[:4]) + (p[4] if len(p) > 4 else None,))
+                per[(p[0], p[1])] = (0, p[3])
     for line in (open(args.config) if not args.jobs_list else []):
         m = ROW.match(line)
-        if not m or m.group(3):
+        if not m or m.group("no"):
             continue
-        s, y = int(m.group(1)), int(m.group(2))
-        if (args.only_years and y not in args.only_years) or (args.only_samples and s not in args.only_samples):
+        s, y = int(m.group("sample")), int(m.group("year"))
+        also = int(m.group("also")) if m.group("also") else None
+        if also is not None and s >= 1000:
+            sys.exit("a second year is for MC rows only: " + line.strip())
+        if (args.only_years and y not in args.only_years and also not in args.only_years) or \
+                (args.only_samples and s not in args.only_samples):
             continue
         if (args.kind == "mc" and s >= 1000) or (args.kind == "data" and s < 1000):
             continue
@@ -228,22 +266,33 @@ def main():
         fpj = args.mc_files_per_job if s < 1000 else args.data_files_per_job
         g = max(1, math.ceil(n / fpj))
         if splitting is not None:
-            gs = plan_njobs(splitting, os.path.basename(fl), s, y)
+            gs = plan_njobs(splitting, os.path.basename(fl), s, y, also)
             if gs is None:
                 print("WARNING: no splitting entry for", fl, "-> files per job", fpj)
             else:
                 g = gs
         per[(s, y)] = (n, g)
         for j in range(min(g, args.max_jobs_per_sample) if args.max_jobs_per_sample else g):
-            out = os.path.join(area, "output", "fillhisto_wzzAnalysis_sample{0}_year{1}_job{2}.root".format(s, y, j))
-            if args.missing_only and os.path.exists(out):
+            outs = [os.path.join(area, "output", "fillhisto_wzzAnalysis_sample{0}_year{1}_job{2}.root".format(s, yr, j))
+                    for yr in (y, also) if yr is not None]
+            # a two-year job reruns when either output is missing (it rewrites both)
+            if args.missing_only and all(os.path.exists(o) for o in outs):
                 continue
-            jobs.append((s, y, j, g))
+            jobs.append((s, y, j, g, also))
     name = args.name or args.kind
     jobs_file = os.path.join(area, "jobs_{0}.txt".format(name))
+    dual_file = os.path.join(area, "jobs_{0}_dual.txt".format(name))
+    single = [r for r in jobs if r[4] is None]
+    dual = [r for r in jobs if r[4] is not None]
     with open(jobs_file, "w") as f:
-        for r in jobs:
+        for r in single:
             f.write("{0} {1} {2} {3}\n".format(*r))
+    if dual:
+        with open(dual_file, "w") as f:
+            for r in dual:
+                f.write("{0} {1} {2} {3} {4}\n".format(*r))
+    elif os.path.exists(dual_file):
+        os.remove(dual_file)
     # written aside and renamed: queued jobs of running clusters read the wrapper / tarball at start
     tmp = os.path.join(area, ".wzz_condor.sh.new")
     open(tmp, "w").write(WRAPPER)
@@ -253,16 +302,18 @@ def main():
     if not os.path.exists(proxy):
         sys.exit("no grid proxy at {0}".format(proxy))
     jdl = os.path.join(area, "submit_{0}.jdl".format(name))
-    open(jdl, "w").write(SUBMIT.format(area=area, proxy=proxy, jobs=jobs_file, maxwall=args.max_wall,
-                                         disk=args.disk, copy=0 if args.stream else 1, chunk_mb=args.chunk_mb,
-                                         sites='+DESIRED_Sites = "{0}"\n'.format(args.sites) if args.sites else ""))
+    open(jdl, "w").write(SUBMIT.format(area=area, proxy=proxy, maxwall=args.max_wall,
+                                       disk=args.disk, copy=0 if args.stream else 1, chunk_mb=args.chunk_mb,
+                                       sites='+DESIRED_Sites = "{0}"\n'.format(args.sites) if args.sites else "")
+                         + (QUEUE_SINGLE.format(area=area, jobs=jobs_file) if single else "")
+                         + (QUEUE_DUAL.format(area=area, jobs=dual_file) if dual else ""))
     if not args.no_tarball and (not args.missing_only or not os.path.exists(os.path.join(area, "wzzAnalysis.tgz"))):
         items = " ".join(TAR_ITEMS)
         subprocess.run("tar czf {0}/.wzzAnalysis.tgz.new {1} && gzip -t {0}/.wzzAnalysis.tgz.new && "
                        "mv {0}/.wzzAnalysis.tgz.new {0}/wzzAnalysis.tgz".format(area, items), shell=True, check=True)
     nmc = sum(1 for r in jobs if r[0] < 1000)
-    print("samples {0}  jobs {1} (MC {2}, data {3})  files {4}".format(
-        len(per), len(jobs), nmc, len(jobs) - nmc, sum(n for n, _ in per.values())))
+    print("samples {0}  jobs {1} (MC {2}, data {3}; {4} of them write two years)  files {5}".format(
+        len(per), len(jobs), nmc, len(jobs) - nmc, len(dual), sum(n for n, _ in per.values())))
     print("work area", area)
     if args.submit:
         # CMS Connect's condor_submit checks X509_USER_PROXY (default /tmp/x509up_u<uid>) and tries an

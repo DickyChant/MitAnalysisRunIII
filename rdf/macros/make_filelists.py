@@ -16,7 +16,8 @@ import re
 import subprocess
 import sys
 
-ROW = re.compile(r"^\s*(\d+)\s+(\d+)\s*(no)?\s*$")
+# "<sample> <year> [+<second year>] [no]" (submit_wzz.ROW; the second year reads the same files)
+ROW = re.compile(r"^\s*(\d+)\s+(\d+)(?:\s+\+\d+)?\s*(no)?\s*$")
 
 
 def das_name(dirname, tier):
